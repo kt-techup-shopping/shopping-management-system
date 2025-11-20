@@ -26,6 +26,8 @@ public class UserService {
 	private final PasswordEncoder passwordEncoder;
 
 	public void create(UserRequest.Create request) {
+		Preconditions.validate(!userRepository.existsByLoginId(request.loginId()), ErrorCode.EXIST_USER);
+
 		var newUser = User.normalUser(
 			request.loginId(),
 			UUID.randomUUID(),

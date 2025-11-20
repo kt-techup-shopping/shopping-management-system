@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.shop.domain.user.model.User;
+import com.shop.domain.user.request.UserUpdateRequest;
 import com.shop.domain.user.service.UserService;
 import com.shop.global.common.ApiResult;
 import com.shop.domain.user.request.UserRequest;
@@ -70,5 +71,16 @@ public class UserController {
 		var user = userService.detail(currentUser.getId());
 
 		return ApiResult.ok(user);
+	}
+
+	@PutMapping("/my-info")
+	@ResponseStatus(HttpStatus.OK)
+	public ApiResult<Void> updateMyInfo(
+		@AuthenticationPrincipal CurrentUser currentUser,
+		@RequestBody @Valid UserUpdateRequest request
+	) {
+		userService.update(currentUser.getId(), request.name(), request.email(), request.mobile());
+
+		return ApiResult.ok();
 	}
 }

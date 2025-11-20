@@ -74,8 +74,6 @@ class OrderServiceTest {
 				"010-0000-0000",
 				Gender.MALE,
 				LocalDate.now(),
-				LocalDateTime.now(),
-				LocalDateTime.now(),
 				Role.USER,
 				Status.ACTIVATED
 			)
@@ -121,8 +119,6 @@ class OrderServiceTest {
 				"010-0000-000" + i,
 				Gender.MALE,
 				LocalDate.now(),
-				LocalDateTime.now(),
-				LocalDateTime.now(),
 				Role.USER,
 				Status.ACTIVATED
 			));

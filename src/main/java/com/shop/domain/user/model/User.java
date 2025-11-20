@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.hibernate.annotations.UuidGenerator;
+
 import com.shop.global.common.BaseEntity;
 import com.shop.domain.order.model.Order;
 
@@ -38,7 +40,7 @@ public class User extends BaseEntity {
 	private List<Order> orders = new ArrayList<>();
 
 	public User(String loginId, UUID uuid, String password, String name, String email, String mobile, Gender gender,
-		LocalDate birthday, LocalDateTime createdAt, LocalDateTime updatedAt, Role role, Status status) {
+		LocalDate birthday, Role role, Status status) {
 		this.loginId = loginId;
 		this.uuid = uuid;
 		this.password = password;
@@ -47,14 +49,12 @@ public class User extends BaseEntity {
 		this.mobile = mobile;
 		this.gender = gender;
 		this.birthday = birthday;
-		this.createdAt = createdAt;
-		this.updatedAt = updatedAt;
 		this.status = status;
 	}
 
 	public static User normalUser(String loginId, UUID uuid, String password, String name, String email, String mobile,
 		Gender gender,
-		LocalDate birthday, LocalDateTime createdAt, LocalDateTime updatedAt, Status status) {
+		LocalDate birthday, Status status) {
 		return new User(
 			loginId,
 			uuid,
@@ -64,8 +64,6 @@ public class User extends BaseEntity {
 			mobile,
 			gender,
 			birthday,
-			createdAt,
-			updatedAt,
 			Role.USER,
 			status
 		);
@@ -94,5 +92,10 @@ public class User extends BaseEntity {
 		this.name = name;
 		this.email = email;
 		this.mobile = mobile;
+	}
+
+	public void withdrawal() {
+		this.status = Status.IN_ACTIVATED;
+		this.isDeleted = true;
 	}
 }

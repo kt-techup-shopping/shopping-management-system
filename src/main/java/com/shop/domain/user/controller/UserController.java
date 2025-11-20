@@ -83,4 +83,14 @@ public class UserController {
 
 		return ApiResult.ok();
 	}
+
+	@PostMapping("/withdrawal")
+	@ResponseStatus(HttpStatus.OK)
+	public ApiResult<Void> withdrawal(
+		@AuthenticationPrincipal CurrentUser currentUser
+	) {
+		userService.delete(currentUser.getId());
+
+		return ApiResult.ok();
+	}
 }

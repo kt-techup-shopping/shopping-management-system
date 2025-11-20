@@ -35,8 +35,6 @@ public class UserService {
 			request.mobile(),
 			request.gender(),
 			request.birthday(),
-			LocalDateTime.now(),
-			LocalDateTime.now(),
 			Status.ACTIVATED
 		);
 
@@ -71,6 +69,8 @@ public class UserService {
 	}
 
 	public void delete(Long id) {
-		userRepository.deleteById(id);
+		var user = userRepository.findByIdOrThrow(id, ErrorCode.NOT_FOUND_USER);
+
+		user.withdrawal();
 	}
 }

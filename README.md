@@ -104,7 +104,6 @@ com.shop
 애플리케이션 실행 후 다음 URL에서 API 문서를 확인할 수 있습니다:
 - http://localhost:8080/swagger-ui.html
 
-
 ## 주요 기능 (기능 추가 예정)
 ````
 쇼핑몰 백엔드 – 기능 명세서

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import com.shop.global.common.BaseEntity;
 import com.shop.domain.order.model.Order;
@@ -15,56 +16,54 @@ import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-// 1. domain과 entity를 분리해야
-// 2. 굳이? 같이쓰지뭐
 @Getter
 @Entity
 @NoArgsConstructor
 public class User extends BaseEntity {
 	private String loginId;
+	private UUID uuid;
 	private String password;
 	private String name;
 	private String email;
 	private String mobile;
-	// ordinal : enum의 순서를 DB에 저장 => 절대 사용하지마세욤
-	// string : enum의 값 DB에 저장
 	@Enumerated(EnumType.STRING)
 	private Gender gender;
 	private LocalDate birthday;
-
 	@Enumerated(EnumType.STRING)
 	private Role role;
+	@Enumerated(EnumType.STRING)
+	private Status status;
 
 	@OneToMany(mappedBy = "user")
 	private List<Order> orders = new ArrayList<>();
 
-	public User(String loginId, String password, String name, String email, String mobile, Gender gender,
-		LocalDate birthday, LocalDateTime createdAt, LocalDateTime updatedAt, Role role) {
+	public User(String loginId, UUID uuid, String password, String name, String email, String mobile, Gender gender,
+		LocalDate birthday, Role role, Status status) {
 		this.loginId = loginId;
+		this.uuid = uuid;
 		this.password = password;
 		this.name = name;
 		this.email = email;
 		this.mobile = mobile;
 		this.gender = gender;
 		this.birthday = birthday;
-		this.createdAt = createdAt;
-		this.updatedAt = updatedAt;
+		this.status = status;
 	}
 
-	public static User normalUser(String loginId, String password, String name, String email, String mobile,
+	public static User normalUser(String loginId, UUID uuid, String password, String name, String email, String mobile,
 		Gender gender,
-		LocalDate birthday, LocalDateTime createdAt, LocalDateTime updatedAt) {
+		LocalDate birthday, Status status) {
 		return new User(
 			loginId,
+			uuid,
 			password,
 			name,
 			email,
 			mobile,
 			gender,
 			birthday,
-			createdAt,
-			updatedAt,
-			Role.USER
+			Role.USER,
+			status
 		);
 	}
 
@@ -91,5 +90,10 @@ public class User extends BaseEntity {
 		this.name = name;
 		this.email = email;
 		this.mobile = mobile;
+	}
+
+	public void delete() {
+		this.status = Status.INACTIVE;
+		this.isDeleted = true;
 	}
 }

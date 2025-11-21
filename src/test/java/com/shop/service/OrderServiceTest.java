@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -18,6 +19,7 @@ import com.shop.domain.order.service.OrderService;
 import com.shop.domain.product.model.Product;
 import com.shop.domain.user.model.Gender;
 import com.shop.domain.user.model.Role;
+import com.shop.domain.user.model.Status;
 import com.shop.domain.user.model.User;
 import com.shop.domain.order.repository.OrderRepository;
 import com.shop.domain.orderproduct.repository.OrderProductRepository;
@@ -65,15 +67,15 @@ class OrderServiceTest {
 		var user = userRepository.save(
 			new User(
 				"testuser",
+				UUID.randomUUID(),
 				"password",
 				"Test User",
 				"email",
 				"010-0000-0000",
 				Gender.MALE,
 				LocalDate.now(),
-				LocalDateTime.now(),
-				LocalDateTime.now(),
-				Role.USER
+				Role.USER,
+				Status.ACTIVE
 			)
 		);
 
@@ -110,15 +112,15 @@ class OrderServiceTest {
 		for (int i = 0; i < repeatCount; i++) {
 			userList.add(new User(
 				"testuser-" + i,
+				UUID.randomUUID(),
 				"password",
 				"Test User-" + i,
 				"email-" + i,
 				"010-0000-000" + i,
 				Gender.MALE,
 				LocalDate.now(),
-				LocalDateTime.now(),
-				LocalDateTime.now(),
-				Role.USER
+				Role.USER,
+				Status.ACTIVE
 			));
 		}
 

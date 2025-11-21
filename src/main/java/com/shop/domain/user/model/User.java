@@ -10,6 +10,7 @@ import org.hibernate.annotations.UuidGenerator;
 
 import com.shop.global.common.BaseEntity;
 import com.shop.domain.order.model.Order;
+import com.shop.global.common.DeletedStatus;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -96,6 +97,6 @@ public class User extends BaseEntity {
 
 	public void withdrawal() {
 		this.status = Status.IN_ACTIVATED;
-		this.isDeleted = true;
+		this.isDeleted = DeletedStatus.T;
 	}
 }

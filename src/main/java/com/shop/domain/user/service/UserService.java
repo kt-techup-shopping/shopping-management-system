@@ -37,7 +37,7 @@ public class UserService {
 			request.mobile(),
 			request.gender(),
 			request.birthday(),
-			Status.ACTIVATED
+			Status.ACTIVE
 		);
 
 			userRepository.save(newUser);

@@ -75,7 +75,7 @@ class OrderServiceTest {
 				Gender.MALE,
 				LocalDate.now(),
 				Role.USER,
-				Status.ACTIVATED
+				Status.ACTIVE
 			)
 		);
 
@@ -120,7 +120,7 @@ class OrderServiceTest {
 				Gender.MALE,
 				LocalDate.now(),
 				Role.USER,
-				Status.ACTIVATED
+				Status.ACTIVE
 			));
 		}
 

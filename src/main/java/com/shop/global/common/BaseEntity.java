@@ -26,7 +26,9 @@ public abstract class BaseEntity {
 	@Enumerated(EnumType.STRING)
 	protected DeletedStatus isDeleted = DeletedStatus.F;
 	@CreatedDate
+	@Column(updatable = false, nullable = false)
 	protected LocalDateTime createdAt;
 	@LastModifiedDate
+	@Column(nullable = false)
 	protected LocalDateTime updatedAt;
 }

@@ -23,8 +23,7 @@ public abstract class BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	protected Long id;
-	@Enumerated(EnumType.STRING)
-	protected DeletedStatus isDeleted = DeletedStatus.F;
+	protected Boolean isDeleted = false;
 	@CreatedDate
 	@Column(updatable = false, nullable = false)
 	protected LocalDateTime createdAt;

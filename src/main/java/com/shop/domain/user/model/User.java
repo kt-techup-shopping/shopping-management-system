@@ -6,11 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.hibernate.annotations.UuidGenerator;
-
 import com.shop.global.common.BaseEntity;
 import com.shop.domain.order.model.Order;
-import com.shop.global.common.DeletedStatus;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -97,6 +94,6 @@ public class User extends BaseEntity {
 
 	public void delete() {
 		this.status = Status.INACTIVE;
-		this.isDeleted = DeletedStatus.T;
+		this.isDeleted = true;
 	}
 }

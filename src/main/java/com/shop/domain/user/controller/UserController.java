@@ -67,7 +67,6 @@ public class UserController {
 	public ApiResult<User> getMyInfo(
 		@AuthenticationPrincipal CurrentUser currentUser
 	) {
-		// TODO: 어떤 정보를 받아올 지 논의
 		var user = userService.detail(currentUser.getId());
 
 		return ApiResult.ok(user);
@@ -75,7 +74,7 @@ public class UserController {
 
 	@PutMapping("/my-info")
 	@ResponseStatus(HttpStatus.OK)
-	public ApiResult<Void> updateMyInfo(
+	public ApiResult<Void> putMyInfo(
 		@AuthenticationPrincipal CurrentUser currentUser,
 		@RequestBody @Valid UserUpdateRequest request
 	) {
@@ -84,9 +83,9 @@ public class UserController {
 		return ApiResult.ok();
 	}
 
-	@PostMapping("/withdrawal")
+	@PutMapping("/withdrawal")
 	@ResponseStatus(HttpStatus.OK)
-	public ApiResult<Void> withdrawal(
+	public ApiResult<Void> deleteUser(
 		@AuthenticationPrincipal CurrentUser currentUser
 	) {
 		userService.delete(currentUser.getId());

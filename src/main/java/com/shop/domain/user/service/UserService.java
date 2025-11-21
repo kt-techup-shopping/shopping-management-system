@@ -73,6 +73,6 @@ public class UserService {
 	public void delete(Long id) {
 		var user = userRepository.findByIdOrThrow(id, ErrorCode.NOT_FOUND_USER);
 
-		user.withdrawal();
+		user.delete();
 	}
 }

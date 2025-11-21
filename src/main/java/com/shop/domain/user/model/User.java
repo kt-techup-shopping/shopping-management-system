@@ -95,7 +95,7 @@ public class User extends BaseEntity {
 		this.mobile = mobile;
 	}
 
-	public void withdrawal() {
+	public void delete() {
 		this.status = Status.INACTIVE;
 		this.isDeleted = DeletedStatus.T;
 	}

@@ -25,5 +25,4 @@ public abstract class BaseEntity {
 	protected LocalDateTime updatedAt;
 
 	protected boolean isDeleted = false;
-
 }

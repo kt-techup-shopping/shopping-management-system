@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.shop.domain.auth.request.RefreshTokenRequest;
 import com.shop.domain.auth.service.AuthService;
 import com.shop.domain.user.request.UserCreateRequest;
 import com.shop.domain.user.service.UserService;
@@ -39,4 +40,13 @@ public class AuthController {
 
 		return ApiResult.ok();
 	}
+
+	@PostMapping("/refresh")
+	@ResponseStatus(HttpStatus.OK)
+	public ApiResult<LoginResponse> postRefreshToken(@RequestBody @Valid RefreshTokenRequest request) {
+		var pair = authService.refresh(request.refreshToken());
+
+		return ApiResult.ok(new LoginResponse(pair.getFirst(), pair.getSecond()));
+	}
+
 }

@@ -1,6 +1,7 @@
 package com.shop.domain.auth.controller;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +15,7 @@ import com.shop.domain.user.service.UserService;
 import com.shop.global.common.ApiResult;
 import com.shop.domain.auth.request.LoginRequest;
 import com.shop.domain.auth.response.LoginResponse;
+import com.shop.global.security.CurrentUser;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -49,4 +51,11 @@ public class AuthController {
 		return ApiResult.ok(new LoginResponse(pair.getFirst(), pair.getSecond()));
 	}
 
+	@PostMapping("/logout")
+	@ResponseStatus(HttpStatus.OK)
+	public ApiResult<Void> postLogout(@AuthenticationPrincipal CurrentUser currentUser) {
+		authService.logout(currentUser.getId());
+
+		return ApiResult.ok();
+	}
 }

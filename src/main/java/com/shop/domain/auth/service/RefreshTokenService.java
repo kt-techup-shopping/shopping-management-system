@@ -33,4 +33,8 @@ public class RefreshTokenService {
 
 		return stored.equals(refreshToken);
 	}
+
+	public void delete(Long userId) {
+		redisTemplate.delete(key(userId));
+	}
 }

@@ -66,4 +66,8 @@ public class AuthService {
 
 		return Pair.of(newAccessToken, newRefreshToken);
 	}
+
+	public void logout(Long id) {
+		refreshTokenService.delete(id);
+	}
 }

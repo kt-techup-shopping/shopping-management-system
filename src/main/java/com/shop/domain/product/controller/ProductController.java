@@ -41,7 +41,7 @@ public class ProductController extends SwaggerAssistance {
 		@RequestParam(required = false) Long categoryId,
 		@Parameter Paging paging
 	) {
-		return ApiResult.ok(productService.search(keyword, categoryId, paging.toPageable()));
+		return ApiResult.ok(productService.search(keyword, categoryId, paging.toPageable(), paging.sort()));
 	}
 
 	@PostMapping

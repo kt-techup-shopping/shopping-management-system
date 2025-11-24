@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.shop.domain.category.model.Category;
@@ -30,7 +31,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 	private final QProduct product = QProduct.product;
 
 	@Override
-	public Page<ProductSearchResponse> search(String keyword, Long categoryId, PageRequest pageable) {
+	public Page<ProductSearchResponse> search(String keyword, Long categoryId, PageRequest pageable, String sort) {
 		var booleanBuilder = new BooleanBuilder();
 		booleanBuilder.and(isActive());
 		booleanBuilder.and(containsProductName(keyword));
@@ -46,7 +47,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 			))
 			.from(product)
 			.where(booleanBuilder)
-			.orderBy(product.id.desc())
+			.orderBy(resolveSort(sort))
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
 			.fetch();
@@ -85,6 +86,21 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 			return product.category.id.in(ids);
 		}
 		return product.category.id.eq(categoryId);
+	}
+
+	// 정렬 기준
+	private OrderSpecifier<?> resolveSort(String sort) {
+		if (Strings.isBlank(sort)) {
+			return product.id.desc();
+		}
+
+		return switch (sort) {
+			case "priceAsc" -> product.price.asc();
+			case "priceDesc" -> product.price.desc();
+			case "latest" -> product.createdAt.desc();
+			case "oldest" -> product.createdAt.asc();
+			default -> product.id.desc();
+		};
 	}
 
 }

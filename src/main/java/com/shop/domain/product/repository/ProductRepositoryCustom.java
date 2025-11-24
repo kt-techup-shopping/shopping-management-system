@@ -10,5 +10,5 @@ import com.shop.domain.order.response.OrderResponse;
 import com.shop.domain.product.dto.response.ProductSearchResponse;
 
 public interface ProductRepositoryCustom {
-	Page<ProductSearchResponse> search(String keyword, Long categoryId, PageRequest pageable);
+	Page<ProductSearchResponse> search(String keyword, Long categoryId, PageRequest pageable, String sort);
 }

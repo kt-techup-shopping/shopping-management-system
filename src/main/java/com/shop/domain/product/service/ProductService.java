@@ -1,7 +1,5 @@
 package com.shop.domain.product.service;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -74,8 +72,8 @@ public class ProductService {
 	}
 
 	// 상품 목록 조회
-	public Page<ProductSearchResponse> search(String keyword, Long categoryId, PageRequest pageable) {
-		return productRepository.search(keyword, categoryId, pageable);
+	public Page<ProductSearchResponse> search(String keyword, Long categoryId, PageRequest pageable, String sort) {
+		return productRepository.search(keyword, categoryId, pageable, sort);
 	}
 
 

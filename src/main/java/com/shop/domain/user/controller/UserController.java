@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.shop.domain.user.model.User;
+import com.shop.domain.user.request.UserCreateRequest;
 import com.shop.domain.user.request.UserUpdateRequest;
 import com.shop.domain.user.service.UserService;
 import com.shop.global.common.ApiResult;
-import com.shop.domain.user.request.UserRequest;
 import com.shop.domain.user.request.UserUpdatePasswordRequest;
 import com.shop.global.security.CurrentUser;
 
@@ -29,13 +29,6 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/users")
 public class UserController {
 	private final UserService userService;
-
-	@PostMapping
-	@ResponseStatus(HttpStatus.CREATED)
-	public ApiResult<Void> create(@Valid @RequestBody UserRequest.Create request) {
-		userService.create(request);
-		return ApiResult.ok();
-	}
 
 	@GetMapping("/duplicate-login-id")
 	@ResponseStatus(HttpStatus.OK)

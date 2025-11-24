@@ -1,6 +1,5 @@
 package com.shop.domain.user.service;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -9,11 +8,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.shop.domain.user.model.Status;
 import com.shop.domain.user.model.User;
+import com.shop.domain.user.request.UserCreateRequest;
 import com.shop.global.common.ErrorCode;
 import com.shop.global.common.Preconditions;
-import com.shop.domain.user.request.UserRequest;
 import com.shop.domain.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -25,7 +23,7 @@ public class UserService {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 
-	public void create(UserRequest.Create request) {
+	public void create(UserCreateRequest request) {
 		Preconditions.validate(!userRepository.existsByLoginId(request.loginId()), ErrorCode.EXIST_USER);
 
 		var newUser = User.normalUser(
@@ -36,8 +34,7 @@ public class UserService {
 			request.email(),
 			request.mobile(),
 			request.gender(),
-			request.birthday(),
-			Status.ACTIVE
+			request.birthday()
 		);
 
 			userRepository.save(newUser);

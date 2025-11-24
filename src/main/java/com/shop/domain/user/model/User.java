@@ -47,12 +47,13 @@ public class User extends BaseEntity {
 		this.mobile = mobile;
 		this.gender = gender;
 		this.birthday = birthday;
+		this.role = role;
 		this.status = status;
 	}
 
 	public static User normalUser(String loginId, UUID uuid, String password, String name, String email, String mobile,
 		Gender gender,
-		LocalDate birthday, Status status) {
+		LocalDate birthday) {
 		return new User(
 			loginId,
 			uuid,
@@ -63,7 +64,7 @@ public class User extends BaseEntity {
 			gender,
 			birthday,
 			Role.USER,
-			status
+			Status.ACTIVE
 		);
 	}
 

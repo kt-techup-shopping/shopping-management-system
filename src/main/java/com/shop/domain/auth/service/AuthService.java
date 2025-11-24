@@ -32,8 +32,8 @@ public class AuthService {
 		var accessExp = jwtService.getAccessExpiration();
 		var refreshExp = jwtService.getRefreshExpiration();
 
-		var accessToken = jwtService.issue(user.getId(), accessExp);
-		var refreshToken = jwtService.issue(user.getId(), refreshExp);
+		var accessToken = jwtService.issue(user.getId(), user.getRole(), accessExp);
+		var refreshToken = jwtService.issue(user.getId(), user.getRole(), refreshExp);
 
 		long refreshTtlMs = refreshExp.getTime() - System.currentTimeMillis();
 		refreshTokenService.save(user.getId(), refreshToken, refreshTtlMs);
@@ -58,8 +58,8 @@ public class AuthService {
 		var newAccessExp = jwtService.getAccessExpiration();
 		var newRefreshExp = jwtService.getRefreshExpiration();
 
-		var newAccessToken = jwtService.issue(user.getId(), newAccessExp);
-		var newRefreshToken = jwtService.issue(user.getId(), newRefreshExp);
+		var newAccessToken = jwtService.issue(user.getId(), user.getRole(), newAccessExp);
+		var newRefreshToken = jwtService.issue(user.getId(), user.getRole(), newRefreshExp);
 
 		long newRefreshTtlMs = newRefreshExp.getTime() - System.currentTimeMillis();
 		refreshTokenService.save(user.getId(), newRefreshToken, newRefreshTtlMs);

@@ -31,9 +31,10 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 	private final QProduct product = QProduct.product;
 
 	@Override
-	public Page<ProductSearchResponse> search(String keyword, Long categoryId, PageRequest pageable, String sort) {
+	public Page<ProductSearchResponse> search(String keyword, Long categoryId, Boolean activeOnly, String sort,
+		PageRequest pageable) {
 		var booleanBuilder = new BooleanBuilder();
-		booleanBuilder.and(isActive());
+		booleanBuilder.and(filterActive(activeOnly));
 		booleanBuilder.and(containsProductName(keyword));
 		booleanBuilder.and(categoryIn(categoryId));
 
@@ -66,9 +67,10 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 		return Strings.isNotBlank(keyword) ? product.name.containsIgnoreCase(keyword) : null;
 	}
 
-	// 판매중인 상품인지 확인
-	private BooleanExpression isActive() {
-		return product.status.eq(ProductStatus.ACTIVATED);
+	// 판매중 필터링 여부
+	private BooleanExpression filterActive(Boolean activeOnly) {
+		return Boolean.TRUE.equals(activeOnly)
+			? product.status.eq(ProductStatus.ACTIVATED) : null;
 	}
 
 	// 카테고리 필터링

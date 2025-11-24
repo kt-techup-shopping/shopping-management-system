@@ -33,7 +33,7 @@ public class AuthController {
 	}
 
 	@PostMapping("/signup")
-	@ResponseStatus(HttpStatus.OK)
+	@ResponseStatus(HttpStatus.CREATED)
 	public ApiResult<Void> signup(@RequestBody @Valid UserCreateRequest request) {
 		userService.create(request);
 

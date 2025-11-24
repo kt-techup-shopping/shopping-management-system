@@ -22,6 +22,7 @@ import com.shop.global.common.Paging;
 import com.shop.global.common.SwaggerAssistance;
 import com.shop.domain.product.dto.request.ProductRequest;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,9 +38,10 @@ public class ProductController extends SwaggerAssistance {
 	@GetMapping
 	public ApiResult<Page<ProductSearchResponse>> search(
 		@RequestParam(required = false) String keyword,
-		@ParameterObject Paging paging // @Parameter -> @ParameterObject
+		@RequestParam(required = false) Long categoryId,
+		@Parameter Paging paging
 	) {
-		return ApiResult.ok(productService.search(keyword, paging.toPageable()));
+		return ApiResult.ok(productService.search(keyword, categoryId, paging.toPageable()));
 	}
 
 	@PostMapping

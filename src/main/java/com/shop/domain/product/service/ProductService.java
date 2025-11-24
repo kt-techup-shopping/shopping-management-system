@@ -1,10 +1,13 @@
 package com.shop.domain.product.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.shop.domain.category.service.CategoryService;
 import com.shop.domain.product.dto.response.ProductSearchResponse;
 import com.shop.domain.product.model.Product;
 import com.shop.domain.product.repository.ProductRepository;
@@ -16,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ProductService {
 	private final ProductRepository productRepository;
+	private final CategoryService categoryService;
 
 	public void create(String name, Long price, Long quantity) {
 		productRepository.save(
@@ -70,7 +74,9 @@ public class ProductService {
 	}
 
 	// 상품 목록 조회
-	public Page<ProductSearchResponse> search(String keyword, PageRequest pageable) {
-		return productRepository.search(keyword, pageable);
+	public Page<ProductSearchResponse> search(String keyword, Long categoryId, PageRequest pageable) {
+		return productRepository.search(keyword, categoryId, pageable);
 	}
+
+
 }

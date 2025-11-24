@@ -14,11 +14,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.shop.domain.user.model.User;
-import com.shop.domain.user.request.UserCreateRequest;
 import com.shop.domain.user.request.UserUpdateRequest;
 import com.shop.domain.user.service.UserService;
 import com.shop.global.common.ApiResult;
-import com.shop.domain.user.request.UserUpdatePasswordRequest;
 import com.shop.global.security.CurrentUser;
 
 import jakarta.validation.Valid;
@@ -36,16 +34,6 @@ public class UserController {
 		var result = userService.isDuplicateLoginId(loginId);
 
 		return ApiResult.ok(result);
-	}
-
-	@PutMapping("/{id}/update-password")
-	@ResponseStatus(HttpStatus.OK)
-	public ApiResult<Void> updatePassword(
-		@PathVariable Long id,
-		@RequestBody @Valid UserUpdatePasswordRequest request
-	) {
-		userService.changePassword(id, request.oldPassword(), request.newPassword());
-		return ApiResult.ok();
 	}
 
 	@DeleteMapping("/{id}")

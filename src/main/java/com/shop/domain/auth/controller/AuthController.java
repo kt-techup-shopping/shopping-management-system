@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.shop.domain.auth.request.RefreshTokenRequest;
 import com.shop.domain.auth.service.AuthService;
 import com.shop.domain.user.request.UserCreateRequest;
+import com.shop.domain.user.request.UserUpdatePasswordRequest;
 import com.shop.domain.user.service.UserService;
 import com.shop.global.common.ApiResult;
 import com.shop.domain.auth.request.LoginRequest;
@@ -55,6 +56,17 @@ public class AuthController {
 	@ResponseStatus(HttpStatus.OK)
 	public ApiResult<Void> postLogout(@AuthenticationPrincipal CurrentUser currentUser) {
 		authService.logout(currentUser.getId());
+
+		return ApiResult.ok();
+	}
+
+	@PostMapping("/reset-password/confirm")
+	@ResponseStatus(HttpStatus.OK)
+	public ApiResult<Void> postResetPasswordConfirm(
+		@AuthenticationPrincipal CurrentUser currentUser,
+		@RequestBody @Valid UserUpdatePasswordRequest request
+	) {
+		userService.changePassword(currentUser.getId(), request.oldPassword(), request.newPassword());
 
 		return ApiResult.ok();
 	}

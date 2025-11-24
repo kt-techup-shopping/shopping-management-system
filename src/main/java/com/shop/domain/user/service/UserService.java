@@ -44,13 +44,14 @@ public class UserService {
 		return userRepository.existsByLoginId(loginId);
 	}
 
-	public void changePassword(Long id, String oldPassword, String password) {
+	public void changePassword(Long id, String oldPassword, String newPassword) {
 		var user = userRepository.findByIdOrThrow(id, ErrorCode.NOT_FOUND_USER);
 
-		Preconditions.validate(user.getPassword().equals(oldPassword), ErrorCode.DOES_NOT_MATCH_OLD_PASSWORD);
-		Preconditions.validate(!oldPassword.equals(password), ErrorCode.CAN_NOT_ALLOWED_SAME_PASSWORD);
+		Preconditions.validate(passwordEncoder.matches(oldPassword, user.getPassword()),
+			ErrorCode.DOES_NOT_MATCH_OLD_PASSWORD);
+		Preconditions.validate(!oldPassword.equals(newPassword), ErrorCode.CAN_NOT_ALLOWED_SAME_PASSWORD);
 
-		user.changePassword(password);
+		user.changePassword(passwordEncoder.encode(newPassword));
 	}
 
 	public Page<User> search(Pageable pageable, String keyword) {

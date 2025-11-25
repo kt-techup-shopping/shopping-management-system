@@ -5,14 +5,19 @@ import java.util.List;
 
 import org.apache.logging.log4j.util.Strings;
 
+import com.shop.domain.category.model.Category;
+import com.shop.domain.discount.model.Discount;
+import com.shop.domain.orderproduct.model.OrderProduct;
 import com.shop.global.common.BaseEntity;
 import com.shop.global.common.ErrorCode;
 import com.shop.global.common.Preconditions;
-import com.shop.domain.orderproduct.model.OrderProduct;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -63,12 +68,21 @@ public class Product extends BaseEntity {
 	private Long stock;
 	@Enumerated(EnumType.STRING)
 	private ProductStatus status = ProductStatus.ACTIVATED;
+	private String description;
+	private String color;
 
 	// @Version
 	// private Long version;
 
 	@OneToMany(mappedBy = "product")
 	private List<OrderProduct> orderProducts = new ArrayList<>();
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "category_id")
+	private Category category;
+
+	@OneToMany(mappedBy = "product")
+	private List<Discount> discounts = new ArrayList<>();
 
 	public Product(String name, Long price, Long stock) {
 		Preconditions.validate(Strings.isNotBlank(name), ErrorCode.INVALID_PARAMETER);

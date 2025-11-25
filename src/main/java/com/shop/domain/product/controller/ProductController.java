@@ -46,6 +46,7 @@ public class ProductController extends SwaggerAssistance {
 		return ApiResult.ok(productService.search(keyword, categoryId, activeOnly, paging.sort(), paging.toPageable()));
 	}
 
+	// 상품 상세 조회
 	@GetMapping("/{id}")
 	@ResponseStatus(HttpStatus.OK)
 	public ApiResult<ProductDetailResponse> getDetailById(@PathVariable Long id){

@@ -5,7 +5,7 @@ import com.shop.domain.category.model.Category;
 import com.shop.domain.discount.model.DiscountType;
 import com.shop.domain.product.model.ProductStatus;
 
-public record ProductDetailProjection(
+public record ProductDetailQueryResponse(
 	Long id,
 	String name,
 	Long price,
@@ -18,6 +18,6 @@ public record ProductDetailProjection(
 	Long discountedPrice
 ) {
 	@QueryProjection
-	public ProductDetailProjection{
+	public ProductDetailQueryResponse {
 	}
 }

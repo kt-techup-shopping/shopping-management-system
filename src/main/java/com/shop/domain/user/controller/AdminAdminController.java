@@ -39,14 +39,6 @@ public class AdminAdminController {
 		return ApiResult.ok();
 	}
 
-	@PutMapping
-	@ResponseStatus(HttpStatus.OK)
-	public ApiResult<Void> updateUserRoleToAdmin(@AuthenticationPrincipal CurrentUser currentUser) {
-		adminService.updateUserRoleToAdmin(currentUser.getId());
-
-		return ApiResult.ok();
-	}
-
 	// 관리자 권한 삭제
 	@PutMapping("{id}/delete")
 	@ResponseStatus(HttpStatus.OK)

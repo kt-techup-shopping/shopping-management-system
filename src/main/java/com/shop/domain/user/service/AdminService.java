@@ -17,12 +17,6 @@ import lombok.RequiredArgsConstructor;
 public class AdminService {
 	private final UserRepository userRepository;
 
-	public void updateUserRoleToAdmin(Long id) {
-		var user = userRepository.findByIdOrThrow(id, ErrorCode.NOT_FOUND_USER);
-
-		user.promoteToAdmin();
-	}
-
 	public void updateUserRoleToUser(Long id) {
 		var user = userRepository.findByIdOrThrow(id, ErrorCode.NOT_FOUND_USER);
 

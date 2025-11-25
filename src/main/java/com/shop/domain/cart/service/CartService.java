@@ -76,8 +76,6 @@ public class CartService {
 		Preconditions.validate(product.isActive(), ErrorCode.NOT_ACTIVE);
 		// 상품의 재고가 담으려는 재고보다 적을 경우 오류 발생
 		Preconditions.validate(product.getStock() >= request.getQuantity(), ErrorCode.NOT_ENOUGH_STOCK);
-		// 상품의 수량 변경이 1보다 적을때 오류 발생
-		Preconditions.validate(request.getQuantity() >= 1, ErrorCode.MIN_PIECE);
 
 		cartItem.updateQuantity(request.getQuantity());
 	}

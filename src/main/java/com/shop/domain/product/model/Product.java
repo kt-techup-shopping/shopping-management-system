@@ -5,10 +5,10 @@ import java.util.List;
 
 import org.apache.logging.log4j.util.Strings;
 
+import com.shop.domain.orderproduct.model.OrderProduct;
 import com.shop.global.common.BaseEntity;
 import com.shop.global.common.ErrorCode;
 import com.shop.global.common.Preconditions;
-import com.shop.domain.orderproduct.model.OrderProduct;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -61,6 +61,7 @@ public class Product extends BaseEntity {
 	private String name;
 	private Long price;
 	private Long stock;
+	private Long discountPrice;
 	@Enumerated(EnumType.STRING)
 	private ProductStatus status = ProductStatus.ACTIVATED;
 
@@ -117,5 +118,21 @@ public class Product extends BaseEntity {
 
 	public void mapToOrderProduct(OrderProduct orderProduct) {
 		this.orderProducts.add(orderProduct);
+	}
+
+	public boolean isActive() {
+		return this.status == ProductStatus.ACTIVATED;
+	}
+
+	public boolean isInActive() {
+		return this.status == ProductStatus.IN_ACTIVATED;
+	}
+
+	public boolean isSoldOut() {
+		return stock == 0 && this.status == ProductStatus.SOLD_OUT;
+	}
+
+	public void getDiscountPrice(Long discountPrice) {
+		this.price = discountPrice;
 	}
 }

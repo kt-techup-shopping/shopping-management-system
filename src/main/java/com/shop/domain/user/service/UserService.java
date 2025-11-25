@@ -40,6 +40,23 @@ public class UserService {
 			userRepository.save(newUser);
 	}
 
+	public void createAdmin(UserCreateRequest request) {
+		Preconditions.validate(!userRepository.existsByLoginId(request.loginId()), ErrorCode.EXIST_USER);
+
+		var newAdmin = User.admin(
+			request.loginId(),
+			UUID.randomUUID(),
+			passwordEncoder.encode(request.password()),
+			request.name(),
+			request.email(),
+			request.mobile(),
+			request.gender(),
+			request.birthday()
+		);
+
+		userRepository.save(newAdmin);
+	}
+
 	public boolean isDuplicateLoginId(String loginId) {
 		return userRepository.existsByLoginId(loginId);
 	}

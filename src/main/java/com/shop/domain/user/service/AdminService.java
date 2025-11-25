@@ -8,7 +8,6 @@ import com.shop.domain.user.model.Role;
 import com.shop.domain.user.repository.UserRepository;
 import com.shop.global.common.ErrorCode;
 import com.shop.global.common.Preconditions;
-import com.shop.global.security.CurrentUser;
 
 import lombok.RequiredArgsConstructor;
 

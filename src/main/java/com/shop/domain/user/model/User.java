@@ -68,18 +68,20 @@ public class User extends BaseEntity {
 		);
 	}
 
-	public static User admin(String loginId, String password, String name, String email, String mobile, Gender gender,
-		LocalDate birthday, LocalDateTime createdAt, LocalDateTime updatedAt) {
-		return User.admin(
+	public static User admin(String loginId, UUID uuid, String password, String name, String email, String mobile,
+		Gender gender,
+		LocalDate birthday) {
+		return new User(
 			loginId,
+			uuid,
 			password,
 			name,
 			email,
 			mobile,
 			gender,
 			birthday,
-			createdAt,
-			updatedAt
+			Role.ADMIN,
+			Status.ACTIVE
 		);
 	}
 

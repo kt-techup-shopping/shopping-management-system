@@ -24,12 +24,7 @@ public class AdminService {
 		user.promoteToAdmin();
 	}
 
-	public void updateUserRoleToUser(CurrentUser currentUser, Long id) {
-		System.out.println(currentUser.getRole());
-		System.out.println(currentUser.getId());
-
-		Preconditions.validate(currentUser.getRole() == Role.ADMIN, ErrorCode.NOT_ADMIN_PERMISSION);
-
+	public void updateUserRoleToUser(Long id) {
 		var user = userRepository.findByIdOrThrow(id, ErrorCode.NOT_FOUND_USER);
 
 		Preconditions.validate(user.getRole() == Role.ADMIN, ErrorCode.NOT_USER_ROLE_ADMIN);

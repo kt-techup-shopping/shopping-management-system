@@ -1,6 +1,7 @@
 package com.shop.domain.user.controller;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('ADMIN')")
 @RequestMapping("/admin/admins")
 public class AdminAdminController {
 	private final AdminService adminService;
@@ -30,11 +32,8 @@ public class AdminAdminController {
 
 	@PutMapping("{id}/delete")
 	@ResponseStatus(HttpStatus.OK)
-	public ApiResult<Void> updateUserRoleToUser(
-		@AuthenticationPrincipal CurrentUser currentUser,
-		@PathVariable Long id
-	) {
-		adminService.updateUserRoleToUser(currentUser, id);
+	public ApiResult<Void> updateUserRoleToUser(@PathVariable Long id) {
+		adminService.updateUserRoleToUser(id);
 
 		return ApiResult.ok();
 	}

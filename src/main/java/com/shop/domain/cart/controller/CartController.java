@@ -26,14 +26,14 @@ import lombok.RequiredArgsConstructor;
 
 @Tag(name = "장바구니", description = "장바구니 API")
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/cart")
 @RequiredArgsConstructor
 public class CartController {
 
 	private final CartService cartService;
 
 	@Operation(summary = "장바구니 조회")
-	@GetMapping("/cart")
+	@GetMapping
 	public ApiResult<CartResponse> getCart(
 		@AuthenticationPrincipal CurrentUser currentUser) {
 		CartResponse cart = cartService.getCart(currentUser.getId());
@@ -41,7 +41,7 @@ public class CartController {
 	}
 
 	@Operation(summary = "장바구니 검색")
-	@GetMapping("/cart/search")
+	@GetMapping("/search")
 	public ApiResult<Page<CartItemResponse>> searchCartItems(
 		@AuthenticationPrincipal CurrentUser currentUser,
 		@RequestParam(required = false) String keyword,
@@ -52,7 +52,7 @@ public class CartController {
 	}
 
 	@Operation(summary = "장바구니 상품 추가")
-	@PostMapping("/cart/items")
+	@PostMapping("/items")
 	public ApiResult<Long> addCartItem(
 		@AuthenticationPrincipal CurrentUser currentUser,
 		@Valid @RequestBody CartItemRequest.Create request) {
@@ -61,7 +61,7 @@ public class CartController {
 	}
 
 	@Operation(summary = "상품 수량 변경")
-	@PutMapping("/cart/items/{itemId}")
+	@PutMapping("/items/{itemId}")
 	public ApiResult<Void> updateCartItem(
 		@AuthenticationPrincipal CurrentUser currentUser,
 		@PathVariable Long itemId,
@@ -71,7 +71,7 @@ public class CartController {
 	}
 
 	@Operation(summary = "특정 상품 삭제")
-	@PutMapping("/cart/items/{itemId}/delete")
+	@PutMapping("/items/{itemId}/delete")
 	public ApiResult<Void> deleteCartItem(
 		@AuthenticationPrincipal CurrentUser currentUser,
 		@PathVariable Long itemId) {
@@ -80,7 +80,7 @@ public class CartController {
 	}
 
 	@Operation(summary = "선택 상품 일괄 삭제")
-	@PutMapping("/cart/items")
+	@PutMapping("/items")
 	public ApiResult<Void> deleteCartItems(
 		@AuthenticationPrincipal CurrentUser currentUser,
 		@Valid @RequestBody CartItemRequest.Delete request) {
@@ -89,7 +89,7 @@ public class CartController {
 	}
 
 	@Operation(summary = "장바구니 비우기")
-	@PutMapping("/cart")
+	@PutMapping
 	public ApiResult<Void> clearCart(
 		@AuthenticationPrincipal CurrentUser currentUser) {
 		cartService.clearCart(currentUser.getId());

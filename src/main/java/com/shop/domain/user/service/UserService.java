@@ -1,6 +1,5 @@
 package com.shop.domain.user.service;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -9,11 +8,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.shop.domain.user.model.Status;
 import com.shop.domain.user.model.User;
+import com.shop.domain.user.request.UserCreateRequest;
 import com.shop.global.common.ErrorCode;
 import com.shop.global.common.Preconditions;
-import com.shop.domain.user.request.UserRequest;
 import com.shop.domain.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -25,7 +23,7 @@ public class UserService {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 
-	public void create(UserRequest.Create request) {
+	public void create(UserCreateRequest request) {
 		Preconditions.validate(!userRepository.existsByLoginId(request.loginId()), ErrorCode.EXIST_USER);
 
 		var newUser = User.normalUser(
@@ -36,8 +34,7 @@ public class UserService {
 			request.email(),
 			request.mobile(),
 			request.gender(),
-			request.birthday(),
-			Status.ACTIVE
+			request.birthday()
 		);
 
 			userRepository.save(newUser);
@@ -47,13 +44,14 @@ public class UserService {
 		return userRepository.existsByLoginId(loginId);
 	}
 
-	public void changePassword(Long id, String oldPassword, String password) {
+	public void changePassword(Long id, String oldPassword, String newPassword) {
 		var user = userRepository.findByIdOrThrow(id, ErrorCode.NOT_FOUND_USER);
 
-		Preconditions.validate(user.getPassword().equals(oldPassword), ErrorCode.DOES_NOT_MATCH_OLD_PASSWORD);
-		Preconditions.validate(!oldPassword.equals(password), ErrorCode.CAN_NOT_ALLOWED_SAME_PASSWORD);
+		Preconditions.validate(passwordEncoder.matches(oldPassword, user.getPassword()),
+			ErrorCode.DOES_NOT_MATCH_OLD_PASSWORD);
+		Preconditions.validate(!oldPassword.equals(newPassword), ErrorCode.CAN_NOT_ALLOWED_SAME_PASSWORD);
 
-		user.changePassword(password);
+		user.changePassword(passwordEncoder.encode(newPassword));
 	}
 
 	public Page<User> search(Pageable pageable, String keyword) {

@@ -97,4 +97,9 @@ public class User extends BaseEntity {
 		this.status = Status.INACTIVE;
 		this.isDeleted = true;
 	}
+
+	public void promoteToAdmin() {
+		System.out.println("어드민으로 교체!");
+		this.role = Role.ADMIN;
+	}
 }

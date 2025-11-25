@@ -22,9 +22,9 @@ import com.shop.domain.category.repository.CategoryRepository;
 import com.shop.domain.discount.model.DiscountType;
 import com.shop.domain.discount.model.QDiscount;
 import com.shop.domain.product.response.ProductSearchResponse;
-import com.shop.domain.product.dto.response.QProductSearchResponse;
 import com.shop.domain.product.model.ProductStatus;
 import com.shop.domain.product.model.QProduct;
+import com.shop.domain.product.response.QProductSearchResponse;
 
 import lombok.RequiredArgsConstructor;
 

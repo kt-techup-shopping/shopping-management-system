@@ -21,14 +21,12 @@ import com.shop.domain.category.model.Category;
 import com.shop.domain.category.repository.CategoryRepository;
 import com.shop.domain.discount.model.DiscountType;
 import com.shop.domain.discount.model.QDiscount;
-import com.shop.domain.product.dto.response.ProductDetailProjection;
-import com.shop.domain.product.dto.response.ProductDetailResponse;
-import com.shop.domain.product.dto.response.ProductSearchResponse;
-import com.shop.domain.product.dto.response.QProductDetailProjection;
-import com.shop.domain.product.dto.response.QProductSearchResponse;
-import com.shop.domain.product.model.Product;
 import com.shop.domain.product.model.ProductStatus;
 import com.shop.domain.product.model.QProduct;
+import com.shop.domain.product.response.ProductDetailProjection;
+import com.shop.domain.product.response.ProductSearchResponse;
+import com.shop.domain.product.response.QProductDetailProjection;
+import com.shop.domain.product.response.QProductSearchResponse;
 
 import lombok.RequiredArgsConstructor;
 

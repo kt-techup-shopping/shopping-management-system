@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.shop.domain.category.dto.CategoryDetailResponse;
+import com.shop.domain.category.response.CategoryDetailResponse;
 import com.shop.domain.category.model.Category;
 
 import lombok.RequiredArgsConstructor;

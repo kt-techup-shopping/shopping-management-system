@@ -4,8 +4,7 @@ import org.springframework.data.domain.PageRequest;
 
 public record Paging(
 	Integer page,
-	Integer size,
-	String sort
+	Integer size
 ) {
 	private static final int DEFAULT_PAGE = 1;
 	private static final int DEFAULT_SIZE = 10;

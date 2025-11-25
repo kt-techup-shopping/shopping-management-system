@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.shop.domain.category.service.CategoryService;
 import com.shop.domain.product.repository.ProductRepository;
+import com.shop.domain.product.request.ProductSort;
 import com.shop.domain.product.response.ProductDetailResponse;
 import com.shop.domain.product.response.ProductSearchResponse;
 
@@ -64,7 +65,7 @@ public class ProductService {
 	// 상품 목록 조회
 	public Page<ProductSearchResponse> getSearchList(String keyword, Long categoryId, Boolean activeOnly, String sort,
 		PageRequest pageable) {
-		return productRepository.getSearchList(keyword, categoryId, activeOnly, sort, pageable);
+		return productRepository.getSearchList(keyword, categoryId, activeOnly, ProductSort.from(sort), pageable);
 	}
 
 	// 상품 상세 조회

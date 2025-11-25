@@ -102,6 +102,16 @@ public class Product extends BaseEntity {
 		this.updatedAt = LocalDateTime.now();
 	}
 
+	public Product(String name, Long price, Long stock) {
+		Preconditions.validate(Strings.isNotBlank(name), ErrorCode.INVALID_PARAMETER);
+		Preconditions.validate(price >= 0, ErrorCode.INVALID_PARAMETER);
+		Preconditions.validate(stock >= 0, ErrorCode.INVALID_PARAMETER);
+
+		this.name = name;
+		this.price = price;
+		this.stock = stock;
+	}
+
 	public void update(String name, Long price, Long stock) {
 		this.name = name;
 		this.price = price;

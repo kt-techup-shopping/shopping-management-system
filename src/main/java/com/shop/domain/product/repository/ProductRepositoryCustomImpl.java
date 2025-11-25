@@ -12,7 +12,6 @@ import org.springframework.stereotype.Repository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.SubQueryExpression;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
@@ -25,6 +24,7 @@ import com.shop.domain.discount.model.DiscountType;
 import com.shop.domain.discount.model.QDiscount;
 import com.shop.domain.product.model.ProductStatus;
 import com.shop.domain.product.model.QProduct;
+import com.shop.domain.product.request.ProductSort;
 import com.shop.domain.product.response.AdminProductSearchResponse;
 import com.shop.domain.product.response.ProductDetailProjection;
 import com.shop.domain.product.response.ProductSearchResponse;
@@ -49,7 +49,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 		String keyword,
 		Long categoryId,
 		Boolean activeOnly,
-		String sort,
+		ProductSort sort,
 		PageRequest pageable
 	) {
 		return searchProducts(
@@ -101,7 +101,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 		String keyword,
 		Long categoryId,
 		Boolean activeOnly,
-		String sort,
+		ProductSort sort,
 		PageRequest pageable
 	) {
 		return searchProducts(
@@ -128,7 +128,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 		String keyword,
 		Long categoryId,
 		Boolean activeOnly,
-		String sort,
+		ProductSort sort,
 		PageRequest pageable,
 		Expression<T> projection
 	) {
@@ -195,17 +195,12 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 	}
 
 	// 정렬 기준 -> OrderSpecifier 변환 (QueryDSL 정렬 메타데이터 객체)
-	private OrderSpecifier<?> resolveSort(String sort) {
-		if (Strings.isBlank(sort)) {
-			return product.id.desc();
-		}
-
+	private OrderSpecifier<?> resolveSort(ProductSort sort) {
 		return switch (sort) {
-			case "priceAsc" -> product.price.asc();
-			case "priceDesc" -> product.price.desc();
-			case "latest" -> product.createdAt.desc();
-			case "oldest" -> product.createdAt.asc();
-			default -> product.id.desc();
+			case ProductSort.PRICE_ASC -> product.price.asc();
+			case ProductSort.PRICE_DESC -> product.price.desc();
+			case ProductSort.LATEST -> product.createdAt.desc();
+			case ProductSort.DEFAULT -> product.id.asc();
 		};
 	}
 

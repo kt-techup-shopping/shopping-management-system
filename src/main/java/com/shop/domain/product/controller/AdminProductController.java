@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.shop.domain.product.request.ProductCreateRequest;
+import com.shop.domain.product.request.ProductSort;
 import com.shop.domain.product.response.AdminProductSearchResponse;
 import com.shop.domain.product.service.AdminProductService;
 import com.shop.global.common.ApiResult;
@@ -49,8 +50,9 @@ public class AdminProductController {
 		@RequestParam(required = false) String keyword,
 		@RequestParam(required = false) Long categoryId,
 		@RequestParam(required = false) Boolean activeOnly,
+		@RequestParam(required = false) String sort,
 		@Parameter Paging paging
 	) {
-		return ApiResult.ok(adminProductService.getAdminSearchList(keyword, categoryId, activeOnly, paging.sort(), paging.toPageable()));
+		return ApiResult.ok(adminProductService.getAdminSearchList(keyword, categoryId, activeOnly, sort, paging.toPageable()));
 	}
 }

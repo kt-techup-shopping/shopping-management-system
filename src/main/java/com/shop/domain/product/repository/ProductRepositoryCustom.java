@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.shop.domain.order.response.OrderResponse;
 import com.shop.domain.product.dto.response.ProductSearchResponse;
+import com.shop.domain.product.model.Product;
 
 public interface ProductRepositoryCustom {
 	Page<ProductSearchResponse> search(String keyword, Long categoryId, Boolean activeOnly, String sort, PageRequest pageable);

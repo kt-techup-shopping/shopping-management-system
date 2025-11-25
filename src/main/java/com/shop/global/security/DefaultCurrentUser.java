@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.shop.domain.user.model.Role;
@@ -33,7 +34,7 @@ public class DefaultCurrentUser implements UserDetails, CurrentUser {
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return List.of();
+		return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
 	}
 
 	@Override

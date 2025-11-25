@@ -51,11 +51,13 @@ public class JwtFilter extends OncePerRequestFilter {
 
 		var id = jwtService.parseId(token);
 		Role role = jwtService.parseRole(token);
+		String loginId = "파싱한아이디";
 
+		var principal = new DefaultCurrentUser(id, loginId, role);
 
 		var techUpToken = new TechUpAuthenticationToken(
-			new DefaultCurrentUser(id, "파싱한아이디", role),
-			List.of()
+			principal,
+			principal.getAuthorities()
 		);
 
 		SecurityContextHolder.getContext().setAuthentication(techUpToken);

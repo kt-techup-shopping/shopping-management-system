@@ -9,7 +9,6 @@ import com.shop.domain.category.service.CategoryService;
 import com.shop.domain.product.dto.response.ProductDetailResponse;
 import com.shop.domain.product.dto.response.ProductSearchResponse;
 import com.shop.domain.product.model.Product;
-import com.shop.domain.product.model.ProductStatus;
 import com.shop.domain.product.repository.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -79,7 +78,7 @@ public class ProductService {
 	}
 
 	// 상품 상세 조회
-	public ProductDetailResponse detail(Long id) {
+	public ProductDetailResponse getDetailById(Long id) {
 		var product = productRepository.findDetailById(id);
 		var categoryList = categoryService.getCategoryHierarchy(product.category());
 

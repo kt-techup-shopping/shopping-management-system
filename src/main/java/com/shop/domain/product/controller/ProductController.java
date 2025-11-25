@@ -1,6 +1,5 @@
 package com.shop.domain.product.controller;
 
-import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -49,8 +48,8 @@ public class ProductController extends SwaggerAssistance {
 
 	@GetMapping("/{id}")
 	@ResponseStatus(HttpStatus.OK)
-	public ApiResult<ProductDetailResponse> detail(@PathVariable Long id){
-		return ApiResult.ok(productService.detail(id));
+	public ApiResult<ProductDetailResponse> getDetailById(@PathVariable Long id){
+		return ApiResult.ok(productService.getDetailById(id));
 	}
 
 	@PostMapping

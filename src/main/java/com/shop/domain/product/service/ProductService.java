@@ -80,18 +80,20 @@ public class ProductService {
 
 	// 상품 상세 조회
 	public ProductDetailResponse detail(Long id) {
-		var product = productRepository.findByIdOrThrow(id);
-		var categoryList = categoryService.getCategoryHierarchy(product.getCategory());
+		var product = productRepository.findDetailById(id);
+		var categoryList = categoryService.getCategoryHierarchy(product.category());
 
 		return new ProductDetailResponse(
-			product.getId(),
-			product.getName(),
-			product.getPrice(),
-			product.getDescription(),
-			product.getColor(),
-			product.getStatus(),
+			product.id(),
+			product.name(),
+			product.price(),
+			product.description(),
+			product.color(),
+			product.status(),
+			product.discountValue(),
+			product.discountType(),
+			product.discountedPrice(),
 			categoryList
 		);
-
 	}
 }

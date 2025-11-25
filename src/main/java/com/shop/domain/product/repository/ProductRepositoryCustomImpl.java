@@ -21,7 +21,10 @@ import com.shop.domain.category.model.Category;
 import com.shop.domain.category.repository.CategoryRepository;
 import com.shop.domain.discount.model.DiscountType;
 import com.shop.domain.discount.model.QDiscount;
+import com.shop.domain.product.dto.response.ProductDetailProjection;
+import com.shop.domain.product.dto.response.ProductDetailResponse;
 import com.shop.domain.product.dto.response.ProductSearchResponse;
+import com.shop.domain.product.dto.response.QProductDetailProjection;
 import com.shop.domain.product.dto.response.QProductSearchResponse;
 import com.shop.domain.product.model.Product;
 import com.shop.domain.product.model.ProductStatus;
@@ -74,6 +77,30 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 			.fetch().size();
 
 		return new PageImpl<>(content, pageable, total);
+	}
+
+	@Override
+	public ProductDetailProjection findDetailById(Long id) {
+		return jpaQueryFactory
+			.select(new QProductDetailProjection(
+				product.id,
+				product.name,
+				product.price,
+				product.description,
+				product.color,
+				product.status,
+				product.category,
+				discount.value,
+				discount.type,
+				discountedPriceExpression()
+			))
+			.from(product)
+			.leftJoin(discount)
+			.on(discount.product.eq(product)
+				.and(discount.id.eq(latestDiscountIdSubQuery()))
+			)
+			.where(product.id.eq(id))
+			.fetchOne();
 	}
 
 	// 상품명에 키워드가 포함되는지 확인

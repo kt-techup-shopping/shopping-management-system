@@ -67,6 +67,7 @@ public class Cart extends BaseEntity {
 		cartItems.clear();
 	}
 
+	// 비활성 상태의 상품 제거
 	public void removeInactiveProducts() {
 		cartItems.removeIf(item -> !item.getProduct().isActive());
 	}

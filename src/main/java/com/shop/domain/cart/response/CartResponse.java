@@ -38,7 +38,7 @@ public record CartResponse(
 		);
 	}
 
-	// 빈 장바구니 생성
+	// 빈 장바구니
 	public static CartResponse empty(Long userId) {
 		return new CartResponse(
 			null,

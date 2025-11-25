@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.logging.log4j.util.Strings;
 
 import com.shop.domain.category.model.Category;
+import com.shop.domain.discount.model.Discount;
 import com.shop.domain.orderproduct.model.OrderProduct;
 import com.shop.global.common.BaseEntity;
 import com.shop.global.common.ErrorCode;
@@ -79,6 +80,9 @@ public class Product extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "category_id")
 	private Category category;
+
+	@OneToMany(mappedBy = "product")
+	private List<Discount> discounts = new ArrayList<>();
 
 	public Product(String name, Long price, Long stock) {
 		Preconditions.validate(Strings.isNotBlank(name), ErrorCode.INVALID_PARAMETER);

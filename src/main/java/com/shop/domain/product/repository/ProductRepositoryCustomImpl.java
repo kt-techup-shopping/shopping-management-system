@@ -11,12 +11,19 @@ import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.SubQueryExpression;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.NumberExpression;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.shop.domain.category.model.Category;
 import com.shop.domain.category.repository.CategoryRepository;
+import com.shop.domain.discount.model.DiscountType;
+import com.shop.domain.discount.model.QDiscount;
 import com.shop.domain.product.dto.response.ProductSearchResponse;
 import com.shop.domain.product.dto.response.QProductSearchResponse;
+import com.shop.domain.product.model.Product;
 import com.shop.domain.product.model.ProductStatus;
 import com.shop.domain.product.model.QProduct;
 
@@ -29,6 +36,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 	private final CategoryRepository categoryRepository;
 	private final JPAQueryFactory jpaQueryFactory;
 	private final QProduct product = QProduct.product;
+	private final QDiscount discount = QDiscount.discount;
 
 	@Override
 	public Page<ProductSearchResponse> search(String keyword, Long categoryId, Boolean activeOnly, String sort,
@@ -43,10 +51,16 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 				product.id,
 				product.name,
 				product.price,
-				product.stock,
-				product.status
+				product.status,
+				discount.value,
+				discount.type,
+				discountedPriceExpression()
 			))
 			.from(product)
+			.leftJoin(discount)
+			.on(discount.product.eq(product)
+				.and(discount.id.eq(latestDiscountIdSubQuery()))
+			)
 			.where(booleanBuilder)
 			.orderBy(resolveSort(sort))
 			.offset(pageable.getOffset())
@@ -103,6 +117,29 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 			case "oldest" -> product.createdAt.asc();
 			default -> product.id.desc();
 		};
+	}
+
+	private SubQueryExpression<Long> latestDiscountIdSubQuery() {
+		QDiscount sub = new QDiscount("subDiscount");
+		return JPAExpressions
+			.select(sub.id)
+			.from(sub)
+			.where(sub.product.eq(product))
+			.orderBy(sub.createdAt.desc())
+			.limit(1);
+	}
+
+	private NumberExpression<Long> discountedPriceExpression() {
+		NumberExpression<Long> rate =
+			product.price.subtract(product.price.multiply(discount.value).divide(100));
+
+		NumberExpression<Long> amount =
+			product.price.subtract(discount.value.longValue());
+
+		return new CaseBuilder()
+			.when(discount.type.eq(DiscountType.PERCENT)).then(rate)
+			.when(discount.type.eq(DiscountType.FIXED)).then(amount)
+			.otherwise(product.price);
 	}
 
 }

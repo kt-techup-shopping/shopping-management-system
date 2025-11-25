@@ -37,7 +37,7 @@ public class ProductController extends SwaggerAssistance {
 
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
-	public ApiResult<Page<ProductSearchResponse>> search(
+	public ApiResult<Page<ProductSearchResponse>> getSearchList(
 		@RequestParam(required = false) String keyword,
 		@RequestParam(required = false) Long categoryId,
 		@RequestParam(required = false) Boolean activeOnly,

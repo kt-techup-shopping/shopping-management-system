@@ -2,7 +2,6 @@ package com.shop.domain.user.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -12,12 +11,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.shop.domain.user.request.UserCreateRequest;
+import com.shop.domain.user.request.UserUpdateRequest;
 import com.shop.domain.user.service.AdminService;
 import com.shop.domain.user.service.UserService;
 import com.shop.global.common.ApiResult;
-import com.shop.global.security.CurrentUser;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -34,7 +34,16 @@ public class AdminAdminController {
 	public ApiResult<Void> create(@RequestBody @Valid UserCreateRequest request) {
 		userService.createAdmin(request);
 
-		System.out.println(request.name());
+		return ApiResult.ok();
+	}
+
+	// 관리자 정보 수정
+	@PutMapping("/{id}")
+	@ResponseStatus(HttpStatus.OK)
+	public ApiResult<Void> updateAdminInfo(
+		@RequestBody @Valid UserUpdateRequest request,
+		@PathVariable Long id) {
+		userService.update(id, request.name(), request.email(), request.mobile());
 
 		return ApiResult.ok();
 	}

@@ -20,16 +20,6 @@ public class ProductService {
 	private final ProductRepository productRepository;
 	private final CategoryService categoryService;
 
-	public void create(String name, Long price, Long quantity) {
-		productRepository.save(
-			new Product(
-				name,
-				price,
-				quantity
-			)
-		);
-	}
-
 	public void update(Long id, String name, Long price, Long quantity) {
 		var product = productRepository.findByIdOrThrow(id);
 
@@ -73,7 +63,8 @@ public class ProductService {
 	}
 
 	// 상품 목록 조회
-	public Page<ProductSearchResponse> search(String keyword, Long categoryId, Boolean activeOnly, String sort, PageRequest pageable) {
+	public Page<ProductSearchResponse> search(String keyword, Long categoryId, Boolean activeOnly, String sort,
+		PageRequest pageable) {
 		return productRepository.search(keyword, categoryId, activeOnly, sort, pageable);
 	}
 

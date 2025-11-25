@@ -33,7 +33,7 @@ public class SecurityConfiguration {
 		"/api/health/**", "/swagger-ui/**", "/v3/api-docs/**",
 		"/products", "/products/*"
 	};
-	private static final String[] POST_PERMIT_ALL = {"/users", "/auth/login"};
+	private static final String[] POST_PERMIT_ALL = {"/users", "/auth/login","/admin/products"};
 	private static final String[] PUT_PERMIT_ALL = {"/api/v1/public/**"};
 	private static final String[] PATCH_PERMIT_ALL = {"/api/v1/public/**"};
 	private static final String[] DELETE_PERMIT_ALL = {"/api/v1/public/**"};

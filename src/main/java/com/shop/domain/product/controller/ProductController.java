@@ -52,18 +52,6 @@ public class ProductController extends SwaggerAssistance {
 		return ApiResult.ok(productService.getDetailById(id));
 	}
 
-	@PostMapping
-	@ResponseStatus(HttpStatus.CREATED)
-	public ApiResult<Void> create(@RequestBody @Valid ProductRequest.Create request) {
-		productService.create(
-			request.getName(),
-			request.getPrice(),
-			request.getQuantity()
-		);
-
-		return ApiResult.ok();
-	}
-
 	@PutMapping("/{id}")
 	public ApiResult<Void> update(
 		@PathVariable Long id,

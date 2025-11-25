@@ -99,7 +99,10 @@ public class User extends BaseEntity {
 	}
 
 	public void promoteToAdmin() {
-		System.out.println("어드민으로 교체!");
 		this.role = Role.ADMIN;
+	}
+
+	public void demoteToUser() {
+		this.role = Role.USER;
 	}
 }

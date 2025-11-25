@@ -2,6 +2,7 @@ package com.shop.domain.user.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -23,6 +24,17 @@ public class AdminAdminController {
 	@ResponseStatus(HttpStatus.OK)
 	public ApiResult<Void> updateUserRoleToAdmin(@AuthenticationPrincipal CurrentUser currentUser) {
 		adminService.updateUserRoleToAdmin(currentUser.getId());
+
+		return ApiResult.ok();
+	}
+
+	@PutMapping("{id}/delete")
+	@ResponseStatus(HttpStatus.OK)
+	public ApiResult<Void> updateUserRoleToUser(
+		@AuthenticationPrincipal CurrentUser currentUser,
+		@PathVariable Long id
+	) {
+		adminService.updateUserRoleToUser(currentUser, id);
 
 		return ApiResult.ok();
 	}

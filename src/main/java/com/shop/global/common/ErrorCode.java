@@ -19,6 +19,8 @@ public enum ErrorCode {
 	FAIL_ACQUIRED_LOCK(HttpStatus.BAD_REQUEST, "락 획득에 실패했습니다."),
 	ERROR_SYSTEM(HttpStatus.INTERNAL_SERVER_ERROR, "시스템 오류가 발생했습니다."),
 	INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "다시 로그인 해주세요."),
+	NOT_USER_ROLE_ADMIN(HttpStatus.BAD_REQUEST, "해당 유저는 관리자 권한이 아닙니다."),
+	NOT_ADMIN_PERMISSION(HttpStatus.BAD_REQUEST, "관리자만 수행할 수 있는 작업입니다."),
 	;
 
 	private final HttpStatus status;

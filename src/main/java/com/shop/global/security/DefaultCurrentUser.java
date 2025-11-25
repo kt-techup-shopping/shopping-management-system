@@ -6,6 +6,8 @@ import java.util.List;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.shop.domain.user.model.Role;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +19,7 @@ public class DefaultCurrentUser implements UserDetails, CurrentUser {
 	//jwt파싱해서 넣어주면 될 것 같음
 	private Long id;
 	private String loginId;
+	private Role role;
 
 	@Override
 	public Long getId() {
@@ -41,5 +44,10 @@ public class DefaultCurrentUser implements UserDetails, CurrentUser {
 	@Override
 	public String getUsername() {
 		return id.toString();
+	}
+
+	@Override
+	public Role getRole() {
+		return this.role;
 	}
 }

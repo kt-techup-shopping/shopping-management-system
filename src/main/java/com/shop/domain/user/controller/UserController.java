@@ -17,8 +17,6 @@ import com.shop.domain.user.model.User;
 import com.shop.domain.user.request.UserUpdateRequest;
 import com.shop.domain.user.service.UserService;
 import com.shop.global.common.ApiResult;
-import com.shop.domain.user.request.UserRequest;
-import com.shop.domain.user.request.UserUpdatePasswordRequest;
 import com.shop.global.security.CurrentUser;
 
 import jakarta.validation.Valid;
@@ -30,29 +28,12 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 	private final UserService userService;
 
-	@PostMapping
-	@ResponseStatus(HttpStatus.CREATED)
-	public ApiResult<Void> create(@Valid @RequestBody UserRequest.Create request) {
-		userService.create(request);
-		return ApiResult.ok();
-	}
-
 	@GetMapping("/duplicate-login-id")
 	@ResponseStatus(HttpStatus.OK)
 	public ApiResult<Boolean> isDuplicateLoginId(@RequestParam String loginId) {
 		var result = userService.isDuplicateLoginId(loginId);
 
 		return ApiResult.ok(result);
-	}
-
-	@PutMapping("/{id}/update-password")
-	@ResponseStatus(HttpStatus.OK)
-	public ApiResult<Void> updatePassword(
-		@PathVariable Long id,
-		@RequestBody @Valid UserUpdatePasswordRequest request
-	) {
-		userService.changePassword(id, request.oldPassword(), request.newPassword());
-		return ApiResult.ok();
 	}
 
 	@DeleteMapping("/{id}")

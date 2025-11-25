@@ -34,19 +34,19 @@ public class CartController {
 
 	@Operation(summary = "장바구니 조회")
 	@GetMapping
-	public ApiResult<CartResponse.Detail> getCart(
+	public ApiResult<CartResponse> getCart(
 		@AuthenticationPrincipal CurrentUser currentUser) {
-		CartResponse.Detail cart = cartService.getCart(currentUser.getId());
+		CartResponse cart = cartService.getCart(currentUser.getId());
 		return ApiResult.ok(cart);
 	}
 
 	@Operation(summary = "장바구니 검색")
 	@GetMapping("/search")
-	public ApiResult<Page<CartItemResponse.Detail>> searchCartItems(
+	public ApiResult<Page<CartItemResponse>> searchCartItems(
 		@AuthenticationPrincipal CurrentUser currentUser,
 		@RequestParam(required = false) String keyword,
 		Pageable pageable) {
-		Page<CartItemResponse.Detail> result = cartService.searchCartItems(
+		Page<CartItemResponse> result = cartService.searchCartItems(
 			currentUser.getId(), keyword, pageable);
 		return ApiResult.ok(result);
 	}

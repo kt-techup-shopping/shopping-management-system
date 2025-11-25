@@ -31,16 +31,16 @@ public class CartService {
 	private final ProductRepository productRepository;
 	private final UserRepository userRepository;
 
-	public CartResponse.Detail getCart(Long userId) {
+	public CartResponse getCart(Long userId) {
 		return cartRepository.findWithCartItemsAndProductsByUserId(userId)
 			.map(cart -> {
 				cart.removeInactiveProducts();
-				return CartResponse.Detail.from(cart);
+				return CartResponse.from(cart);
 			})
-			.orElse(CartResponse.Detail.empty(userId));
+			.orElse(CartResponse.empty(userId));
 	}
 
-	public Page<CartItemResponse.Detail> searchCartItems(Long userId, String keyword, Pageable pageable) {
+	public Page<CartItemResponse> searchCartItems(Long userId, String keyword, Pageable pageable) {
 		return cartItemRepository.search(userId, keyword, pageable);
 	}
 

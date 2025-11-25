@@ -6,5 +6,5 @@ import org.springframework.data.domain.Pageable;
 import com.shop.domain.cartitem.response.CartItemResponse;
 
 public interface CartItemRepositoryCustom {
-	Page<CartItemResponse.Detail> search(Long userId, String keyword, Pageable pageable);
+	Page<CartItemResponse> search(Long userId, String keyword, Pageable pageable);
 }

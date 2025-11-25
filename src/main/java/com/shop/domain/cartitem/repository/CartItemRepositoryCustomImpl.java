@@ -29,7 +29,7 @@ public class CartItemRepositoryCustomImpl implements CartItemRepositoryCustom {
 	private final QCart cart = QCart.cart;
 
 	@Override
-	public Page<CartItemResponse.Detail> search(Long userId, String keyword, Pageable pageable) {
+	public Page<CartItemResponse> search(Long userId, String keyword, Pageable pageable) {
 		List<CartItem> items = jpaQueryFactory
 			.selectFrom(cartItem)
 			.join(cartItem.product, product).fetchJoin()
@@ -54,8 +54,8 @@ public class CartItemRepositoryCustomImpl implements CartItemRepositoryCustom {
 			)
 			.fetchOne();
 
-		List<CartItemResponse.Detail> content = items.stream()
-			.map(CartItemResponse.Detail::of)
+		List<CartItemResponse> content = items.stream()
+			.map(CartItemResponse::of)
 			.toList();
 
 		return new PageImpl<>(content, pageable, total != null ? total : 0);

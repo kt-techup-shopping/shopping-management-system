@@ -10,7 +10,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.SubQueryExpression;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
@@ -23,8 +25,10 @@ import com.shop.domain.discount.model.DiscountType;
 import com.shop.domain.discount.model.QDiscount;
 import com.shop.domain.product.model.ProductStatus;
 import com.shop.domain.product.model.QProduct;
+import com.shop.domain.product.response.AdminProductSearchResponse;
 import com.shop.domain.product.response.ProductDetailProjection;
 import com.shop.domain.product.response.ProductSearchResponse;
+import com.shop.domain.product.response.QAdminProductSearchResponse;
 import com.shop.domain.product.response.QProductDetailProjection;
 import com.shop.domain.product.response.QProductSearchResponse;
 
@@ -39,16 +43,22 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 	private final QProduct product = QProduct.product;
 	private final QDiscount discount = QDiscount.discount;
 
+	// 사용자 상품 목록 조회 (검색/카테고리/판매중/정렬 조건 적용)
 	@Override
-	public Page<ProductSearchResponse> search(String keyword, Long categoryId, Boolean activeOnly, String sort,
-		PageRequest pageable) {
-		var booleanBuilder = new BooleanBuilder();
-		booleanBuilder.and(filterActive(activeOnly));
-		booleanBuilder.and(containsProductName(keyword));
-		booleanBuilder.and(categoryIn(categoryId));
-
-		var content = jpaQueryFactory
-			.select(new QProductSearchResponse(
+	public Page<ProductSearchResponse> getSearchList(
+		String keyword,
+		Long categoryId,
+		Boolean activeOnly,
+		String sort,
+		PageRequest pageable
+	) {
+		return searchProducts(
+			keyword,
+			categoryId,
+			activeOnly,
+			sort,
+			pageable,
+			new QProductSearchResponse(
 				product.id,
 				product.name,
 				product.price,
@@ -56,27 +66,11 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 				discount.value,
 				discount.type,
 				discountedPriceExpression()
-			))
-			.from(product)
-			.leftJoin(discount)
-			.on(discount.product.eq(product)
-				.and(discount.id.eq(latestDiscountIdSubQuery()))
 			)
-			.where(booleanBuilder)
-			.orderBy(resolveSort(sort))
-			.offset(pageable.getOffset())
-			.limit(pageable.getPageSize())
-			.fetch();
-
-		var total = (long)jpaQueryFactory
-			.select(product.id)
-			.from(product)
-			.where(booleanBuilder)
-			.fetch().size();
-
-		return new PageImpl<>(content, pageable, total);
+		);
 	}
 
+	// 상품 상세 조회
 	@Override
 	public ProductDetailProjection findDetailById(Long id) {
 		return jpaQueryFactory
@@ -101,35 +95,106 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 			.fetchOne();
 	}
 
-	// 상품명에 키워드가 포함되는지 확인
+	// 관리자 상품 목록 조회 (검색/카테고리/판매중/정렬 조건 적용, 재고 포함)
+	@Override
+	public Page<AdminProductSearchResponse> getAdminSearchList(
+		String keyword,
+		Long categoryId,
+		Boolean activeOnly,
+		String sort,
+		PageRequest pageable
+	) {
+		return searchProducts(
+			keyword,
+			categoryId,
+			activeOnly,
+			sort,
+			pageable,
+			new QAdminProductSearchResponse(
+				product.id,
+				product.name,
+				product.price,
+				product.stock,
+				product.status,
+				discount.value,
+				discount.type,
+				discountedPriceExpression()
+			)
+		);
+	}
+
+	// 공통 상품 검색 쿼리
+	private <T> Page<T> searchProducts(
+		String keyword,
+		Long categoryId,
+		Boolean activeOnly,
+		String sort,
+		PageRequest pageable,
+		Expression<T> projection
+	) {
+		// 검색 조건 빌더
+		var builder = new BooleanBuilder();
+		builder.and(filterActive(activeOnly));
+		builder.and(containsProductName(keyword));
+		builder.and(categoryIn(categoryId));
+
+		var content = jpaQueryFactory
+			.select(projection)
+			.from(product)
+			// 최신 할인 정보 조회 위해 discount 테이블 left join
+			.leftJoin(discount)
+			.on(discount.product.eq(product)
+				.and(discount.id.eq(latestDiscountIdSubQuery()))
+			)
+			.where(builder)
+			.orderBy(resolveSort(sort))
+			.offset(pageable.getOffset())
+			.limit(pageable.getPageSize())
+			.fetch();
+
+		long total = jpaQueryFactory
+			.select(product.id.count())
+			.from(product)
+			.where(builder)
+			.fetch().size();
+
+		return new PageImpl<>(content, pageable, total);
+	}
+
+	// 상품명에 키워드가 포함되는지 검색 조건 생성
 	private BooleanExpression containsProductName(String keyword) {
 		return Strings.isNotBlank(keyword) ? product.name.containsIgnoreCase(keyword) : null;
 	}
 
-	// 판매중 필터링 여부
+	// 판매중 상품만 필터링하는 조건 생성
 	private BooleanExpression filterActive(Boolean activeOnly) {
 		return Boolean.TRUE.equals(activeOnly)
 			? product.status.eq(ProductStatus.ACTIVATED) : null;
 	}
 
-	// 카테고리 필터링
+	// 카테고리 및 하위 카테고리 포함 필터
 	private BooleanExpression categoryIn(Long categoryId) {
-		return categoryId != null ? categoryMatch(categoryId) : null;
-	}
+		// 카테고리 미지정 시 전체
+		if (categoryId == null) {
+			return null;
+		}
 
-	// 카테고리 및 하위 카테고리 포함 여부 확인
-	private BooleanExpression categoryMatch(Long categoryId) {
+		// 자식 카테고리 조회
 		List<Category> children = categoryRepository.findByParentId(categoryId);
+
+		// 상위 + 자식 카테고리 전체
 		if (!children.isEmpty()) {
 			List<Long> ids = new ArrayList<>();
 			ids.add(categoryId);
 			ids.addAll(children.stream().map(Category::getId).toList());
 			return product.category.id.in(ids);
 		}
+
+		// 자식 없으면 해당 카테고리 매칭
 		return product.category.id.eq(categoryId);
 	}
 
-	// 정렬 기준
+	// 정렬 기준 -> OrderSpecifier 변환 (QueryDSL 정렬 메타데이터 객체)
 	private OrderSpecifier<?> resolveSort(String sort) {
 		if (Strings.isBlank(sort)) {
 			return product.id.desc();
@@ -144,6 +209,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 		};
 	}
 
+	// 각 상품별 최신 할인 id를 조회하는 서브쿼리
 	private SubQueryExpression<Long> latestDiscountIdSubQuery() {
 		QDiscount sub = new QDiscount("subDiscount");
 		return JPAExpressions
@@ -154,6 +220,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 			.limit(1);
 	}
 
+	// 할인 타입에 따라 최종 할인 가격을 계산하는 표현식
 	private NumberExpression<Long> discountedPriceExpression() {
 		NumberExpression<Long> rate =
 			product.price.subtract(product.price.multiply(discount.value).divide(100));

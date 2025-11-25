@@ -62,9 +62,9 @@ public class ProductService {
 	}
 
 	// 상품 목록 조회
-	public Page<ProductSearchResponse> search(String keyword, Long categoryId, Boolean activeOnly, String sort,
+	public Page<ProductSearchResponse> getSearchList(String keyword, Long categoryId, Boolean activeOnly, String sort,
 		PageRequest pageable) {
-		return productRepository.search(keyword, categoryId, activeOnly, sort, pageable);
+		return productRepository.getSearchList(keyword, categoryId, activeOnly, sort, pageable);
 	}
 
 	// 상품 상세 조회

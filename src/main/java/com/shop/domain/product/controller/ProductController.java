@@ -42,7 +42,7 @@ public class ProductController extends SwaggerAssistance {
 		@RequestParam(required = false) Boolean activeOnly,
 		@Parameter Paging paging
 	) {
-		return ApiResult.ok(productService.search(keyword, categoryId, activeOnly, paging.sort(), paging.toPageable()));
+		return ApiResult.ok(productService.getSearchList(keyword, categoryId, activeOnly, paging.sort(), paging.toPageable()));
 	}
 
 	@GetMapping("/{id}")

@@ -1,11 +1,15 @@
 package com.shop.domain.product.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.shop.domain.category.repository.CategoryRepository;
 import com.shop.domain.product.model.Product;
 import com.shop.domain.product.repository.ProductRepository;
+import com.shop.domain.product.response.AdminProductSearchResponse;
+import com.shop.domain.product.response.ProductSearchResponse;
 import com.shop.global.common.ErrorCode;
 
 import lombok.RequiredArgsConstructor;
@@ -29,5 +33,10 @@ public class AdminProductService {
 			color,
 			category
 		));
+	}
+
+	// 관리자 상품 목록 조회
+	public Page<AdminProductSearchResponse> getAdminSearchList(String keyword, Long categoryId, Boolean activeOnly, String sort, PageRequest pageable) {
+		return productRepository.getAdminSearchList(keyword, categoryId, activeOnly, sort, pageable);
 	}
 }

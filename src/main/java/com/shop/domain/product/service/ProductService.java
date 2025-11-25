@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.shop.domain.category.service.CategoryService;
-import com.shop.domain.product.dto.response.ProductSearchResponse;
+import com.shop.domain.product.response.ProductSearchResponse;
 import com.shop.domain.product.model.Product;
 import com.shop.domain.product.repository.ProductRepository;
 

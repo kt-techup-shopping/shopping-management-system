@@ -1,4 +1,4 @@
-package com.shop.domain.product.dto.response;
+package com.shop.domain.product.response;
 
 import com.querydsl.core.annotations.QueryProjection;
 import com.shop.domain.discount.model.DiscountType;

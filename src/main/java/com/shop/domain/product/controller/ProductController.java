@@ -1,6 +1,5 @@
 package com.shop.domain.product.controller;
 
-import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,12 +14,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.shop.domain.product.dto.response.ProductSearchResponse;
+import com.shop.domain.product.response.ProductSearchResponse;
 import com.shop.domain.product.service.ProductService;
 import com.shop.global.common.ApiResult;
 import com.shop.global.common.Paging;
 import com.shop.global.common.SwaggerAssistance;
-import com.shop.domain.product.dto.request.ProductRequest;
+import com.shop.domain.product.request.ProductRequest;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

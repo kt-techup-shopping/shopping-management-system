@@ -24,16 +24,20 @@ import lombok.RequiredArgsConstructor;
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration {
-	// 패스워드 저장할거면 암호화해
-	// bcrypt단방향해시암호화
-	// 평문은 5번 해싱해서 랜덤한 값을 저장함 -> 비교할때는 5번해싱해서 같은지를 비교
 	private final JwtFilter jwtFilter;
 
-	private static final String[] GET_PERMIT_ALL = {"/api/health/**", "/swagger-ui/**", "/v3/api-docs/**"};
-	private static final String[] POST_PERMIT_ALL = {"/users", "/auth/login"};
+	private static final String[] GET_PERMIT_ALL = {
+		"/api/health/**", "/swagger-ui/**", "/v3/api-docs/**",
+		"/products", "/products/*", "/admin/products", "/admin/products/*"
+	};
+	private static final String[] POST_PERMIT_ALL = {
+		"/auth/login", "/auth/signup", "/auth/refresh",
+		"/admin/products"
+	};
 	private static final String[] PUT_PERMIT_ALL = {"/api/v1/public/**"};
 	private static final String[] PATCH_PERMIT_ALL = {"/api/v1/public/**"};
 	private static final String[] DELETE_PERMIT_ALL = {"/api/v1/public/**"};
+	private static final String[] ADMIN_PERMIT_ALL = {"/admin/**"};
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
@@ -58,6 +62,9 @@ public class SecurityConfiguration {
 					request.requestMatchers(HttpMethod.PATCH, PATCH_PERMIT_ALL).permitAll();
 					request.requestMatchers(HttpMethod.PUT, PUT_PERMIT_ALL).permitAll();
 					request.requestMatchers(HttpMethod.DELETE, DELETE_PERMIT_ALL).permitAll();
+
+					// admin 접근 권한 확인
+					request.requestMatchers(ADMIN_PERMIT_ALL).hasRole("ADMIN");
 					request.anyRequest().authenticated();
 				}
 			)

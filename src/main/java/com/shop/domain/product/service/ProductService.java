@@ -1,10 +1,15 @@
 package com.shop.domain.product.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.shop.domain.product.model.Product;
+import com.shop.domain.category.service.CategoryService;
 import com.shop.domain.product.repository.ProductRepository;
+import com.shop.domain.product.request.ProductSort;
+import com.shop.domain.product.response.ProductDetailResponse;
+import com.shop.domain.product.response.ProductSearchResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -13,16 +18,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ProductService {
 	private final ProductRepository productRepository;
-
-	public void create(String name, Long price, Long quantity) {
-		productRepository.save(
-			new Product(
-				name,
-				price,
-				quantity
-			)
-		);
-	}
+	private final CategoryService categoryService;
 
 	public void update(Long id, String name, Long price, Long quantity) {
 		var product = productRepository.findByIdOrThrow(id);
@@ -64,5 +60,31 @@ public class ProductService {
 		var product = productRepository.findByIdOrThrow(id);
 
 		product.increaseStock(quantity);
+	}
+
+	// 상품 목록 조회
+	public Page<ProductSearchResponse> getSearchList(String keyword, Long categoryId, Boolean activeOnly, String sort,
+		PageRequest pageable) {
+		return productRepository.getSearchList(keyword, categoryId, activeOnly, ProductSort.from(sort), pageable);
+	}
+
+	// 상품 상세 조회
+	public ProductDetailResponse getDetailById(Long id) {
+		var product = productRepository.findDetailById(id);
+		var categoryList = categoryService.getCategoryHierarchy(product.category());
+
+		// ProductDetailProjection + CategoryList
+		return new ProductDetailResponse(
+			product.id(),
+			product.name(),
+			product.price(),
+			product.description(),
+			product.color(),
+			product.status(),
+			product.discountValue(),
+			product.discountType(),
+			product.discountedPrice(),
+			categoryList
+		);
 	}
 }

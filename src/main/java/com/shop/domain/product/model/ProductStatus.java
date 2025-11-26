@@ -1,5 +1,10 @@
 package com.shop.domain.product.model;
 
+import java.util.Arrays;
+
+import com.shop.global.common.CustomException;
+import com.shop.global.common.ErrorCode;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -13,4 +18,16 @@ public enum ProductStatus {
 	DELETED("삭제");
 
 	private final String description;
+
+	public boolean matches(String value) {
+		return this.name().equalsIgnoreCase(value);
+	}
+
+	public static ProductStatus from(String value) {
+		return Arrays.stream(values())
+			.filter(v -> v.matches(value))
+			.findFirst()
+			.orElseThrow(() -> new CustomException(ErrorCode.INVALID_PRODUCT_STATUS));
+	}
+
 }

@@ -23,6 +23,8 @@ public enum ErrorCode {
 	INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "다시 로그인 해주세요."),
 	PAGE_INVALID(HttpStatus.BAD_REQUEST, "Page 값은 1 이상이어야 합니다."),
 	SIZE_INVALID(HttpStatus.BAD_REQUEST, "Size 값은 1 이상이어야 합니다."),
+	// Product
+	INVALID_PRODUCT_STATUS(HttpStatus.BAD_REQUEST, "유효하지 않은 상품 상태입니다.")
 	;
 
 	private final HttpStatus status;

@@ -21,14 +21,11 @@ public abstract class BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	protected Long id;
-
+	protected Boolean isDeleted = false;
 	@CreatedDate
 	@Column(updatable = false, nullable = false)
 	protected LocalDateTime createdAt;
-
 	@LastModifiedDate
 	@Column(nullable = false)
 	protected LocalDateTime updatedAt;
-
-	protected String isDeleted = "F";
 }

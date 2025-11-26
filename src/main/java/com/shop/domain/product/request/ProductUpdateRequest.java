@@ -8,13 +8,13 @@ public record ProductUpdateRequest(
 	String name,
 	@NotNull
 	Long price,
-	@NotNull
+	@NotBlank
 	String description,
-	@NotNull
+	@NotBlank
 	String color,
 	@NotNull
 	Long deltaStock,
-	@NotNull
+	@NotBlank
 	String status,
 	@NotNull
 	Long categoryId

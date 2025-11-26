@@ -31,6 +31,7 @@ public class CartService {
 	private final ProductRepository productRepository;
 	private final UserRepository userRepository;
 
+	// 장바구니를 조회하는 API
 	public CartResponse getCart(Long userId) {
 		return cartRepository.findWithCartItemsAndProductsByUserId(userId)
 			.map(cart -> {
@@ -40,10 +41,12 @@ public class CartService {
 			.orElse(CartResponse.empty(userId));
 	}
 
+	// 장바구니를 검색하는 API
 	public Page<CartItemResponse> searchCartItems(Long userId, String keyword, Pageable pageable) {
 		return cartItemRepository.search(userId, keyword, pageable);
 	}
 
+	// 장바구니에 상품을 담는 API
 	@Transactional
 	public Long addCartItem(Long userId, Long productId, CartItemRequest.Create request) {
 		Product product = productRepository.findById(productId)
@@ -65,6 +68,7 @@ public class CartService {
 			});
 	}
 
+	// 장바구니 상품의 수량을 변경하는 API
 	@Transactional
 	public void updateCartItem(Long userId, Long cartItemId, CartItemRequest.Update request) {
 		CartItem cartItem = cartItemRepository.findWithProductByCartUserIdAndId(userId, cartItemId)
@@ -80,6 +84,7 @@ public class CartService {
 		cartItem.updateQuantity(request.getQuantity());
 	}
 
+	// 장바구니에서 상품을 삭제하는 API
 	@Transactional
 	public void deleteCartItem(Long userId, Long cartItemId) {
 		CartItem cartItem = cartItemRepository.findByCartUserIdAndId(userId, cartItemId)
@@ -88,11 +93,13 @@ public class CartService {
 		cartItemRepository.delete(cartItem);
 	}
 
+	// 장바구니에서 지정한 상품들을 삭제하는 API
 	@Transactional
 	public void deleteCartItems(Long userId, CartItemRequest.Delete request) {
 		cartItemRepository.deleteByCartUserIdAndIdIn(userId, request.getCartItemId());
 	}
 
+	// 장바구니를 비우는 API
 	@Transactional
 	public void clearCart(Long userId) {
 		cartItemRepository.deleteAllByCartUserId(userId);
@@ -103,6 +110,7 @@ public class CartService {
 		cartItemRepository.deleteByProductId(productId);
 	}
 
+	// 장바구니를 생성하는 메서드
 	private Cart getOrCreateCart(Long userId) {
 		return cartRepository.findByUserId(userId)
 			.orElseGet(() -> {

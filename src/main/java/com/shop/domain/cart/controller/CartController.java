@@ -24,8 +24,9 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
-
 
 @Tag(name = "장바구니", description = "장바구니 API")
 @RestController
@@ -50,7 +51,7 @@ public class CartController {
 	@GetMapping("/search")
 	public ApiResult<Page<CartItemResponse>> searchCartItems(
 		@AuthenticationPrincipal CurrentUser currentUser,
-		@RequestParam(required = false) String keyword,
+		@RequestParam(required = false) @NotBlank String keyword,
 		@Parameter(hidden = true) Paging paging
 	) {
 		Page<CartItemResponse> result = cartService.searchCartItems(
@@ -73,7 +74,7 @@ public class CartController {
 	@PutMapping("/items/{itemId}")
 	public ApiResult<Void> updateCartItem(
 		@AuthenticationPrincipal CurrentUser currentUser,
-		@PathVariable Long itemId,
+		@PathVariable @Min(1) Long itemId,
 		@Valid @RequestBody CartItemRequest.Update request) {
 		cartService.updateCartItem(currentUser.getId(), itemId, request);
 		return ApiResult.ok();
@@ -84,7 +85,7 @@ public class CartController {
 	@PutMapping("/items/{itemId}/delete")
 	public ApiResult<Void> deleteCartItem(
 		@AuthenticationPrincipal CurrentUser currentUser,
-		@PathVariable Long itemId) {
+		@PathVariable @Min(1) Long itemId) {
 		cartService.deleteCartItem(currentUser.getId(), itemId);
 		return ApiResult.ok();
 	} // ex : PUT http://localhost:8080/cart/3/delete

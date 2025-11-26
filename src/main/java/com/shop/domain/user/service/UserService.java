@@ -1,6 +1,6 @@
 package com.shop.domain.user.service;
 
-import java.time.LocalDateTime;
+import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,17 +9,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.shop.domain.user.model.User;
+import com.shop.domain.user.request.UserCreateRequest;
 import com.shop.global.common.ErrorCode;
 import com.shop.global.common.Preconditions;
-import com.shop.domain.user.request.UserRequest;
 import com.shop.domain.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
-
-// 구현체가 하나 이상 필요로해야 인터페이스가 의미가있다
-// 인터페이스 : 구현체 1:1로 다 나눠야하나
-// 관례를 지키려고 추상화를 굳이하는 것을 관습적추상화
-// 인터페이스로 굳이 나눴을때 불편한 점
 
 @Service
 @RequiredArgsConstructor
@@ -28,21 +23,19 @@ public class UserService {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 
-	// 트랜잭션 처리해줘
-	// PSA - Portable Service Abstraction
-	// 환경설정을 살짝 바꿔서 일관된 서비스를 제공하는 것
-	public void create(UserRequest.Create request) {
+	public void create(UserCreateRequest request) {
+		Preconditions.validate(!userRepository.existsByLoginId(request.loginId()), ErrorCode.EXIST_USER);
+
 		var newUser = User.normalUser(
-				request.loginId(),
+			request.loginId(),
+			UUID.randomUUID(),
 			passwordEncoder.encode(request.password()),
-				request.name(),
-				request.email(),
-				request.mobile(),
-				request.gender(),
-				request.birthday(),
-				LocalDateTime.now(),
-				LocalDateTime.now()
-			);
+			request.name(),
+			request.email(),
+			request.mobile(),
+			request.gender(),
+			request.birthday()
+		);
 
 			userRepository.save(newUser);
 	}
@@ -51,19 +44,16 @@ public class UserService {
 		return userRepository.existsByLoginId(loginId);
 	}
 
-	public void changePassword(Long id, String oldPassword, String password) {
+	public void changePassword(Long id, String oldPassword, String newPassword) {
 		var user = userRepository.findByIdOrThrow(id, ErrorCode.NOT_FOUND_USER);
 
-		//검증 작업
-		// 긍정적인 상황만 생각하자 -> 패스워드가 이전것과 달라야 => 해피한
-		// 패스워드가 같으면 안되는데 => 넌 해피하지 않은 상황
-		Preconditions.validate(user.getPassword().equals(oldPassword), ErrorCode.DOES_NOT_MATCH_OLD_PASSWORD);
-		Preconditions.validate(!oldPassword.equals(password), ErrorCode.CAN_NOT_ALLOWED_SAME_PASSWORD);
+		Preconditions.validate(passwordEncoder.matches(oldPassword, user.getPassword()),
+			ErrorCode.DOES_NOT_MATCH_OLD_PASSWORD);
+		Preconditions.validate(!oldPassword.equals(newPassword), ErrorCode.CAN_NOT_ALLOWED_SAME_PASSWORD);
 
-		user.changePassword(password);
+		user.changePassword(passwordEncoder.encode(newPassword));
 	}
 
-	// Pageable 인터페이스
 	public Page<User> search(Pageable pageable, String keyword) {
 		return userRepository.findAllByNameContaining(keyword, pageable);
 	}
@@ -79,9 +69,8 @@ public class UserService {
 	}
 
 	public void delete(Long id) {
-		userRepository.deleteById(id);
-		// 삭제에는 두가지 개념 - softdelete, harddelete
-		// var user = userRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
-		// userRepository.delete(user);
+		var user = userRepository.findByIdOrThrow(id, ErrorCode.NOT_FOUND_USER);
+
+		user.delete();
 	}
 }

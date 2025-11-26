@@ -17,10 +17,11 @@ public class JwtService {
 
 	public String issue(Long id, Role role, Date expiration) {
 
-		return Jwts.builder()
+		return Jwts
+			.builder()
 			.issuer("shopping-api")
 			.subject(id.toString())
-			.claim("roles", List.of(role))
+			.claim("role", role.name())
 			// TODO: membership 구현되면 추가
 			// .claim("tier", "GOLD")
 			.issuedAt(new Date())
@@ -61,5 +62,17 @@ public class JwtService {
 			.getSubject();
 
 		return Long.valueOf(id);
+	}
+
+	public Role parseRole(String token) {
+		String role = Jwts
+			.parser()
+			.verifyWith(jwtProperties.getSecret())
+			.build()
+			.parseSignedClaims(token)
+			.getPayload()
+			.get("role", String.class);
+
+		return Role.valueOf(role);
 	}
 }

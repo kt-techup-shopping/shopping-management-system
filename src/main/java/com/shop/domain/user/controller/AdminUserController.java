@@ -39,9 +39,10 @@ public class AdminUserController {
 		@RequestParam(required = false) String keyword,
 		@RequestParam(required = false) Gender gender,
 		@RequestParam(required = false) Boolean activeOnly,
+		@RequestParam(required = false) String sort,
 		@Parameter Paging paging
 	) {
-		var userList = userService.searchUsers(keyword, gender, activeOnly, paging.sort(), paging.toPageable());
+		var userList = userService.searchUsers(keyword, gender, activeOnly, sort, paging.toPageable());
 
 		return ApiResult.ok(userList);
 	}

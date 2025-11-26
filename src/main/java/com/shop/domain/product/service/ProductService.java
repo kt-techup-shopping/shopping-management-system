@@ -65,6 +65,7 @@ public class ProductService {
 		var product = productRepository.findDetailById(id);
 		var categoryList = categoryService.getCategoryHierarchy(product.category());
 
+		// ProductDetailProjection + CategoryList
 		return new ProductDetailResponse(
 			product.id(),
 			product.name(),

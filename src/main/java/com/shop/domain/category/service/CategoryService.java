@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CategoryService {
 
+	// 상위 카테고리 리스트 포함하여 반환
 	public List<CategoryDetailResponse> getCategoryHierarchy(Category category) {
 		List<Category> list = new ArrayList<>();
 		while (category != null) {

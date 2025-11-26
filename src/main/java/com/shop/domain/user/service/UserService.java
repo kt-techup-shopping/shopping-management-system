@@ -3,13 +3,16 @@ package com.shop.domain.user.service;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.shop.domain.user.model.Gender;
+import com.shop.domain.user.model.Role;
 import com.shop.domain.user.model.User;
 import com.shop.domain.user.request.UserCreateRequest;
+import com.shop.domain.user.response.UserSearchResponse;
 import com.shop.global.common.ErrorCode;
 import com.shop.global.common.Preconditions;
 import com.shop.domain.user.repository.UserRepository;
@@ -40,6 +43,23 @@ public class UserService {
 			userRepository.save(newUser);
 	}
 
+	public void createAdmin(UserCreateRequest request) {
+		Preconditions.validate(!userRepository.existsByLoginId(request.loginId()), ErrorCode.EXIST_USER);
+
+		var newAdmin = User.admin(
+			request.loginId(),
+			UUID.randomUUID(),
+			passwordEncoder.encode(request.password()),
+			request.name(),
+			request.email(),
+			request.mobile(),
+			request.gender(),
+			request.birthday()
+		);
+
+		userRepository.save(newAdmin);
+	}
+
 	public boolean isDuplicateLoginId(String loginId) {
 		return userRepository.existsByLoginId(loginId);
 	}
@@ -54,8 +74,9 @@ public class UserService {
 		user.changePassword(passwordEncoder.encode(newPassword));
 	}
 
-	public Page<User> search(Pageable pageable, String keyword) {
-		return userRepository.findAllByNameContaining(keyword, pageable);
+	public Page<UserSearchResponse> searchUsers(String keyword, Gender gender, Boolean activeOnly, String sort,
+		PageRequest pageable) {
+		return userRepository.search(keyword, gender, activeOnly, Role.USER, sort, pageable);
 	}
 
 	public User detail(Long id) {
@@ -72,5 +93,11 @@ public class UserService {
 		var user = userRepository.findByIdOrThrow(id, ErrorCode.NOT_FOUND_USER);
 
 		user.delete();
+	}
+
+	public void deactivateUser(Long id) {
+		var user = userRepository.findByIdOrThrow(id, ErrorCode.NOT_FOUND_USER);
+
+		user.deactivate();
 	}
 }

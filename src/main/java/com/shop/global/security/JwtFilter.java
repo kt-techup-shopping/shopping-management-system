@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 	private static final String TOKEN_PREFIX = "Bearer ";
+	private static final String BASE_LOGINID = "baseLoginId";
 
 	private final JwtService jwtService;
 
@@ -51,9 +52,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
 		var id = jwtService.parseId(token);
 		Role role = jwtService.parseRole(token);
-		String loginId = "파싱한아이디";
 
-		var principal = new DefaultCurrentUser(id, loginId, role);
+		var principal = new DefaultCurrentUser(id, BASE_LOGINID, role);
 
 		var techUpToken = new TechUpAuthenticationToken(
 			principal,

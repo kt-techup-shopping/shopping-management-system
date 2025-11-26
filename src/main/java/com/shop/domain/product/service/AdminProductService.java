@@ -98,4 +98,11 @@ public class AdminProductService {
 		var product = productRepository.findByIdOrThrow(id);
 		product.inActivate();
 	}
+
+	// 관리자 상품 상태 품절 토글
+	@Lock(key = Lock.Key.PRODUCT, index = 0, waitTime = 1000, leaseTime = 500, timeUnit = TimeUnit.MILLISECONDS)
+	public void updateSoldOutToggle(Long id) {
+		var product = productRepository.findByIdOrThrow(id);
+		product.toggleSoldOut();
+	}
 }

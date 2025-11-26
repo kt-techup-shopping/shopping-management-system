@@ -150,4 +150,10 @@ public class Product extends BaseEntity {
 	public void getDiscountPrice(Long discountPrice) {
 		this.price = discountPrice;
 	}
+
+	public void toggleSoldOut() {
+		this.status = this.status == ProductStatus.SOLD_OUT
+			? ProductStatus.ACTIVATED
+			: ProductStatus.SOLD_OUT;
+	}
 }

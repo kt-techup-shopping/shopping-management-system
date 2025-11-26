@@ -103,4 +103,12 @@ public class AdminProductController {
 		adminProductService.updateInActivated(id);
 		return ApiResult.ok();
 	}
+
+	// 관리자 상품 품절 (토글)
+	@PutMapping("/{id}/toggle-sold-out")
+	@ResponseStatus(HttpStatus.OK)
+	public ApiResult<Void> updateSoldOut(@PathVariable Long id) {
+		adminProductService.updateSoldOutToggle(id);
+		return ApiResult.ok();
+	}
 }

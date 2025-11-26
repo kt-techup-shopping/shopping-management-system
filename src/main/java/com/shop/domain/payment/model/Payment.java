@@ -9,7 +9,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -31,4 +30,29 @@ public class Payment extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "order_id")
 	private Order order;
+
+	private Payment(Long totalAmount, Long discountAmount, Long deliveryFee, Long finalAmount, PaymentType type,
+		Order order) {
+		this.totalAmount = totalAmount;
+		this.discountAmount = discountAmount;
+		this.deliveryFee = deliveryFee;
+		this.finalAmount = finalAmount;
+		this.status = PaymentStatus.PENDING;
+		this.type = type;
+		this.order = order;
+	}
+
+	public static Payment create(Long totalAmount, Long discountAmount, Long deliveryFee, PaymentType type, Order order) {
+		Long finalAmount = totalAmount - discountAmount + deliveryFee;
+
+		return new Payment(
+			totalAmount,
+			discountAmount,
+			deliveryFee,
+			finalAmount,
+			type,
+			order
+		);
+	}
+
 }

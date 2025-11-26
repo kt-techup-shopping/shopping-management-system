@@ -37,6 +37,7 @@ public class SecurityConfiguration {
 	private static final String[] PUT_PERMIT_ALL = {"/api/v1/public/**", "/admin/products/*"};
 	private static final String[] PATCH_PERMIT_ALL = {"/api/v1/public/**"};
 	private static final String[] DELETE_PERMIT_ALL = {"/api/v1/public/**"};
+	private static final String[] ADMIN_PERMIT_ALL = {"/admin/**"};
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
@@ -61,6 +62,9 @@ public class SecurityConfiguration {
 					request.requestMatchers(HttpMethod.PATCH, PATCH_PERMIT_ALL).permitAll();
 					request.requestMatchers(HttpMethod.PUT, PUT_PERMIT_ALL).permitAll();
 					request.requestMatchers(HttpMethod.DELETE, DELETE_PERMIT_ALL).permitAll();
+
+					// admin 접근 권한 확인
+					request.requestMatchers(ADMIN_PERMIT_ALL).hasRole("ADMIN");
 					request.anyRequest().authenticated();
 				}
 			)

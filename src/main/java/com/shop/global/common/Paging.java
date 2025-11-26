@@ -15,7 +15,7 @@ public record Paging(
 		size = size == null ? DEFAULT_SIZE : size;
 
 		Preconditions.validate(page >= 1, ErrorCode.PAGE_INVALID);
-		Preconditions.validate(size >= 1, ErrorCode.SIZE_INVALID);
+		Preconditions.validate(size >= 1 && size <= 100, ErrorCode.SIZE_INVALID);
 	}
 
 	public PageRequest toPageable() {

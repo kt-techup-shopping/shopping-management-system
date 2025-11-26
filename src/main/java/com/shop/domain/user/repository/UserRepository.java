@@ -12,7 +12,7 @@ import com.shop.global.common.ErrorCode;
 import com.shop.domain.user.model.User;
 
 
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends UserRepositoryCustom, JpaRepository<User, Long> {
 	Boolean existsByLoginId(String loginId);
 
 	Optional<User> findByLoginId(String loginId);

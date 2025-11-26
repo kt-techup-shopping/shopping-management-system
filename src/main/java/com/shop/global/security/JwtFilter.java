@@ -9,6 +9,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.shop.domain.user.model.Role;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 	private static final String TOKEN_PREFIX = "Bearer ";
+	private static final String BASE_LOGINID = "baseLoginId";
 
 	private final JwtService jwtService;
 
@@ -48,10 +51,13 @@ public class JwtFilter extends OncePerRequestFilter {
 		}
 
 		var id = jwtService.parseId(token);
+		Role role = jwtService.parseRole(token);
+
+		var principal = new DefaultCurrentUser(id, BASE_LOGINID, role);
 
 		var techUpToken = new TechUpAuthenticationToken(
-			new DefaultCurrentUser(id, "파싱한아이디"),
-			List.of()
+			principal,
+			principal.getAuthorities()
 		);
 
 		SecurityContextHolder.getContext().setAuthentication(techUpToken);

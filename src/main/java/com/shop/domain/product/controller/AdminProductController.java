@@ -2,6 +2,7 @@ package com.shop.domain.product.controller;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,8 +26,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/admin/products")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('ADMIN')")
+@RequestMapping("/admin/products")
 public class AdminProductController {
 
 	private final AdminProductService adminProductService;
@@ -53,10 +55,10 @@ public class AdminProductController {
 		@RequestParam(required = false) String keyword,
 		@RequestParam(required = false) Long categoryId,
 		@RequestParam(required = false) Boolean activeOnly,
-		@RequestParam(required = false) String sort,
+		@RequestParam(required = false) String productSort,
 		@Parameter Paging paging
 	) {
-		return ApiResult.ok(adminProductService.getAdminSearchList(keyword, categoryId, activeOnly, sort, paging.toPageable()));
+		return ApiResult.ok(adminProductService.getAdminSearchList(keyword, categoryId, activeOnly, productSort, paging.toPageable()));
 	}
 
 	// 관리자 상품 상세 조회

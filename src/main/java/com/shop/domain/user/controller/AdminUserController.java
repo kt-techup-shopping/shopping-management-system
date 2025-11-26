@@ -2,9 +2,10 @@ package com.shop.domain.user.controller;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,65 +13,47 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.shop.domain.user.model.Gender;
+import com.shop.domain.user.response.UserDetailResponse;
+import com.shop.domain.user.response.UserSearchResponse;
 import com.shop.domain.user.service.UserService;
 import com.shop.global.common.ApiResult;
 import com.shop.global.common.Paging;
-import com.shop.global.common.SwaggerAssistance;
-import com.shop.domain.user.response.UserResponse;
 import com.shop.domain.user.request.UserUpdateRequest;
-import com.shop.global.security.CurrentUser;
 
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-@Tag(name = "User")
 @RestController
 @RequestMapping("/admin/users")
 @RequiredArgsConstructor
-public class AdminUserController extends SwaggerAssistance {
+@PreAuthorize("hasRole('ADMIN')")
+public class AdminUserController {
 	private final UserService userService;
-	// 유저 리스트 조회
 
-	//?key=value&page=1&keyword=asdasd
-	// 이름에
-	@Operation(
-		parameters = {
-			@Parameter(name = "keyword", description = "검색 키워드(이름)"),
-			@Parameter(name = "page", description = "페이지 번호", example = "1"),
-			@Parameter(name = "size", description = "페이지 크기", example = "10")
-		}
-	)
+	// 유저 리스트 조회
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
-	public ApiResult<Page<UserResponse.Search>> search(
-		@AuthenticationPrincipal CurrentUser currentUser,
+	public ApiResult<Page<UserSearchResponse>> getUserList(
 		@RequestParam(required = false) String keyword,
-		@Parameter(hidden = true) Paging paging
+		@RequestParam(required = false) Gender gender,
+		@RequestParam(required = false) Boolean activeOnly,
+		@RequestParam(required = false) String sort,
+		@Parameter Paging paging
 	) {
-		System.out.println(currentUser.getId());
-		// pageable -> interface -> 구현체 : PageRequest
-		// 인터페이스가 존재하면 반드시 구현체(클래스)가 있다고 약속이 되어있다.
-		var search = userService.search(paging.toPageable(), keyword)
-			.map(user -> new UserResponse.Search(
-				user.getId(),
-				user.getName(),
-				user.getCreatedAt()
-			));
+		var userList = userService.searchUsers(keyword, gender, activeOnly, sort, paging.toPageable());
 
-		return ApiResult.ok(search);
-
+		return ApiResult.ok(userList);
 	}
-	// 유저 상세 조회
 
+	// 유저 상세 조회
 	@GetMapping("/{id}")
 	@ResponseStatus(HttpStatus.OK)
-	public ApiResult<UserResponse.Detail> detail(@PathVariable Long id) {
+	public ApiResult<UserDetailResponse> detail(@PathVariable Long id) {
 		var user = userService.detail(id);
 
-		return ApiResult.ok(new UserResponse.Detail(
+		return ApiResult.ok(new UserDetailResponse(
 			user.getId(),
 			user.getName(),
 			user.getEmail()
@@ -85,7 +68,13 @@ public class AdminUserController extends SwaggerAssistance {
 
 		return ApiResult.ok();
 	}
-	// 유저 삭제
-	// DELETE FROM MEMBER WHERE id = ?
-	// 유저 비밀번호 초기화
+
+	// 유저 비활성화
+	@PostMapping("/{id}/inactivate")
+	@ResponseStatus(HttpStatus.OK)
+	public ApiResult<Void> updateUserStatusInactive(@PathVariable Long id) {
+		userService.deactivateUser(id);
+
+		return ApiResult.ok();
+	}
 }

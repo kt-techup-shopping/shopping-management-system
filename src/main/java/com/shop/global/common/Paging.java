@@ -3,10 +3,11 @@ package com.shop.global.common;
 import org.springframework.data.domain.PageRequest;
 
 public record Paging(
-	Integer page,
-	Integer size
-
+	int page,
+	int size,
 	//todo: 정렬기능도 추가 예정
+	String sort,
+	String order
 ) {
 	public Paging {
 		if (page == null || page < 1) {

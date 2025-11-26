@@ -67,6 +67,7 @@ public class AdminProductService {
 		);
 	}
 
+	// 관리자 상품 정보 수정
 	@Lock(key = Lock.Key.PRODUCT, index = 0, waitTime = 1000, leaseTime = 500, timeUnit = TimeUnit.MILLISECONDS)
 	public void updateDetail(Long id, String name, Long price, String description, String color, Long deltaStock,
 		String status, Long categoryId) {
@@ -82,5 +83,12 @@ public class AdminProductService {
 			ProductStatus.from(status),
 			category
 		);
+	}
+
+	// 관리자 상품 활성화 처리
+	@Lock(key = Lock.Key.PRODUCT, index = 0, waitTime = 1000, leaseTime = 500, timeUnit = TimeUnit.MILLISECONDS)
+	public void updateActivated(Long id) {
+		var product = productRepository.findByIdOrThrow(id);
+		product.activate();
 	}
 }

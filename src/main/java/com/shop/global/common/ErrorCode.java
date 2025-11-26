@@ -26,6 +26,7 @@ public enum ErrorCode {
 	INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "다시 로그인 해주세요."),
 	PAGE_INVALID(HttpStatus.BAD_REQUEST, "Page 값은 1 이상이어야 합니다."),
 	SIZE_INVALID(HttpStatus.BAD_REQUEST, "Size 값은 1 이상이어야 합니다."),
+	NOT_USER_ROLE_ADMIN(HttpStatus.BAD_REQUEST, "해당 유저는 관리자 권한이 아닙니다."),
 	// Product
 	INVALID_PRODUCT_STATUS(HttpStatus.BAD_REQUEST, "유효하지 않은 상품 상태입니다."),
 	// Review
@@ -33,8 +34,6 @@ public enum ErrorCode {
 	NOT_FOUND_REVIEW(HttpStatus.BAD_REQUEST, "존재하지 않는 리뷰입니다."),
 	DOES_NOT_MATCH_USER_REVIEW(HttpStatus.BAD_REQUEST, "리뷰는 작성자만 삭제할 수 있습니다."),
 	ALREADY_WRITE_REVIEW(HttpStatus.BAD_REQUEST, "이미 상품에 대한 리뷰를 작성했습니다."),
-
-	NOT_USER_ROLE_ADMIN(HttpStatus.BAD_REQUEST, "해당 유저는 관리자 권한이 아닙니다."),
 	;
 
 	private final HttpStatus status;

@@ -1,5 +1,7 @@
 package com.shop.domain.payment.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -7,6 +9,7 @@ import com.shop.domain.order.repository.OrderRepository;
 import com.shop.domain.payment.model.Payment;
 import com.shop.domain.payment.model.PaymentType;
 import com.shop.domain.payment.repository.PaymentRepository;
+import com.shop.domain.payment.response.PaymentResponse;
 import com.shop.global.common.ErrorCode;
 import com.shop.global.common.Preconditions;
 
@@ -43,4 +46,15 @@ public class PaymentService {
 
 		paymentRepository.save(payment);
 	}
+
+	public List<PaymentResponse> getPayment(Long orderId) {
+		var order = orderRepository.findByIdOrThrow(orderId, ErrorCode.NOT_FOUND_ORDER);
+
+		return order
+			.getPayments()
+			.stream()
+			.map(PaymentResponse::of)
+			.toList();
+	}
+
 }

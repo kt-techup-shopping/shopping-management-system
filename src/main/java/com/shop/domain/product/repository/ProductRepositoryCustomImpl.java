@@ -25,11 +25,13 @@ import com.shop.domain.discount.model.QDiscount;
 import com.shop.domain.product.model.ProductStatus;
 import com.shop.domain.product.model.QProduct;
 import com.shop.domain.product.request.ProductSort;
+import com.shop.domain.product.response.AdminProductDetailQueryResponse;
 import com.shop.domain.product.response.AdminProductSearchResponse;
-import com.shop.domain.product.response.ProductDetailProjection;
+import com.shop.domain.product.response.ProductDetailQueryResponse;
 import com.shop.domain.product.response.ProductSearchResponse;
+import com.shop.domain.product.response.QAdminProductDetailQueryResponse;
 import com.shop.domain.product.response.QAdminProductSearchResponse;
-import com.shop.domain.product.response.QProductDetailProjection;
+import com.shop.domain.product.response.QProductDetailQueryResponse;
 import com.shop.domain.product.response.QProductSearchResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -70,11 +72,11 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 		);
 	}
 
-	// 상품 상세 조회
+	// 사용자 상품 상세 조회
 	@Override
-	public ProductDetailProjection findDetailById(Long id) {
-		return jpaQueryFactory
-			.select(new QProductDetailProjection(
+	public ProductDetailQueryResponse findDetailById(Long id) {
+		return findProductDetail(
+			id, new QProductDetailQueryResponse(
 				product.id,
 				product.name,
 				product.price,
@@ -85,14 +87,8 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 				discount.value,
 				discount.type,
 				discountedPriceExpression()
-			))
-			.from(product)
-			.leftJoin(discount)
-			.on(discount.product.eq(product)
-				.and(discount.id.eq(latestDiscountIdSubQuery()))
 			)
-			.where(product.id.eq(id))
-			.fetchOne();
+		);
 	}
 
 	// 관리자 상품 목록 조회 (검색/카테고리/판매중/정렬 조건 적용, 재고 포함)
@@ -116,6 +112,26 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 				product.price,
 				product.stock,
 				product.status,
+				discount.value,
+				discount.type,
+				discountedPriceExpression()
+			)
+		);
+	}
+
+	// 관리자 상품 상세 조회
+	@Override
+	public AdminProductDetailQueryResponse findAdminDetailById(Long id) {
+		return findProductDetail(
+			id, new QAdminProductDetailQueryResponse(
+				product.id,
+				product.name,
+				product.price,
+				product.description,
+				product.color,
+				product.stock,
+				product.status,
+				product.category,
 				discount.value,
 				discount.type,
 				discountedPriceExpression()
@@ -159,6 +175,23 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 			.fetch().size();
 
 		return new PageImpl<>(content, pageable, total);
+	}
+
+	// 공통 상품 상세 조회 쿼리
+	private <T> T findProductDetail(
+		Long productId,
+		Expression<T> projection
+	) {
+		return jpaQueryFactory
+			.select(projection)
+			.from(product)
+			// 최신 할인 정보 조회 위해 discount 테이블 left join
+			.leftJoin(discount)
+			.on(discount.product.eq(product)
+				.and(discount.id.eq(latestDiscountIdSubQuery()))
+			)
+			.where(product.id.eq(productId))
+			.fetchOne();
 	}
 
 	// 상품명에 키워드가 포함되는지 검색 조건 생성

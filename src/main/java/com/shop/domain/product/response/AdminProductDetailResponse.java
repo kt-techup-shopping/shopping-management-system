@@ -1,23 +1,22 @@
 package com.shop.domain.product.response;
 
-import com.querydsl.core.annotations.QueryProjection;
-import com.shop.domain.category.model.Category;
+import java.util.List;
+
+import com.shop.domain.category.response.CategoryDetailResponse;
 import com.shop.domain.discount.model.DiscountType;
 import com.shop.domain.product.model.ProductStatus;
 
-public record ProductDetailProjection(
+public record AdminProductDetailResponse(
 	Long id,
 	String name,
 	Long price,
 	String description,
 	String color,
+	Long stock,
 	ProductStatus status,
-	Category category,
 	Long discountValue,
 	DiscountType discountType,
-	Long discountedPrice
+	Long discountedPrice,
+	List<CategoryDetailResponse> categories
 ) {
-	@QueryProjection
-	public ProductDetailProjection{
-	}
 }

@@ -29,7 +29,7 @@ public class AuthService {
 			.orElseThrow(() -> new CustomException(ErrorCode.FAIL_LOGIN));
 
 		Preconditions.validate(passwordEncoder.matches(password, user.getPassword()), ErrorCode.FAIL_LOGIN);
-		Preconditions.validate(user.getStatus() == Status.ACTIVE, ErrorCode.ACCOUNT_INACTIVE);
+		Preconditions.validate(user.getStatus() == Status.ACTIVE, ErrorCode.ACCOUNT_INACTIVED);
 
 		var accessExp = jwtService.getAccessExpiration();
 		var refreshExp = jwtService.getRefreshExpiration();

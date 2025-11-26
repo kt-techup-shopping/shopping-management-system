@@ -10,7 +10,9 @@ import com.shop.domain.cart.repository.CartRepository;
 import com.shop.domain.cart.response.CartResponse;
 import com.shop.domain.cartitem.model.CartItem;
 import com.shop.domain.cartitem.repository.CartItemRepository;
-import com.shop.domain.cartitem.request.CartItemRequest;
+import com.shop.domain.cartitem.request.CartItemCreate;
+import com.shop.domain.cartitem.request.CartItemDelete;
+import com.shop.domain.cartitem.request.CartItemUpdate;
 import com.shop.domain.cartitem.response.CartItemResponse;
 import com.shop.domain.product.model.Product;
 import com.shop.domain.product.repository.ProductRepository;
@@ -48,7 +50,7 @@ public class CartService {
 
 	// 장바구니에 상품을 담는 API
 	@Transactional
-	public Long addCartItem(Long userId, Long productId, CartItemRequest.Create request) {
+	public Long addCartItem(Long userId, Long productId, CartItemCreate request) {
 		Product product = productRepository.findById(productId)
 			.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_PRODUCT));
 		Preconditions.validate(product.getStock() >= request.getQuantity(), ErrorCode.NOT_ENOUGH_STOCK);
@@ -70,7 +72,7 @@ public class CartService {
 
 	// 장바구니 상품의 수량을 변경하는 API
 	@Transactional
-	public void updateCartItem(Long userId, Long cartItemId, CartItemRequest.Update request) {
+	public void updateCartItem(Long userId, Long cartItemId, CartItemUpdate request) {
 		CartItem cartItem = cartItemRepository.findWithProductByCartUserIdAndId(userId, cartItemId)
 			.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_PRODUCT));
 
@@ -95,7 +97,7 @@ public class CartService {
 
 	// 장바구니에서 지정한 상품들을 삭제하는 API
 	@Transactional
-	public void deleteCartItems(Long userId, CartItemRequest.Delete request) {
+	public void deleteCartItems(Long userId, CartItemDelete request) {
 		cartItemRepository.deleteByCartUserIdAndIdIn(userId, request.getCartItemId());
 	}
 

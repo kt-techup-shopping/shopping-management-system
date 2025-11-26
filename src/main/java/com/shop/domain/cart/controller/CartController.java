@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.shop.domain.cart.response.CartResponse;
 import com.shop.domain.cart.service.CartService;
-import com.shop.domain.cartitem.request.CartItemRequest;
+import com.shop.domain.cartitem.request.CartItemCreate;
+import com.shop.domain.cartitem.request.CartItemDelete;
+import com.shop.domain.cartitem.request.CartItemUpdate;
 import com.shop.domain.cartitem.response.CartItemResponse;
 import com.shop.global.common.ApiResult;
 import com.shop.global.common.Paging;
@@ -64,7 +66,7 @@ public class CartController {
 	@PostMapping("/items")
 	public ApiResult<Long> addCartItem(
 		@AuthenticationPrincipal CurrentUser currentUser,
-		@Valid @RequestBody CartItemRequest.Create request) {
+		@Valid @RequestBody CartItemCreate request) {
 		Long cartItemId = cartService.addCartItem(currentUser.getId(), request.getProductId(), request);
 		return ApiResult.ok(cartItemId);
 	} // ex : POST http://localhost:8080/cart/items {"productId" : 1, "quantity" : 2}
@@ -75,7 +77,7 @@ public class CartController {
 	public ApiResult<Void> updateCartItem(
 		@AuthenticationPrincipal CurrentUser currentUser,
 		@PathVariable @Min(1) Long itemId,
-		@Valid @RequestBody CartItemRequest.Update request) {
+		@Valid @RequestBody CartItemUpdate request) {
 		cartService.updateCartItem(currentUser.getId(), itemId, request);
 		return ApiResult.ok();
 	} // ex : PUT http://localhost:8080/cart/items/1 /{"quantity" : 3}
@@ -95,7 +97,7 @@ public class CartController {
 	@PutMapping("/items")
 	public ApiResult<Void> deleteCartItems(
 		@AuthenticationPrincipal CurrentUser currentUser,
-		@Valid @RequestBody CartItemRequest.Delete request) {
+		@Valid @RequestBody CartItemDelete request) {
 		cartService.deleteCartItems(currentUser.getId(), request);
 		return ApiResult.ok();
 	} // ex : PUT http://localhost:8080/cart/items {"cartItemId" : [1,2]}

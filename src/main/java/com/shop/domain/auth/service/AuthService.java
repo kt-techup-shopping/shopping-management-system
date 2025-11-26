@@ -5,6 +5,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.shop.domain.user.model.Status;
 import com.shop.global.common.CustomException;
 import com.shop.global.common.ErrorCode;
 import com.shop.global.common.Preconditions;
@@ -28,6 +29,7 @@ public class AuthService {
 			.orElseThrow(() -> new CustomException(ErrorCode.FAIL_LOGIN));
 
 		Preconditions.validate(passwordEncoder.matches(password, user.getPassword()), ErrorCode.FAIL_LOGIN);
+		Preconditions.validate(user.getStatus() == Status.ACTIVE, ErrorCode.ACCOUNT_INACTIVE);
 
 		var accessExp = jwtService.getAccessExpiration();
 		var refreshExp = jwtService.getRefreshExpiration();

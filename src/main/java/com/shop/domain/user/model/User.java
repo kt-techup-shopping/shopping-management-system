@@ -107,4 +107,8 @@ public class User extends BaseEntity {
 	public void demoteToUser() {
 		this.role = Role.USER;
 	}
+
+	public void deactivate() {
+		this.status = Status.INACTIVE;
+	}
 }

@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.shop.domain.category.service.CategoryService;
-import com.shop.domain.product.model.Product;
 import com.shop.domain.product.repository.ProductRepository;
+import com.shop.domain.product.request.ProductSort;
 import com.shop.domain.product.response.ProductDetailResponse;
 import com.shop.domain.product.response.ProductSearchResponse;
 
@@ -19,16 +19,6 @@ import lombok.RequiredArgsConstructor;
 public class ProductService {
 	private final ProductRepository productRepository;
 	private final CategoryService categoryService;
-
-	public void create(String name, Long price, Long quantity) {
-		productRepository.save(
-			new Product(
-				name,
-				price,
-				quantity
-			)
-		);
-	}
 
 	public void update(Long id, String name, Long price, Long quantity) {
 		var product = productRepository.findByIdOrThrow(id);
@@ -73,8 +63,9 @@ public class ProductService {
 	}
 
 	// 상품 목록 조회
-	public Page<ProductSearchResponse> search(String keyword, Long categoryId, Boolean activeOnly, String sort, PageRequest pageable) {
-		return productRepository.search(keyword, categoryId, activeOnly, sort, pageable);
+	public Page<ProductSearchResponse> getSearchList(String keyword, Long categoryId, Boolean activeOnly, String sort,
+		PageRequest pageable) {
+		return productRepository.getSearchList(keyword, categoryId, activeOnly, ProductSort.from(sort), pageable);
 	}
 
 	// 상품 상세 조회

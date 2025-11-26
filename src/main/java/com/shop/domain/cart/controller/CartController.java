@@ -67,7 +67,7 @@ public class CartController {
 	public ApiResult<Long> addCartItem(
 		@AuthenticationPrincipal CurrentUser currentUser,
 		@Valid @RequestBody CartItemCreate request) {
-		Long cartItemId = cartService.addCartItem(currentUser.getId(), request.getProductId(), request);
+		Long cartItemId = cartService.addCartItem(currentUser.getId(), request.productId(), request);
 		return ApiResult.ok(cartItemId);
 	} // ex : POST http://localhost:8080/cart/items {"productId" : 1, "quantity" : 2}
 

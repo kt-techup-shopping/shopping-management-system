@@ -53,19 +53,19 @@ public class CartService {
 	public Long addCartItem(Long userId, Long productId, CartItemCreate request) {
 		Product product = productRepository.findById(productId)
 			.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_PRODUCT));
-		Preconditions.validate(product.getStock() >= request.getQuantity(), ErrorCode.NOT_ENOUGH_STOCK);
+		Preconditions.validate(product.getStock() >= request.quantity(), ErrorCode.NOT_ENOUGH_STOCK);
 
 		Cart cart = getOrCreateCart(userId);
 
-		return cartItemRepository.findWithProductByCartUserIdAndProductId(userId, request.getProductId())
+		return cartItemRepository.findWithProductByCartUserIdAndProductId(userId, request.productId())
 			.map(existingItem -> {
-				Long newQuantity = existingItem.getQuantity() + request.getQuantity();
+				Long newQuantity = existingItem.getQuantity() + request.quantity();
 				Preconditions.validate(product.getStock() >= newQuantity, ErrorCode.NOT_ENOUGH_STOCK);
-				existingItem.addQuantity(request.getQuantity());
+				existingItem.addQuantity(request.quantity());
 				return existingItem.getId();
 			})
 			.orElseGet(() -> {
-				CartItem cartItem = new CartItem(request.getQuantity(), cart, product);
+				CartItem cartItem = new CartItem(request.quantity(), cart, product);
 				return cartItemRepository.save(cartItem).getId();
 			});
 	}
@@ -81,9 +81,9 @@ public class CartService {
 		// 상품의 상태 확인, 활성이 아닐시 오류 발생
 		Preconditions.validate(product.isActive(), ErrorCode.NOT_ACTIVE);
 		// 상품의 재고가 담으려는 재고보다 적을 경우 오류 발생
-		Preconditions.validate(product.getStock() >= request.getQuantity(), ErrorCode.NOT_ENOUGH_STOCK);
+		Preconditions.validate(product.getStock() >= request.quantity(), ErrorCode.NOT_ENOUGH_STOCK);
 
-		cartItem.updateQuantity(request.getQuantity());
+		cartItem.updateQuantity(request.quantity());
 	}
 
 	// 장바구니에서 상품을 삭제하는 API
@@ -98,7 +98,7 @@ public class CartService {
 	// 장바구니에서 지정한 상품들을 삭제하는 API
 	@Transactional
 	public void deleteCartItems(Long userId, CartItemDelete request) {
-		cartItemRepository.deleteByCartUserIdAndIdIn(userId, request.getCartItemId());
+		cartItemRepository.deleteByCartUserIdAndIdIn(userId, request.cartItemId());
 	}
 
 	// 장바구니를 비우는 API

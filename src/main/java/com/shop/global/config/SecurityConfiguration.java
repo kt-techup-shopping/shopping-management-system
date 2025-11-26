@@ -28,9 +28,12 @@ public class SecurityConfiguration {
 
 	private static final String[] GET_PERMIT_ALL = {
 		"/api/health/**", "/swagger-ui/**", "/v3/api-docs/**",
-		"/products", "/products/*"
+		"/products", "/products/*", "/admin/products", "/admin/products/*"
 	};
-	private static final String[] POST_PERMIT_ALL = {"/auth/login", "/auth/signup", "/auth/refresh"};
+	private static final String[] POST_PERMIT_ALL = {
+		"/auth/login", "/auth/signup", "/auth/refresh",
+		"/admin/products"
+	};
 	private static final String[] PUT_PERMIT_ALL = {"/api/v1/public/**"};
 	private static final String[] PATCH_PERMIT_ALL = {"/api/v1/public/**"};
 	private static final String[] DELETE_PERMIT_ALL = {"/api/v1/public/**"};
@@ -62,7 +65,6 @@ public class SecurityConfiguration {
 
 					// admin 접근 권한 확인
 					request.requestMatchers(ADMIN_PERMIT_ALL).hasRole("ADMIN");
-
 					request.anyRequest().authenticated();
 				}
 			)

@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,13 +13,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.shop.domain.product.request.ProductRequest;
 import com.shop.domain.product.response.ProductDetailResponse;
 import com.shop.domain.product.response.ProductSearchResponse;
 import com.shop.domain.product.service.ProductService;
 import com.shop.global.common.ApiResult;
 import com.shop.global.common.Paging;
 import com.shop.global.common.SwaggerAssistance;
-import com.shop.domain.product.request.ProductRequest;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -41,28 +40,16 @@ public class ProductController extends SwaggerAssistance {
 		@RequestParam(required = false) String keyword,
 		@RequestParam(required = false) Long categoryId,
 		@RequestParam(required = false) Boolean activeOnly,
+		@RequestParam(required = false) String sort,
 		@Parameter Paging paging
 	) {
-		return ApiResult.ok(productService.search(keyword, categoryId, activeOnly, paging.sort(), paging.toPageable()));
+		return ApiResult.ok(productService.getSearchList(keyword, categoryId, activeOnly, sort, paging.toPageable()));
 	}
 
-	// 상품 상세 조회
 	@GetMapping("/{id}")
 	@ResponseStatus(HttpStatus.OK)
 	public ApiResult<ProductDetailResponse> getDetailById(@PathVariable Long id){
 		return ApiResult.ok(productService.getDetailById(id));
-	}
-
-	@PostMapping
-	@ResponseStatus(HttpStatus.CREATED)
-	public ApiResult<Void> create(@RequestBody @Valid ProductRequest.Create request) {
-		productService.create(
-			request.getName(),
-			request.getPrice(),
-			request.getQuantity()
-		);
-
-		return ApiResult.ok();
 	}
 
 	@PutMapping("/{id}")

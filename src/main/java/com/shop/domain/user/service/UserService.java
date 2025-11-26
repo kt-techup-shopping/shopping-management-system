@@ -3,13 +3,16 @@ package com.shop.domain.user.service;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.shop.domain.user.model.Gender;
+import com.shop.domain.user.model.Role;
 import com.shop.domain.user.model.User;
 import com.shop.domain.user.request.UserCreateRequest;
+import com.shop.domain.user.response.UserSearchResponse;
 import com.shop.global.common.ErrorCode;
 import com.shop.global.common.Preconditions;
 import com.shop.domain.user.repository.UserRepository;
@@ -71,8 +74,9 @@ public class UserService {
 		user.changePassword(passwordEncoder.encode(newPassword));
 	}
 
-	public Page<User> search(Pageable pageable, String keyword) {
-		return userRepository.findAllByNameContaining(keyword, pageable);
+	public Page<UserSearchResponse> searchUsers(String keyword, Gender gender, Boolean activeOnly, String sort,
+		PageRequest pageable) {
+		return userRepository.search(keyword, gender, activeOnly, Role.USER, sort, pageable);
 	}
 
 	public User detail(Long id) {

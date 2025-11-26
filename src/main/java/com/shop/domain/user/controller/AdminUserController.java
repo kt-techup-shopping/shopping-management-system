@@ -3,7 +3,6 @@ package com.shop.domain.user.controller;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,15 +13,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.shop.domain.user.model.Gender;
 import com.shop.domain.user.response.UserDetailResponse;
+import com.shop.domain.user.response.UserSearchResponse;
 import com.shop.domain.user.service.UserService;
 import com.shop.global.common.ApiResult;
 import com.shop.global.common.Paging;
-import com.shop.domain.user.response.UserResponse;
 import com.shop.domain.user.request.UserUpdateRequest;
-import com.shop.global.security.CurrentUser;
 
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,30 +32,18 @@ import lombok.RequiredArgsConstructor;
 public class AdminUserController {
 	private final UserService userService;
 
-	@Operation(
-		parameters = {
-			@Parameter(name = "keyword", description = "검색 키워드(이름)"),
-			@Parameter(name = "page", description = "페이지 번호", example = "1"),
-			@Parameter(name = "size", description = "페이지 크기", example = "10")
-		}
-	)
+	// 유저 리스트 조회
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
-	public ApiResult<Page<UserResponse.Search>> search(
-		@AuthenticationPrincipal CurrentUser currentUser,
+	public ApiResult<Page<UserSearchResponse>> getUserList(
 		@RequestParam(required = false) String keyword,
-		@Parameter(hidden = true) Paging paging
+		@RequestParam(required = false) Gender gender,
+		@RequestParam(required = false) Boolean activeOnly,
+		@Parameter Paging paging
 	) {
-		var search = userService
-			.search(paging.toPageable(), keyword)
-			.map(user -> new UserResponse.Search(
-				user.getId(),
-				user.getName(),
-				user.getCreatedAt()
-			));
+		var userList = userService.searchUsers(keyword, gender, activeOnly, paging.sort(), paging.toPageable());
 
-		return ApiResult.ok(search);
-
+		return ApiResult.ok(userList);
 	}
 
 	// 유저 상세 조회

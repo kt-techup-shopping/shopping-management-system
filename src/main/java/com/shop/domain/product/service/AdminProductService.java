@@ -85,10 +85,17 @@ public class AdminProductService {
 		);
 	}
 
-	// 관리자 상품 활성화 처리
+	// 관리자 상품 상태 비활성화
 	@Lock(key = Lock.Key.PRODUCT, index = 0, waitTime = 1000, leaseTime = 500, timeUnit = TimeUnit.MILLISECONDS)
 	public void updateActivated(Long id) {
 		var product = productRepository.findByIdOrThrow(id);
 		product.activate();
+	}
+
+	// 관리자 상품 상태 비활성화
+	@Lock(key = Lock.Key.PRODUCT, index = 0, waitTime = 1000, leaseTime = 500, timeUnit = TimeUnit.MILLISECONDS)
+	public void updateInActivated(Long id) {
+		var product = productRepository.findByIdOrThrow(id);
+		product.inActivate();
 	}
 }

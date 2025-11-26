@@ -12,7 +12,7 @@ import com.shop.domain.product.model.Product;
 
 import jakarta.persistence.LockModeType;
 
-public interface ProductRepository extends JpaRepository<Product, Long> {
+public interface ProductRepository extends ProductRepositoryCustom, JpaRepository<Product, Long> {
 	default Product findByIdOrThrow(Long id) {
 		return findById(id).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_PRODUCT));
 	}

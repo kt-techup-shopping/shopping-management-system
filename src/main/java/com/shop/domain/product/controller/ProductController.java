@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.shop.domain.product.response.ProductDetailResponse;
 import com.shop.domain.product.response.ProductSearchResponse;
 import com.shop.domain.product.service.ProductService;
 import com.shop.global.common.ApiResult;
@@ -43,6 +44,13 @@ public class ProductController extends SwaggerAssistance {
 		@Parameter Paging paging
 	) {
 		return ApiResult.ok(productService.search(keyword, categoryId, activeOnly, paging.sort(), paging.toPageable()));
+	}
+
+	// 상품 상세 조회
+	@GetMapping("/{id}")
+	@ResponseStatus(HttpStatus.OK)
+	public ApiResult<ProductDetailResponse> getDetailById(@PathVariable Long id){
+		return ApiResult.ok(productService.getDetailById(id));
 	}
 
 	@PostMapping

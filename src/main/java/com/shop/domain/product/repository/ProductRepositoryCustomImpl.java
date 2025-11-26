@@ -21,9 +21,11 @@ import com.shop.domain.category.model.Category;
 import com.shop.domain.category.repository.CategoryRepository;
 import com.shop.domain.discount.model.DiscountType;
 import com.shop.domain.discount.model.QDiscount;
-import com.shop.domain.product.response.ProductSearchResponse;
 import com.shop.domain.product.model.ProductStatus;
 import com.shop.domain.product.model.QProduct;
+import com.shop.domain.product.response.ProductDetailQueryResponse;
+import com.shop.domain.product.response.ProductSearchResponse;
+import com.shop.domain.product.response.QProductDetailQueryResponse;
 import com.shop.domain.product.response.QProductSearchResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -73,6 +75,32 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 			.fetch().size();
 
 		return new PageImpl<>(content, pageable, total);
+	}
+
+	// 상품 상세 정보 조회
+	@Override
+	public ProductDetailQueryResponse findDetailById(Long id) {
+		return jpaQueryFactory
+			.select(new QProductDetailQueryResponse(
+				product.id,
+				product.name,
+				product.price,
+				product.description,
+				product.color,
+				product.status,
+				product.category,
+				discount.value,
+				discount.type,
+				discountedPriceExpression()
+			))
+			.from(product)
+			// 최신 할인 정보 조회 위해 discount 테이블 left join
+			.leftJoin(discount)
+			.on(discount.product.eq(product)
+				.and(discount.id.eq(latestDiscountIdSubQuery()))
+			)
+			.where(product.id.eq(id))
+			.fetchOne();
 	}
 
 	// 상품명에 키워드가 포함되는지 확인

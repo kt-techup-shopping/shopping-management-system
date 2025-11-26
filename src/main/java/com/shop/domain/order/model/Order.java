@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.shop.domain.payment.model.Payment;
 import com.shop.global.common.BaseEntity;
 import com.shop.domain.orderproduct.model.OrderProduct;
 import com.shop.domain.user.model.User;
@@ -12,6 +13,7 @@ import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -30,17 +32,15 @@ public class Order extends BaseEntity {
 	private OrderStatus status;
 	private LocalDateTime deliveredAt;
 
-	// 연관관계
-	// 주문 <-> 회원
-	// N : 1 => 다대일
-	// ManyToOne
-	// FK => 많은 쪽에 생김
 	@ManyToOne
 	@JoinColumn(name = "user_id")
 	private User user;
 
 	@OneToMany(mappedBy = "order")
 	private List<OrderProduct> orderProducts = new ArrayList<>();
+
+	@OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
+	private List<Payment> payments = new ArrayList<>();
 
 	private Order(Receiver receiver, User user) {
 		this.receiver = receiver;

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.shop.domain.review.request.ReviewCreateRequest;
+import com.shop.domain.review.request.ReviewLikeRequest;
 import com.shop.domain.review.request.ReviewUpdateRequest;
 import com.shop.domain.review.service.ReviewService;
 import com.shop.global.common.ApiResult;
@@ -20,7 +21,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/reviews")
+@RequestMapping("/reviews")
 @RequiredArgsConstructor
 public class ReviewController {
 
@@ -38,7 +39,7 @@ public class ReviewController {
 		@RequestBody @Valid ReviewCreateRequest reviewCreateRequest,
 		@PathVariable Long productId
 	){
-		reviewService.createReview(reviewCreateRequest, defaultCurrentUser.getId(), productId);
+		reviewService.createReview(reviewCreateRequest, productId, defaultCurrentUser.getId());
 		return ApiResult.ok();
 	}
 
@@ -68,4 +69,13 @@ public class ReviewController {
 		return ApiResult.ok();
 	}
 
+	@PutMapping("/{reviewId}/like")
+	public ApiResult<Void> updateReviewLike(
+		@AuthenticationPrincipal DefaultCurrentUser defaultCurrentUser,
+		@RequestBody @Valid ReviewLikeRequest reviewLikeRequest,
+		@PathVariable Long reviewId
+	){
+		reviewService.updateReviewLike(reviewLikeRequest, reviewId, defaultCurrentUser.getId());
+		return ApiResult.ok();
+	}
 }

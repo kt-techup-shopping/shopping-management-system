@@ -20,6 +20,7 @@ public interface ReviewRepositoryCustom {
 
 	// 상품 별 리뷰 수
 	long countReviewsByProduct(Long productId);
+
 	// 리뷰 id로 조회
 	ReviewDetailQueryResponse findReviewById(Long reviewId, Long loginUserId);
 }

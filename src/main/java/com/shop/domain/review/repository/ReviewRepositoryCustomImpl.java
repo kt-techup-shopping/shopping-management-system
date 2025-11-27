@@ -24,11 +24,15 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
 
 	private final JPAQueryFactory jpaQueryFactory;
 
-	// QClass들을 private final 필드로 선언
 	private final QReview review = QReview.review;
 	private final QReviewLike reviewLike = QReviewLike.reviewLike;
 	private final QUser user = QUser.user;
 
+	/**
+	 * 특정 상품에 대한 리뷰를 조회
+	 * 좋아요순, 최신순, 오래된순(기본값) 에 대한 정렬 가능
+	 * 페이지네이션 적용
+	 */
 	@Override
 	public List<ReviewPageQueryResponse> findReviews(
 		Long loginUserId,
@@ -90,6 +94,10 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
 	}
 
 
+	/**
+	 * 특정 사용자 리뷰 조회하는
+	 * 페이지네이션 적용
+	 */
 	@Override
 	public List<ReviewPageQueryResponse> findReviewsByUser(Long targetUserId, Long loginUserId, int offset, int limit) {
 
@@ -132,8 +140,9 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
 			.fetch();
 	}
 
-
-
+	/**
+	 * 단일 리뷰 조회하는
+	 */
 	@Override
 	public ReviewDetailQueryResponse findReviewById(Long reviewId, Long loginUserId) {
 

@@ -154,6 +154,11 @@ public class ReviewService {
 		saveNewLike(review, user, newType);
 	}
 
+	/**
+	 * 특정 상품에 대한 리뷰를 조회하는
+	 * 좋아요순, 최신순, 오래된순(기본값) 에 대한 정렬 가능
+	 * 페이지네이션 적용
+	 */
 	@Transactional
 	public Page<ReviewPageResponse> getReviewPage(
 		Long loginUserId,
@@ -189,7 +194,10 @@ public class ReviewService {
 		return new PageImpl<>(dtoList, pageable, totalCount);
 	}
 
-
+	/**
+	 * 특정 사용자 리뷰 조회하는
+	 * 페이지네이션 적용
+	 */
 	@Transactional
 	public Page<ReviewPageResponse> getUserReviewsByUuid(
 		String uuid, Long loginUserId, PageRequest pageable
@@ -223,7 +231,9 @@ public class ReviewService {
 		return new PageImpl<>(dtoList, pageable, totalCount);
 	}
 
-
+	/**
+	 * 단일 리뷰 조회하는 API
+	 */
 	@Transactional
 	public ReviewResponse getReview(Long reviewId, Long loginUserId) {
 

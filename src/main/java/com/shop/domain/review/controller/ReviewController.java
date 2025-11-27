@@ -79,6 +79,10 @@ public class ReviewController {
 		return ApiResult.ok();
 	}
 
+	/**
+	 * 사용자가 좋아요를 설정하는 API
+	 * 단일 API를 통한 모든 상태전환 가능
+	 */
 	@PutMapping("/{reviewId}/like")
 	public ApiResult<Void> updateReviewLike(
 		@AuthenticationPrincipal DefaultCurrentUser defaultCurrentUser,
@@ -89,6 +93,11 @@ public class ReviewController {
 		return ApiResult.ok();
 	}
 
+	/**
+	 * 특정 상품에 대한 리뷰를 조회하는 API
+	 * 좋아요순, 최신순, 오래된순(기본값) 에 대한 정렬 가능
+	 * 페이지네이션 적용
+	 */
 	@GetMapping("")
 	@ResponseStatus(HttpStatus.OK)
 	public ApiResult<Page<ReviewPageResponse>> getReviews(
@@ -106,8 +115,10 @@ public class ReviewController {
 		return ApiResult.ok(reviewPage);
 	}
 
-
-	// 특정 사용자 리뷰 조회
+	/**
+	 * 특정 사용자 리뷰 조회하는 API
+	 * 페이지네이션 적용
+	 */
 	@GetMapping("/user")
 	public ApiResult<Page<ReviewPageResponse>> getUserReviews(
 		@RequestParam String userUUID,
@@ -120,7 +131,9 @@ public class ReviewController {
 		return ApiResult.ok(reviewService.getUserReviewsByUuid(userUUID, userId, paging.toPageable()));
 	}
 
-	// 단일 리뷰 조회
+	/**
+	 * 단일 리뷰 조회하는 API
+	 */
 	@GetMapping("/single")
 	public ApiResult<ReviewResponse> getReview(
 		@RequestParam Long reviewId,

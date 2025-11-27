@@ -1,5 +1,11 @@
 package com.shop.domain.review.service;
 
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +19,10 @@ import com.shop.domain.review.repository.ReviewRepository;
 import com.shop.domain.review.request.ReviewCreateRequest;
 import com.shop.domain.review.request.ReviewLikeRequest;
 import com.shop.domain.review.request.ReviewUpdateRequest;
+import com.shop.domain.review.response.ReviewDetailQueryResponse;
+import com.shop.domain.review.response.ReviewPageQueryResponse;
+import com.shop.domain.review.response.ReviewPageResponse;
+import com.shop.domain.review.response.ReviewResponse;
 import com.shop.domain.user.model.User;
 import com.shop.domain.user.repository.UserRepository;
 import com.shop.global.common.CustomException;
@@ -142,6 +152,97 @@ public class ReviewService {
 		// 다른 상태 클릭 → 기존 취소 + 새 상태 적용
 		cancelLike(existing, review, currentType);
 		saveNewLike(review, user, newType);
+	}
+
+	@Transactional
+	public Page<ReviewPageResponse> getReviewPage(
+		Long loginUserId,
+		Long productId,
+		String sort,
+		PageRequest pageable
+	) {
+		List<ReviewPageQueryResponse> daoList = reviewRepository.findReviews(
+			loginUserId,
+			productId,
+			pageable.getPageNumber(),
+			pageable.getPageSize(),
+			sort
+		);
+
+		List<ReviewPageResponse> dtoList = daoList.stream()
+			.map(r -> new ReviewPageResponse(
+				r.reviewId(),
+				r.title(),
+				r.content(),
+				r.orderProductId(),
+				r.userUuid(),
+				r.likeCount(),
+				r.dislikeCount(),
+				r.reviewLikeType()
+			))
+			.toList();
+
+		long totalCount = (productId == null)
+			? reviewRepository.countReviews()
+			: reviewRepository.countReviewsByProduct(productId);
+
+		return new PageImpl<>(dtoList, pageable, totalCount);
+	}
+
+
+	@Transactional
+	public Page<ReviewPageResponse> getUserReviewsByUuid(
+		String uuid, Long loginUserId, PageRequest pageable
+	) {
+		Long targetUserId = userRepository.findByUuid(UUID.fromString(uuid))
+			.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER))
+			.getId();
+
+		List<ReviewPageQueryResponse> daoList = reviewRepository.findReviewsByUser(
+			targetUserId,
+			loginUserId,
+			(int) pageable.getOffset(),
+			pageable.getPageSize()
+		);
+
+		List<ReviewPageResponse> dtoList = daoList.stream()
+			.map(r -> new ReviewPageResponse(
+				r.reviewId(),
+				r.title(),
+				r.content(),
+				r.orderProductId(),
+				r.userUuid(),
+				r.likeCount(),
+				r.dislikeCount(),
+				r.reviewLikeType()
+			))
+			.toList();
+
+		long totalCount = reviewRepository.countReviewsByUser(targetUserId);
+
+		return new PageImpl<>(dtoList, pageable, totalCount);
+	}
+
+
+	@Transactional
+	public ReviewResponse getReview(Long reviewId, Long loginUserId) {
+
+		ReviewDetailQueryResponse dto = reviewRepository.findReviewById(reviewId, loginUserId);
+
+		if (dto == null) {
+			throw new CustomException(ErrorCode.NOT_FOUND_REVIEW);
+		}
+
+		return new ReviewResponse(
+			dto.reviewId(),
+			dto.title(),
+			dto.content(),
+			dto.orderProductId(),
+			dto.userUuid(),
+			dto.likeCount(),
+			dto.dislikeCount(),
+			dto.reviewLikeType()
+		);
 	}
 
 	// 새로운 like 정보를 저장

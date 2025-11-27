@@ -55,4 +55,11 @@ public class Payment extends BaseEntity {
 		);
 	}
 
+	public boolean isPending() {
+		return this.status == PaymentStatus.PENDING;
+	}
+
+	public void complete() {
+		this.status = PaymentStatus.COMPLETED;
+	}
 }

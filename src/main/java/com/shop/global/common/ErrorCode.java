@@ -37,6 +37,10 @@ public enum ErrorCode {
 	// Order
 	NOT_FOUND_ORDER(HttpStatus.BAD_REQUEST, "존재하지 않는 주문입니다."),
 	INVALID_ORDER_STATUS(HttpStatus.BAD_REQUEST, "유효하지 않은 주문입니다."),
+
+	// Payment
+	NOT_FOUND_PAYMENT(HttpStatus.BAD_REQUEST, "해당 결제 내역이 존재하지 않습니다."),
+	INVALID_PAYMENT_STATUS(HttpStatus.BAD_REQUEST, "결제를 처리할 수 없습니다."),
 	;
 
 	private final HttpStatus status;

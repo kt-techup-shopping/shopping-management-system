@@ -40,9 +40,8 @@ public class PaymentService {
 			order
 		);
 
-		order
-			.getPayments()
-			.add(payment);
+		order.addPayment(payment);
+
 
 		paymentRepository.save(payment);
 	}
@@ -57,4 +56,14 @@ public class PaymentService {
 			.toList();
 	}
 
+	public void completePayment(Long paymentId) {
+		var payment = paymentRepository.findByIdOrThrow(paymentId, ErrorCode.NOT_FOUND_PAYMENT);
+		var order = payment.getOrder();
+
+		Preconditions.validate(payment.isPending(), ErrorCode.INVALID_PAYMENT_STATUS);
+		Preconditions.validate(order.isPaymentPending(), ErrorCode.INVALID_ORDER_STATUS);
+
+		payment.complete();
+		order.completePayment();
+	}
 }

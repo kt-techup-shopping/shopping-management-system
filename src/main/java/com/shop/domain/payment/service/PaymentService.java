@@ -61,9 +61,20 @@ public class PaymentService {
 		var order = payment.getOrder();
 
 		Preconditions.validate(payment.isPending(), ErrorCode.INVALID_PAYMENT_STATUS);
-		Preconditions.validate(order.isPaymentPending(), ErrorCode.INVALID_ORDER_STATUS);
+		Preconditions.validate(order.isPending(), ErrorCode.INVALID_ORDER_STATUS);
 
 		payment.complete();
 		order.completePayment();
+	}
+
+	public void cancelPayment(Long paymentId) {
+		var payment = paymentRepository.findByIdOrThrow(paymentId, ErrorCode.NOT_FOUND_PAYMENT);
+		var order = payment.getOrder();
+
+		Preconditions.validate(payment.canCancel(), ErrorCode.INVALID_PAYMENT_STATUS);
+		Preconditions.validate(order.isPending(), ErrorCode.INVALID_ORDER_STATUS);
+
+		payment.cancel();
+		order.resetToPending();
 	}
 }

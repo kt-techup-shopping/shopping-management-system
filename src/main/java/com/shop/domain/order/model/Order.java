@@ -60,8 +60,11 @@ public class Order extends BaseEntity {
 		this.orderProducts.add(orderProduct);
 	}
 
+	// 결제 대기 중인 결제가 있으면 요청 불가
 	public boolean canRequestPayment() {
-		return this.status == OrderStatus.PENDING;
+		return payments
+			.stream()
+			.noneMatch(Payment::isPending);
 	}
 
 	public Long calculateTotalAmount() {
@@ -77,7 +80,7 @@ public class Order extends BaseEntity {
 		this.payments.add(payment);
 	}
 
-	public boolean isPaymentPending() {
+	public boolean isPending() {
 		return this.status == OrderStatus.PENDING;
 	}
 
@@ -85,4 +88,7 @@ public class Order extends BaseEntity {
 		this.status = OrderStatus.COMPLETED;
 	}
 
+	public void resetToPending() {
+		this.status = OrderStatus.PENDING;
+	}
 }

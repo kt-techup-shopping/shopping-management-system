@@ -26,4 +26,13 @@ public class PaymentController {
 
 		return ApiResult.ok();
 	}
+
+	// 결제 취소 처리
+	@PutMapping("{paymentId}/cancel")
+	@ResponseStatus(HttpStatus.OK)
+	public ApiResult<Void> cancelPayment(@PathVariable Long paymentId) {
+		paymentService.cancelPayment(paymentId);
+
+		return ApiResult.ok();
+	}
 }

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.shop.domain.review.model.Review;
+import com.shop.domain.review.model.ReviewLike;
 import com.shop.global.common.BaseEntity;
 import com.shop.domain.order.model.Order;
 
@@ -41,6 +42,8 @@ public class User extends BaseEntity {
 	@OneToMany(mappedBy = "user")
 	private List<Review> reviews = new ArrayList<>();
 
+	@OneToMany(mappedBy = "user")
+	private List<ReviewLike> reviewLikes = new ArrayList<>();
 
 	public User(String loginId, UUID uuid, String password, String name, String email, String mobile, Gender gender,
 		LocalDate birthday, Role role, Status status) {

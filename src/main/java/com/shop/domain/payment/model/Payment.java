@@ -63,10 +63,6 @@ public class Payment extends BaseEntity {
 		this.status = PaymentStatus.COMPLETED;
 	}
 
-	public boolean canCancel() {
-		return this.status == PaymentStatus.PENDING;
-	}
-
 	public void cancel() {
 		this.status = PaymentStatus.CANCELED;
 	}

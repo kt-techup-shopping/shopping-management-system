@@ -84,6 +84,10 @@ public class Order extends BaseEntity {
 		return this.status == OrderStatus.PENDING;
 	}
 
+	public boolean isCompleted() {
+		return this.status == OrderStatus.COMPLETED;
+	}
+
 	public void completePayment() {
 		this.status = OrderStatus.COMPLETED;
 	}

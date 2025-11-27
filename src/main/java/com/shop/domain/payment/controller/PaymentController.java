@@ -1,4 +1,4 @@
-package com.shop.domain.payment;
+package com.shop.domain.payment.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;

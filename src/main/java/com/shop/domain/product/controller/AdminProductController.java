@@ -87,4 +87,20 @@ public class AdminProductController {
 		);
 		return ApiResult.ok();
 	}
+
+	// 관리자 상품 상태 활성화
+	@PutMapping("/{id}/activate")
+	@ResponseStatus(HttpStatus.OK)
+	public ApiResult<Void> updateActivated(@PathVariable Long id) {
+		adminProductService.updateActivated(id);
+		return ApiResult.ok();
+	}
+
+	// 관리자 상품 상태 비활성화
+	@PutMapping("/{id}/in-activate")
+	@ResponseStatus(HttpStatus.OK)
+	public ApiResult<Void> updateInActivated(@PathVariable Long id) {
+		adminProductService.updateInActivated(id);
+		return ApiResult.ok();
+	}
 }

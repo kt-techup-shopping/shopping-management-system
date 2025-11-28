@@ -72,4 +72,19 @@ public class AdminReviewController {
 		);
 		return ApiResult.ok();
 	}
+
+	/**
+	 * 사용자 리뷰 삭제
+	 */
+	@PutMapping("/{reviewId}/force-delete")
+	public ApiResult<Void> deleteReview(
+		@AuthenticationPrincipal DefaultCurrentUser defaultCurrentUser,
+		@PathVariable Long reviewId
+	) {
+		adminReviewService.deleteReview(
+			reviewId,
+			defaultCurrentUser.getId()
+		);
+		return ApiResult.ok();
+	}
 }

@@ -1,5 +1,9 @@
 package com.shop.domain.review.repository;
 
+import static com.shop.domain.orderproduct.model.QOrderProduct.*;
+import static com.shop.domain.product.model.QProduct.*;
+import static com.shop.domain.review.model.QAdminReview.*;
+
 import java.util.List;
 
 import org.springframework.stereotype.Repository;
@@ -9,6 +13,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.shop.domain.review.model.QReview;
 import com.shop.domain.review.model.QReviewLike;
 import com.shop.domain.review.model.ReviewLikeType;
+import com.shop.domain.review.response.QAdminReviewQueryResponse;
 import com.shop.domain.review.response.QReviewDetailQueryResponse;
 import com.shop.domain.review.response.QReviewPageQueryResponse;
 import com.shop.domain.review.response.ReviewDetailQueryResponse;
@@ -60,20 +65,27 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
 				user.uuid,
 				review.likeCount,
 				review.dislikeCount,
-				reviewLikeTypeExpr
+				reviewLikeTypeExpr,
+				new QAdminReviewQueryResponse(adminReview.title, adminReview.content)
 			))
 			.from(review)
 			.join(review.user, user)
-			.join(review.orderProduct)
+			.join(review.orderProduct, orderProduct)
+			.join(orderProduct.product, product)
 			.leftJoin(reviewLike)
 			.on(
 				reviewLike.review.eq(review)
 					.and(loginUserId != null ? reviewLike.user.id.eq(loginUserId) : Expressions.FALSE)
 					.and(reviewLike.isDeleted.isFalse())
 			)
+			.leftJoin(adminReview)
+			.on(
+				adminReview.review.eq(review)
+					.and(adminReview.isDeleted.isFalse())
+			)
 			.where(
 				review.isDeleted.isFalse(),
-				productId != null ? review.orderProduct.id.eq(productId) : null
+				productId != null ? product.id.eq(productId) : null
 			)
 			.offset(offset)
 			.limit(limit);
@@ -120,7 +132,8 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
 				user.uuid,
 				review.likeCount,
 				review.dislikeCount,
-				reviewLikeTypeExpr
+				reviewLikeTypeExpr,
+				new QAdminReviewQueryResponse(adminReview.title, adminReview.content)
 			))
 			.from(review)
 			.join(review.user, user)
@@ -129,6 +142,11 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
 				reviewLike.review.eq(review)
 					.and(loginUserId != null ? reviewLike.user.id.eq(loginUserId) : Expressions.FALSE)
 					.and(reviewLike.isDeleted.isFalse())
+			)
+			.leftJoin(adminReview)
+			.on(
+				adminReview.review.eq(review)
+					.and(adminReview.isDeleted.isFalse())
 			)
 			.where(
 				review.user.id.eq(targetUserId),
@@ -162,18 +180,24 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
 					user.uuid,
 					review.likeCount,
 					review.dislikeCount,
-					likeTypeExpression
+					likeTypeExpression,
+					new QAdminReviewQueryResponse(adminReview.title, adminReview.content)
 				)
 			)
 			.from(review)
 			.join(review.user, user)
 			.leftJoin(reviewLike)
+			.leftJoin(adminReview)
 			.on(
 				reviewLike.review.eq(review)
 					.and(loginUserId != null
 						? reviewLike.user.id.eq(loginUserId)
 						: Expressions.FALSE)
 					.and(reviewLike.isDeleted.isFalse())
+			)
+			.on(
+				adminReview.review.eq(review)
+					.and(adminReview.isDeleted.isFalse())
 			)
 			.where(
 				review.id.eq(reviewId),

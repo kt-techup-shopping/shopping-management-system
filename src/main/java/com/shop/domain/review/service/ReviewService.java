@@ -183,7 +183,8 @@ public class ReviewService {
 				r.userUuid(),
 				r.likeCount(),
 				r.dislikeCount(),
-				r.reviewLikeType()
+				r.reviewLikeType(),
+				r.adminReview()
 			))
 			.toList();
 
@@ -222,7 +223,8 @@ public class ReviewService {
 				r.userUuid(),
 				r.likeCount(),
 				r.dislikeCount(),
-				r.reviewLikeType()
+				r.reviewLikeType(),
+				r.adminReview()
 			))
 			.toList();
 
@@ -251,7 +253,8 @@ public class ReviewService {
 			dto.userUuid(),
 			dto.likeCount(),
 			dto.dislikeCount(),
-			dto.reviewLikeType()
+			dto.reviewLikeType(),
+			dto.adminReview()
 		);
 	}
 

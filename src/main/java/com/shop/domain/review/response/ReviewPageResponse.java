@@ -12,7 +12,8 @@ public record ReviewPageResponse(
 	UUID userUuid,
 	Integer likeCount,
 	Integer dislikeCount,
-	ReviewLikeType reviewLikeType
+	ReviewLikeType reviewLikeType,
+	AdminReviewQueryResponse adminReview
 ) {
 	@QueryProjection
 	public ReviewPageResponse { }

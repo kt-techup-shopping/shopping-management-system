@@ -12,7 +12,8 @@ public record ReviewResponse(
 	UUID userUuid,  // String -> UUID 로 변경
 	Integer likeCount,  // int -> Integer
 	Integer dislikeCount,
-	ReviewLikeType reviewLikeType
+	ReviewLikeType reviewLikeType,
+	AdminReviewQueryResponse adminReview
 ) {
 
 }

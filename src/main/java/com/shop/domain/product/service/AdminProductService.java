@@ -1,5 +1,6 @@
 package com.shop.domain.product.service;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.domain.Page;
@@ -104,5 +105,12 @@ public class AdminProductService {
 	public void updateSoldOutToggle(Long id) {
 		var product = productRepository.findByIdOrThrow(id);
 		product.toggleSoldOut();
+	}
+
+	// 관리자 상품 상태 다중 품절
+	@Transactional
+	public void updateSoldOutList(List<Long> ids) {
+		var products = productRepository.findAllById(ids);
+		products.forEach(Product::soldOut);
 	}
 }

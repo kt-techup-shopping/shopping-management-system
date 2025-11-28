@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.shop.domain.product.request.ProductCreateRequest;
+import com.shop.domain.product.request.ProductSoldOutRequest;
 import com.shop.domain.product.request.ProductUpdateRequest;
 import com.shop.domain.product.response.AdminProductDetailResponse;
 import com.shop.domain.product.response.AdminProductSearchResponse;
@@ -109,6 +110,14 @@ public class AdminProductController {
 	@ResponseStatus(HttpStatus.OK)
 	public ApiResult<Void> updateSoldOut(@PathVariable Long id) {
 		adminProductService.updateSoldOutToggle(id);
+		return ApiResult.ok();
+	}
+
+	// 관리자 상품 상태 다중 품절
+	@PutMapping("/sold-out")
+	@ResponseStatus(HttpStatus.OK)
+	public ApiResult<Void> updateSoldOutList(@RequestBody ProductSoldOutRequest request) {
+		adminProductService.updateSoldOutList(request.productIds());
 		return ApiResult.ok();
 	}
 }

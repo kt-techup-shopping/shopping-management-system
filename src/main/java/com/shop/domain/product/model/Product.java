@@ -64,8 +64,6 @@ public class Product extends BaseEntity {
 		this.description = description;
 		this.color = color;
 		this.category = category;
-		this.createdAt = LocalDateTime.now();
-		this.updatedAt = LocalDateTime.now();
 	}
 
 	public Product(String name, Long price, Long stock) {
@@ -100,7 +98,6 @@ public class Product extends BaseEntity {
 		this.stock += deltaStock;
 		this.status = status;
 		this.category = category;
-		this.updatedAt = LocalDateTime.now();
 	}
 
 	public void soldOut() {

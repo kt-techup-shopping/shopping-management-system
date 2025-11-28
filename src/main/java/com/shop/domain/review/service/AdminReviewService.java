@@ -1,5 +1,10 @@
 package com.shop.domain.review.service;
 
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -8,6 +13,10 @@ import com.shop.domain.review.repository.AdminReviewRepository;
 import com.shop.domain.review.repository.ReviewRepository;
 import com.shop.domain.review.request.AdminReviewCreateRequest;
 import com.shop.domain.review.request.AdminReviewUpdateRequest;
+import com.shop.domain.review.response.AdminNoReviewQueryResponse;
+import com.shop.domain.review.response.AdminReviewDetailQueryResponse;
+import com.shop.domain.review.response.AdminReviewDetailResponse;
+import com.shop.domain.review.response.AdminNoReviewResponse;
 import com.shop.domain.user.repository.UserRepository;
 import com.shop.global.common.CustomException;
 import com.shop.global.common.ErrorCode;
@@ -75,4 +84,42 @@ public class AdminReviewService {
 
 		adminAdminReview.delete();
 	}
+
+	@Transactional
+	public Page<AdminReviewDetailResponse> getAllReviewsWithAdmin(PageRequest pageable) {
+		// Repository에서 QueryResponse를 받아옴
+		List<AdminReviewDetailQueryResponse> queryList = adminReviewRepository.findAllReviewsWithAdmin(pageable);
+
+		// Service Response로 변환
+		List<AdminReviewDetailResponse> responseList = queryList.stream()
+			.map(q -> new AdminReviewDetailResponse(
+				q.reviewId(),
+				q.reviewTitle(),
+				q.reviewContent(),
+				q.userUuid(),
+				q.adminReview() // AdminReviewQuery 그대로 사용
+			))
+			.toList();
+
+		long total = adminReviewRepository.countAllReviews();
+		return new PageImpl<>(responseList, pageable, total);
+	}
+
+	@Transactional
+	public Page<AdminNoReviewResponse> getReviewsWithoutAdmin(PageRequest pageable) {
+		List<AdminNoReviewQueryResponse> queryList = adminReviewRepository.findReviewsWithoutAdmin(pageable);
+
+		List<AdminNoReviewResponse> responseList = queryList.stream()
+			.map(q -> new AdminNoReviewResponse(
+				q.reviewId(),
+				q.reviewTitle(),
+				q.reviewContent(),
+				q.userUuid()
+			))
+			.toList();
+
+		long total = adminReviewRepository.countReviewsWithoutAdmin();
+		return new PageImpl<>(responseList, pageable, total);
+	}
+
 }

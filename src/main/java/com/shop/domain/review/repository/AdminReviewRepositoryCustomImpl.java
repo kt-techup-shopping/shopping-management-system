@@ -41,15 +41,6 @@ public class AdminReviewRepositoryCustomImpl implements AdminReviewRepositoryCus
 				.and(adminReview.isDeleted.isFalse()))
 			.where(review.isDeleted.isFalse());
 
-		// 정렬
-		pageable.getSort().forEach(order -> {
-			if (order.getProperty().equals("id")) {
-				query.orderBy(order.isAscending() ? review.id.asc() : review.id.desc());
-			} else if (order.getProperty().equals("title")) {
-				query.orderBy(order.isAscending() ? review.title.asc() : review.title.desc());
-			}
-		});
-
 		return query
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
@@ -71,15 +62,6 @@ public class AdminReviewRepositoryCustomImpl implements AdminReviewRepositoryCus
 			.leftJoin(adminReview)
 			.on(adminReview.review.eq(review).and(adminReview.isDeleted.isFalse()))
 			.where(review.isDeleted.isFalse(), adminReview.id.isNull());
-
-		// 정렬
-		pageable.getSort().forEach(order -> {
-			if (order.getProperty().equals("id")) {
-				query.orderBy(order.isAscending() ? review.id.asc() : review.id.desc());
-			} else if (order.getProperty().equals("title")) {
-				query.orderBy(order.isAscending() ? review.title.asc() : review.title.desc());
-			}
-		});
 
 		return query
 			.offset(pageable.getOffset())

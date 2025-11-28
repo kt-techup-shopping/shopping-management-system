@@ -1,6 +1,7 @@
 package com.shop.domain.user.repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +17,8 @@ public interface UserRepository extends UserRepositoryCustom, JpaRepository<User
 	Boolean existsByLoginId(String loginId);
 
 	Optional<User> findByLoginId(String loginId);
+
+	Optional<User> findByUuid(UUID uuid);
 
 	@Query("""
 	SELECT exists (SELECT u FROM User u WHERE u.loginId = ?1)

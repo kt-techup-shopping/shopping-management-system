@@ -52,21 +52,6 @@ public class ProductController extends SwaggerAssistance {
 		return ApiResult.ok(productService.getDetailById(id));
 	}
 
-	@PutMapping("/{id}")
-	public ApiResult<Void> update(
-		@PathVariable Long id,
-		@RequestBody @Valid ProductRequest.Update request
-	) {
-		productService.update(
-			id,
-			request.getName(),
-			request.getPrice(),
-			request.getQuantity()
-		);
-
-		return ApiResult.ok();
-	}
-
 	@PatchMapping("/{id}/sold-out")
 	public void soldOut(@PathVariable Long id) {
 		productService.soldOut(id);

@@ -3,12 +3,17 @@ package com.shop.domain.review.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.shop.domain.orderproduct.model.OrderProduct;
+import com.shop.domain.order.repository.OrderRepository;
 import com.shop.domain.orderproduct.repository.OrderProductRepository;
 import com.shop.domain.review.model.Review;
+import com.shop.domain.review.model.ReviewLike;
+import com.shop.domain.review.model.ReviewLikeType;
+import com.shop.domain.review.repository.ReviewLikeRepository;
 import com.shop.domain.review.repository.ReviewRepository;
 import com.shop.domain.review.request.ReviewCreateRequest;
+import com.shop.domain.review.request.ReviewLikeRequest;
 import com.shop.domain.review.request.ReviewUpdateRequest;
+import com.shop.domain.user.model.User;
 import com.shop.domain.user.repository.UserRepository;
 import com.shop.global.common.CustomException;
 import com.shop.global.common.ErrorCode;
@@ -22,7 +27,9 @@ public class ReviewService {
 
 	private final ReviewRepository reviewRepository;
 	private final OrderProductRepository orderProductRepository;
+	private final OrderRepository orderRepository;
 	private final UserRepository userRepository;
+	private final ReviewLikeRepository reviewLikeRepository;
 
 	// TODO : Lock 필요성 고민
 	/**
@@ -36,10 +43,17 @@ public class ReviewService {
 			.findById(orderProductId)
 			.orElseThrow(() -> new CustomException(ErrorCode.NOT_PURCHASED_PRODUCT));
 
+
 		var user = userRepository.findByIdOrThrow(userId, ErrorCode.NOT_FOUND_USER);
+
+		// 상품을 구매한 적이 없다면 에러처리
+		Preconditions.validate(orderProduct.getOrder().getUser().equals(user), ErrorCode.NOT_PURCHASED_PRODUCT);
 
 		// 이미 리뷰를 작성했다면 에러처리
 		Preconditions.validate(!reviewRepository.existsByUserIdAndOrderProductIdAndIsDeletedFalse(userId, orderProductId), ErrorCode.ALREADY_WRITE_REVIEW);
+
+
+		// TODO : 구매한 사용자가 맞는지 확인
 
 		var review = new Review(
 			reviewCreateRequest.title(),
@@ -90,4 +104,61 @@ public class ReviewService {
 			reviewUpdateRequest.content()
 		);
 	}
+
+	/**
+	 * 사용자의 리뷰에 대한 좋아요/싫어요를 처리하는 서비스
+	 * 좋아요 등록 및 취소
+	 * 싫여요 등록 및 취소
+	 * 좋아요 <-> 싫어요 상태 전환
+	 */
+	@Transactional
+	public void updateReviewLike(ReviewLikeRequest reviewLikeRequest, Long reviewId, Long userId) {
+		Review review = reviewRepository.findById(reviewId)
+			.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_REVIEW));
+
+		Preconditions.validate(!review.getIsDeleted(), ErrorCode.NOT_FOUND_REVIEW);
+
+		User user = userRepository.findByIdOrThrow(userId, ErrorCode.NOT_FOUND_USER);
+
+		ReviewLikeType newType = reviewLikeRequest.reviewLikeType();
+
+		ReviewLike existing = reviewLikeRepository.findByReviewAndUserAndIsDeletedFalse(review, user)
+			.orElse(null);
+
+		if (existing == null) {
+			// 첫 클릭
+			saveNewLike(review, user, newType);
+			return;
+		}
+
+		ReviewLikeType currentType = existing.getReviewLikeType();
+
+		if (currentType == newType) {
+			// 같은 상태 클릭 → 취소
+			cancelLike(existing, review, newType);
+			return;
+		}
+
+		// 다른 상태 클릭 → 기존 취소 + 새 상태 적용
+		cancelLike(existing, review, currentType);
+		saveNewLike(review, user, newType);
+	}
+
+	// 새로운 like 정보를 저장
+	private void saveNewLike(Review review, User user, ReviewLikeType reviewLikeType) {
+		ReviewLike newLike = new ReviewLike(review, user, reviewLikeType);
+		reviewLikeRepository.save(newLike);
+
+		if (reviewLikeType == ReviewLikeType.LIKE) review.incrementLike();
+		else if (reviewLikeType == ReviewLikeType.DISLIKE) review.incrementDislike();
+	}
+
+	// 좋아요 정보 취소
+	private void cancelLike(ReviewLike like, Review review, ReviewLikeType reviewLikeType) {
+		like.cancel();
+
+		if (reviewLikeType == ReviewLikeType.LIKE) review.decrementLike();
+		else if (reviewLikeType == ReviewLikeType.DISLIKE) review.decrementDislike();
+	}
+
 }

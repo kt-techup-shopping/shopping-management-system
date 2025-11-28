@@ -77,10 +77,29 @@ public class Product extends BaseEntity {
 		this.stock = stock;
 	}
 
-	public void update(String name, Long price, Long stock) {
+	public void update(
+		String name,
+		Long price,
+		String description,
+		String color,
+		Long deltaStock,
+		ProductStatus status,
+		Category category
+	) {
+		Preconditions.validate(Strings.isNotBlank(name), ErrorCode.INVALID_PARAMETER);
+		Preconditions.validate(Strings.isNotBlank(description), ErrorCode.INVALID_PARAMETER);
+		Preconditions.validate(Strings.isNotBlank(color), ErrorCode.INVALID_PARAMETER);
+		Preconditions.validate(price >= 0, ErrorCode.INVALID_PARAMETER);
+		Preconditions.validate(this.stock + deltaStock >= 0, ErrorCode.INVALID_PARAMETER);
+
 		this.name = name;
 		this.price = price;
-		this.stock = stock;
+		this.description = description;
+		this.color = color;
+		this.stock += deltaStock;
+		this.status = status;
+		this.category = category;
+		this.updatedAt = LocalDateTime.now();
 	}
 
 	public void soldOut() {

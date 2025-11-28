@@ -1,9 +1,8 @@
-package com.shop.service;
+package com.shop.service.order;
 
 import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;

@@ -1,12 +1,16 @@
 package com.shop.domain.order.controller;
 
+import java.util.List;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.shop.domain.order.request.OrderCreateRequest;
+import com.shop.domain.order.response.OrderDetailResponse;
 import com.shop.domain.order.service.OrderService;
 import com.shop.global.common.ApiResult;
 import com.shop.domain.order.request.OrderRequest;
@@ -33,5 +37,13 @@ public class OrderController {
 			orderCreateRequest
 		);
 		return ApiResult.ok();
+	}
+
+	@GetMapping
+	public ApiResult<List<OrderDetailResponse>> getMyOrders(
+		@AuthenticationPrincipal DefaultCurrentUser defaultCurrentUser) {
+
+		List<OrderDetailResponse> orders = orderService.getMyOrders(defaultCurrentUser.getId());
+		return ApiResult.ok(orders);
 	}
 }

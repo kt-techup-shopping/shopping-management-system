@@ -1,6 +1,7 @@
 package com.shop.domain.order.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.redisson.api.RedissonClient;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
@@ -10,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.shop.domain.order.model.Order;
 import com.shop.domain.order.model.Receiver;
 import com.shop.domain.order.request.OrderCreateRequest;
+import com.shop.domain.order.response.OrderDetailQueryResponse;
+import com.shop.domain.order.response.OrderDetailResponse;
 import com.shop.global.common.ErrorCode;
 import com.shop.global.common.Lock;
 import com.shop.global.common.Preconditions;
@@ -75,6 +78,37 @@ public class OrderService {
 				return orderProduct;
 			})
 			.toList();
-
 	}
+
+	public List<OrderDetailResponse> getMyOrders(Long userId) {
+		var queryResults = orderRepository.findOrderDetailByUserId(userId);
+
+		// 주문별로 그룹핑
+		var grouped = queryResults.stream()
+			.collect(Collectors.groupingBy(OrderDetailQueryResponse::orderId));
+
+		return grouped.entrySet().stream()
+			.map(entry -> {
+				var first = entry.getValue().get(0);
+				var products = entry.getValue().stream()
+					.map(qr -> new OrderDetailResponse.OrderProductInfo(
+						qr.productName(),
+						qr.productPrice(),
+						qr.quantity()
+					))
+					.toList();
+
+				return new OrderDetailResponse(
+					first.orderId(),
+					first.receiverName(),
+					first.receiverAddress(),
+					first.receiverMobile(),
+					first.orderStatus(),
+					first.deliveredAt(),
+					products
+				);
+			})
+			.toList();
+	}
+
 }

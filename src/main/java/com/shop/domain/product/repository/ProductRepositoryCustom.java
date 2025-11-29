@@ -8,6 +8,8 @@ import com.shop.domain.product.response.AdminProductDetailQueryResponse;
 import com.shop.domain.product.response.AdminProductSearchResponse;
 import com.shop.domain.product.response.ProductDetailQueryResponse;
 import com.shop.domain.product.response.ProductSearchResponse;
+import com.shop.domain.product.response.AdminProductStockResponse;
+import com.shop.global.common.Paging;
 
 public interface ProductRepositoryCustom {
 	Page<ProductSearchResponse> getSearchList(String keyword, Long categoryId, Boolean activeOnly,
@@ -19,4 +21,5 @@ public interface ProductRepositoryCustom {
 	Page<AdminProductSearchResponse> getAdminSearchList(String keyword, Long categoryId, Boolean activeOnly,
 		ProductSort sort, PageRequest pageable);
 
+	Page<AdminProductStockResponse> getStockList(PageRequest pageable);
 }

@@ -16,6 +16,7 @@ import com.shop.domain.product.repository.ProductRepository;
 import com.shop.domain.product.request.ProductSort;
 import com.shop.domain.product.response.AdminProductDetailResponse;
 import com.shop.domain.product.response.AdminProductSearchResponse;
+import com.shop.domain.product.response.AdminProductStockResponse;
 import com.shop.global.common.ErrorCode;
 import com.shop.global.common.Lock;
 
@@ -112,5 +113,10 @@ public class AdminProductService {
 	public void updateSoldOutList(List<Long> ids) {
 		var products = productRepository.findAllById(ids);
 		products.forEach(Product::soldOut);
+	}
+
+	// 관리자 상품 재고 목록 조회
+	public Page<AdminProductStockResponse> getStockList(PageRequest paging) {
+		return productRepository.getStockList(paging);
 	}
 }

@@ -18,6 +18,7 @@ import com.shop.domain.product.request.ProductSoldOutRequest;
 import com.shop.domain.product.request.ProductUpdateRequest;
 import com.shop.domain.product.response.AdminProductDetailResponse;
 import com.shop.domain.product.response.AdminProductSearchResponse;
+import com.shop.domain.product.response.AdminProductStockResponse;
 import com.shop.domain.product.service.AdminProductService;
 import com.shop.global.common.ApiResult;
 import com.shop.global.common.Paging;
@@ -59,7 +60,15 @@ public class AdminProductController {
 		@RequestParam(required = false) String sort,
 		@Parameter Paging paging
 	) {
-		return ApiResult.ok(adminProductService.getAdminSearchList(keyword, categoryId, activeOnly, sort, paging.toPageable()));
+		return ApiResult.ok(
+			adminProductService.getAdminSearchList(
+				keyword,
+				categoryId,
+				activeOnly,
+				sort,
+				paging.toPageable()
+			)
+		);
 	}
 
 	// 관리자 상품 상세 조회
@@ -119,5 +128,12 @@ public class AdminProductController {
 	public ApiResult<Void> updateSoldOutList(@RequestBody ProductSoldOutRequest request) {
 		adminProductService.updateSoldOutList(request.productIds());
 		return ApiResult.ok();
+	}
+
+	// 관리자 상품 재고 목록 조회
+	@GetMapping("/stock")
+	@ResponseStatus(HttpStatus.OK)
+	public ApiResult<Page<AdminProductStockResponse>> getStockDetailList(@Parameter Paging paging) {
+		return ApiResult.ok(adminProductService.getStockList(paging.toPageable()));
 	}
 }

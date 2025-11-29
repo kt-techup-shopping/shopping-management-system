@@ -116,8 +116,8 @@ public class AdminProductService {
 	}
 
 	// 관리자 상품 재고 목록 조회
-	public Page<AdminProductStockResponse> getStockList(PageRequest paging) {
-		return productRepository.getStockList(paging);
+	public Page<AdminProductStockResponse> getStockList(String keyword, PageRequest paging) {
+		return productRepository.getStockList(keyword, paging);
 	}
 
 	// 관리자 상품 재고 수정

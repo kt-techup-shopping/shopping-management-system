@@ -146,19 +146,23 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 		);
 	}
 
-	// 관리자 상품 재고 목록 조회
+	// 관리자 상품 재고 목록 조회 (검색 조건 적용)
 	@Override
-	public Page<AdminProductStockResponse> getStockList(PageRequest pageable) {
+	public Page<AdminProductStockResponse> getStockList(String keyword, PageRequest pageable) {
 		var reservedStock = reservedStockExpression();
+		BooleanBuilder builder = new BooleanBuilder();
+		builder.and(stockKeywordFilter(keyword));			// 숫자면 상품 ID, 아니면 상품명 검색
+
 		var content = jpaQueryFactory
 			.select(new QAdminProductStockResponse(
 				product.id,
 				product.name,
-				product.stock.subtract(reservedStock),	// 사용 가능한 재고 = 전체 재고 - 예약된 재고
-				reservedStock,							// 예약된 재고 (주문 상태 PENDING 또는 COMPLETED)
-				product.stock							// 전체 재고 = 사용 가능한 재고 + 예약된 재고
+				product.stock.subtract(reservedStock),		// 사용 가능한 재고 = 전체 재고 - 예약된 재고
+				reservedStock,								// 예약된 재고 (주문 상태 PENDING 또는 COMPLETED)
+				product.stock								// 전체 재고 = 사용 가능한 재고 + 예약된 재고
 			))
 			.from(product)
+			.where(builder)
 			.orderBy(product.id.asc())
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
@@ -298,7 +302,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 	// 예약된 재고 수량을 계산하는 표현식 (주문 상태 PENDING 또는 COMPLETED 수량)
 	private SubQueryExpression<Long> reservedStockExpression() {
 		return JPAExpressions
-			.select(orderProduct.quantity.sum().coalesce(0L))	// 없으면 0으로 처리
+			.select(orderProduct.quantity.sum().coalesce(0L))    // 없으면 0으로 처리
 			.from(orderProduct)
 			.join(orderProduct.order, order)
 			.where(
@@ -308,6 +312,16 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 						OrderStatus.COMPLETED
 					))
 			);
+	}
+
+	// Stock 키워드 필터링 (숫자면 상품 ID, 아니면 상품명)
+	private BooleanExpression stockKeywordFilter(String keyword) {
+		if (Strings.isBlank(keyword))
+			return null;
+
+		return keyword.chars().allMatch(Character::isDigit)
+			? product.id.eq(Long.valueOf(keyword))
+			: product.name.containsIgnoreCase(keyword);
 	}
 
 }

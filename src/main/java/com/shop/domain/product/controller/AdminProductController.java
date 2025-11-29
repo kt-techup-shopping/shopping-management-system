@@ -130,11 +130,14 @@ public class AdminProductController {
 		return ApiResult.ok();
 	}
 
-	// 관리자 상품 재고 목록 조회
+	// 관리자 상품 재고 목록 조회 (한글이면 이름, 숫자면 id 검색)
 	@GetMapping("/stock")
 	@ResponseStatus(HttpStatus.OK)
-	public ApiResult<Page<AdminProductStockResponse>> getStockDetailList(@Parameter Paging paging) {
-		return ApiResult.ok(adminProductService.getStockList(paging.toPageable()));
+	public ApiResult<Page<AdminProductStockResponse>> getStockDetailList(
+		@RequestParam(required = false) String keyword,
+		@Parameter Paging paging
+	) {
+		return ApiResult.ok(adminProductService.getStockList(keyword, paging.toPageable()));
 	}
 
 	// 관리자 상품 재고 수정

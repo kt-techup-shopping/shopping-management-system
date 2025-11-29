@@ -20,5 +20,5 @@ public interface ProductRepositoryCustom {
 	Page<AdminProductSearchResponse> getAdminSearchList(String keyword, Long categoryId, Boolean activeOnly,
 		ProductSort sort, PageRequest pageable);
 
-	Page<AdminProductStockResponse> getStockList(PageRequest pageable);
+	Page<AdminProductStockResponse> getStockList(String keyword, PageRequest pageable);
 }

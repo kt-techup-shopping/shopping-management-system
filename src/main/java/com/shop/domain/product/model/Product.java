@@ -20,6 +20,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Version;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -37,8 +38,8 @@ public class Product extends BaseEntity {
 	private String description;
 	private String color;
 
-	// @Version
-	// private Long version;
+	@Version
+	private Long version;
 
 	@OneToMany(mappedBy = "product")
 	private List<OrderProduct> orderProducts = new ArrayList<>();
@@ -63,8 +64,6 @@ public class Product extends BaseEntity {
 		this.description = description;
 		this.color = color;
 		this.category = category;
-		this.createdAt = LocalDateTime.now();
-		this.updatedAt = LocalDateTime.now();
 	}
 
 	public Product(String name, Long price, Long stock) {
@@ -99,7 +98,6 @@ public class Product extends BaseEntity {
 		this.stock += deltaStock;
 		this.status = status;
 		this.category = category;
-		this.updatedAt = LocalDateTime.now();
 	}
 
 	public void soldOut() {
@@ -149,5 +147,11 @@ public class Product extends BaseEntity {
 
 	public void getDiscountPrice(Long discountPrice) {
 		this.price = discountPrice;
+	}
+
+	public void toggleSoldOut() {
+		this.status = this.status == ProductStatus.SOLD_OUT
+			? ProductStatus.ACTIVATED
+			: ProductStatus.SOLD_OUT;
 	}
 }

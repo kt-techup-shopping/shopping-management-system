@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.shop.domain.product.request.ProductCreateRequest;
+import com.shop.domain.product.request.ProductSoldOutRequest;
 import com.shop.domain.product.request.ProductUpdateRequest;
 import com.shop.domain.product.response.AdminProductDetailResponse;
 import com.shop.domain.product.response.AdminProductSearchResponse;
@@ -55,10 +56,10 @@ public class AdminProductController {
 		@RequestParam(required = false) String keyword,
 		@RequestParam(required = false) Long categoryId,
 		@RequestParam(required = false) Boolean activeOnly,
-		@RequestParam(required = false) String productSort,
+		@RequestParam(required = false) String sort,
 		@Parameter Paging paging
 	) {
-		return ApiResult.ok(adminProductService.getAdminSearchList(keyword, categoryId, activeOnly, productSort, paging.toPageable()));
+		return ApiResult.ok(adminProductService.getAdminSearchList(keyword, categoryId, activeOnly, sort, paging.toPageable()));
 	}
 
 	// 관리자 상품 상세 조회
@@ -85,6 +86,38 @@ public class AdminProductController {
 			request.status(),
 			request.categoryId()
 		);
+		return ApiResult.ok();
+	}
+
+	// 관리자 상품 상태 활성화
+	@PutMapping("/{id}/activate")
+	@ResponseStatus(HttpStatus.OK)
+	public ApiResult<Void> updateActivated(@PathVariable Long id) {
+		adminProductService.updateActivated(id);
+		return ApiResult.ok();
+	}
+
+	// 관리자 상품 상태 비활성화
+	@PutMapping("/{id}/in-activate")
+	@ResponseStatus(HttpStatus.OK)
+	public ApiResult<Void> updateInActivated(@PathVariable Long id) {
+		adminProductService.updateInActivated(id);
+		return ApiResult.ok();
+	}
+
+	// 관리자 상품 품절 (토글)
+	@PutMapping("/{id}/toggle-sold-out")
+	@ResponseStatus(HttpStatus.OK)
+	public ApiResult<Void> updateSoldOut(@PathVariable Long id) {
+		adminProductService.updateSoldOutToggle(id);
+		return ApiResult.ok();
+	}
+
+	// 관리자 상품 상태 다중 품절
+	@PutMapping("/sold-out")
+	@ResponseStatus(HttpStatus.OK)
+	public ApiResult<Void> updateSoldOutList(@RequestBody ProductSoldOutRequest request) {
+		adminProductService.updateSoldOutList(request.productIds());
 		return ApiResult.ok();
 	}
 }

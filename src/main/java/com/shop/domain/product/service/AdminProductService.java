@@ -1,5 +1,6 @@
 package com.shop.domain.product.service;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.domain.Page;
@@ -67,6 +68,7 @@ public class AdminProductService {
 		);
 	}
 
+	// 관리자 상품 정보 수정
 	@Lock(key = Lock.Key.PRODUCT, index = 0, waitTime = 1000, leaseTime = 500, timeUnit = TimeUnit.MILLISECONDS)
 	public void updateDetail(Long id, String name, Long price, String description, String color, Long deltaStock,
 		String status, Long categoryId) {
@@ -82,5 +84,33 @@ public class AdminProductService {
 			ProductStatus.from(status),
 			category
 		);
+	}
+
+	// 관리자 상품 상태 비활성화
+	@Transactional
+	public void updateActivated(Long id) {
+		var product = productRepository.findByIdOrThrow(id);
+		product.activate();
+	}
+
+	// 관리자 상품 상태 비활성화
+	@Transactional
+	public void updateInActivated(Long id) {
+		var product = productRepository.findByIdOrThrow(id);
+		product.inActivate();
+	}
+
+	// 관리자 상품 상태 품절 토글
+	@Transactional
+	public void updateSoldOutToggle(Long id) {
+		var product = productRepository.findByIdOrThrow(id);
+		product.toggleSoldOut();
+	}
+
+	// 관리자 상품 상태 다중 품절
+	@Transactional
+	public void updateSoldOutList(List<Long> ids) {
+		var products = productRepository.findAllById(ids);
+		products.forEach(Product::soldOut);
 	}
 }

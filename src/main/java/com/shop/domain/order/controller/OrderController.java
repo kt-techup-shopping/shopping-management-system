@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.shop.domain.order.request.OrderCreateRequest;
 import com.shop.domain.order.service.OrderService;
 import com.shop.global.common.ApiResult;
 import com.shop.domain.order.request.OrderRequest;
@@ -22,16 +23,14 @@ public class OrderController {
 
 	//주문생성
 	@PostMapping
-	public ApiResult<Void> create(
+	public ApiResult<Void> createOrder(
 		@AuthenticationPrincipal DefaultCurrentUser defaultCurrentUser,
-		@RequestBody @Valid OrderRequest.Create request) {
-		orderService.create(
+		@RequestBody @Valid OrderCreateRequest orderCreateRequest) {
+		orderService.createOrder(
 			defaultCurrentUser.getId(),
-			request.productId(),
-			request.receiverName(),
-			request.receiverAddress(),
-			request.receiverMobile(),
-			request.quantity()
+			// lock을 위해 리스트로
+			orderCreateRequest.productQuantity().keySet().stream().toList(),
+			orderCreateRequest
 		);
 		return ApiResult.ok();
 	}

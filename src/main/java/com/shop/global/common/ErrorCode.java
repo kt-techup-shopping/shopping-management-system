@@ -11,6 +11,8 @@ public enum ErrorCode {
 	NOT_FOUND_PRODUCT(HttpStatus.BAD_REQUEST, "상품을 찾을 수 없습니다."),
 	NOT_FOUND_USER(HttpStatus.BAD_REQUEST, "존재하지 않는 회원입니다."),
 	NOT_FOUND_CATEGORY(HttpStatus.BAD_REQUEST, "카테고리를 찾을 수 없습니다."),
+	NOT_FOUND_ORDER(HttpStatus.BAD_REQUEST, "주문을 찾을 수 없습니다."),
+	NOT_FOUND_DELIVERY(HttpStatus.BAD_REQUEST, "배송 정보를 찾을 수 없습니다."),
 	EXIST_USER(HttpStatus.BAD_REQUEST, "이미 존재하는 회원입니다."),
 	FAIL_LOGIN(HttpStatus.BAD_REQUEST, "아이디 혹은 비밀번호가 일치하지 않습니다."),
 	DOES_NOT_MATCH_OLD_PASSWORD(HttpStatus.BAD_REQUEST, "기존 비밀번호가 일치하지 않습니다."),
@@ -27,6 +29,7 @@ public enum ErrorCode {
 	PAGE_INVALID(HttpStatus.BAD_REQUEST, "Page 값은 1 이상이어야 합니다."),
 	SIZE_INVALID(HttpStatus.BAD_REQUEST, "Size 값은 1 이상이어야 합니다."),
 	NOT_USER_ROLE_ADMIN(HttpStatus.BAD_REQUEST, "해당 유저는 관리자 권한이 아닙니다."),
+	WAYBILL_NO_REQUIRED(HttpStatus.BAD_REQUEST, "송장번호는 필수입니다."),
 
 	// Review
 	NOT_PURCHASED_PRODUCT(HttpStatus.BAD_REQUEST, "구매한 적 없는 상품입니다."),

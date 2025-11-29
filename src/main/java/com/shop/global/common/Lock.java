@@ -22,6 +22,6 @@ public @interface Lock {
 	enum Key {
 		PRODUCT,
 		STOCK,
-		USER_EVENT
+		ORDER, USER_EVENT
 	}
 }

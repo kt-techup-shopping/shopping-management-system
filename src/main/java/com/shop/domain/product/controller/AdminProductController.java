@@ -91,7 +91,7 @@ public class AdminProductController {
 			request.price(),
 			request.description(),
 			request.color(),
-			request.deltaStock(),
+			request.quantity(),
 			request.status(),
 			request.categoryId()
 		);

@@ -150,4 +150,12 @@ public class AdminProductController {
 		adminProductService.updateStock(id, quantity);
 		return ApiResult.ok();
 	}
+
+	// 관리자 상품 삭제
+	@PutMapping("/{id}/delete")
+	@ResponseStatus(HttpStatus.OK)
+	public ApiResult<Void> deleteProduct(@PathVariable Long id) {
+		adminProductService.deleteProduct(id);
+		return ApiResult.ok();
+	}
 }

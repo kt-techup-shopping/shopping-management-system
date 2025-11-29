@@ -115,6 +115,7 @@ public class Product extends BaseEntity {
 	public void delete() {
 		// 논리삭제
 		this.status = ProductStatus.DELETED;
+		this.isDeleted = true;
 	}
 
 	public void decreaseStock(Long quantity) {

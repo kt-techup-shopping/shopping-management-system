@@ -126,4 +126,10 @@ public class AdminProductService {
 		var product = productRepository.findByIdOrThrow(id);
 		product.updateStock(quantity);
 	}
+
+	@Transactional
+	public void deleteProduct(Long id) {
+		var product = productRepository.findByIdOrThrow(id);
+		product.delete();
+	}
 }

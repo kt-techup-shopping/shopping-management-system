@@ -154,4 +154,9 @@ public class Product extends BaseEntity {
 			? ProductStatus.ACTIVATED
 			: ProductStatus.SOLD_OUT;
 	}
+
+	public void updateStock(Long quantity) {
+		Preconditions.validate(quantity >= 0, ErrorCode.INVALID_STOCK_QUANTITY);
+		this.stock = quantity;
+	}
 }

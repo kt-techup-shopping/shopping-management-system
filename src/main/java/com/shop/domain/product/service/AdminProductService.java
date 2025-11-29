@@ -119,4 +119,11 @@ public class AdminProductService {
 	public Page<AdminProductStockResponse> getStockList(PageRequest paging) {
 		return productRepository.getStockList(paging);
 	}
+
+	// 관리자 상품 재고 수정
+	@Lock(key = Lock.Key.PRODUCT, index = 0, waitTime = 1000, leaseTime = 500, timeUnit = TimeUnit.MILLISECONDS)
+	public void updateStock(Long id, Long quantity) {
+		var product = productRepository.findByIdOrThrow(id);
+		product.updateStock(quantity);
+	}
 }

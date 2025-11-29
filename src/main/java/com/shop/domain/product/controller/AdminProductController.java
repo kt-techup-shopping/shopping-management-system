@@ -136,4 +136,15 @@ public class AdminProductController {
 	public ApiResult<Page<AdminProductStockResponse>> getStockDetailList(@Parameter Paging paging) {
 		return ApiResult.ok(adminProductService.getStockList(paging.toPageable()));
 	}
+
+	// 관리자 상품 재고 수정
+	@PutMapping("/{id}/stock/{quantity}")
+	@ResponseStatus(HttpStatus.OK)
+	public ApiResult<Void> updateStock(
+		@PathVariable Long id,
+		@PathVariable Long quantity
+	) {
+		adminProductService.updateStock(id, quantity);
+		return ApiResult.ok();
+	}
 }

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import com.shop.domain.order.model.OrderStatus;
 import com.shop.domain.order.model.QOrder;
 import com.shop.domain.order.response.AdminOrderDetailQueryResponse;
+import com.shop.domain.order.response.AdminOrderDetailUserQueryResponse;
 import com.shop.domain.order.response.OrderDetailQueryResponse;
 import com.shop.domain.order.response.OrderDetailUserQueryResponse;
 import com.shop.domain.order.response.QAdminOrderDetailQueryResponse;
@@ -193,6 +194,10 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
 			.fetch();
 	}
 
+	@Override
+	public List<AdminOrderDetailUserQueryResponse> findAdminOrderDetailUser(Long orderId) {
+		return List.of();
+	}
 
 	// 시작하는 '%keyword'
 	// 끝나는 'keyword%'

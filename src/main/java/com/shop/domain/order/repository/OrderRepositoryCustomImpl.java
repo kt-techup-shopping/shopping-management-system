@@ -198,7 +198,7 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
 	}
 
 	@Override
-	public List<AdminOrderDetailUserQueryResponse> findAdminOrderDetailUser(Long orderId) {
+	public List<AdminOrderDetailUserQueryResponse> findAdminOrderDetailUserById(Long orderId) {
 		return jpaQueryFactory
 			.select(new QAdminOrderDetailUserQueryResponse(
 				order.id,

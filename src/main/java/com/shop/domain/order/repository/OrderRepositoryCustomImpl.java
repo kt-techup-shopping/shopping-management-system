@@ -1,5 +1,7 @@
 package com.shop.domain.order.repository;
 
+import java.util.List;
+
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -7,6 +9,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.shop.domain.order.model.QOrder;
+import com.shop.domain.order.response.OrderDetailQueryResponse;
+import com.shop.domain.order.response.QOrderDetailQueryResponse;
 import com.shop.domain.orderproduct.model.QOrderProduct;
 import com.shop.domain.product.model.QProduct;
 import com.shop.domain.order.response.OrderResponse;
@@ -76,6 +80,35 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
 
 		return new PageImpl<>(content, pageable, total);
 	}
+
+	@Override
+	public List<OrderDetailQueryResponse> findOrderDetailByUserId(Long userId) {
+		return jpaQueryFactory
+			.select(new QOrderDetailQueryResponse(
+				order.id,
+				order.receiver.name,
+				order.receiver.address,
+				order.receiver.mobile,
+				product.name,
+				product.price,
+				orderProduct.quantity,
+				order.status.stringValue(),
+				order.deliveredAt
+			))
+			.from(order)
+			.join(orderProduct).on(orderProduct.order.eq(order)
+				.and(orderProduct.isDeleted.eq(false))
+			)
+			.join(product).on(orderProduct.product.eq(product))
+			.where(
+				order.user.id.eq(userId),
+				order.isDeleted.eq(false)
+			)
+			.orderBy(order.createdAt.desc())
+			.fetch();
+	}
+
+
 
 	// 시작하는 '%keyword'
 	// 끝나는 'keyword%'

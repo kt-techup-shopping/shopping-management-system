@@ -34,6 +34,9 @@ public enum ErrorCode {
 	NOT_FOUND_REVIEW(HttpStatus.BAD_REQUEST, "존재하지 않는 리뷰입니다."),
 	DOES_NOT_MATCH_USER_REVIEW(HttpStatus.BAD_REQUEST, "리뷰는 작성자만 삭제할 수 있습니다."),
 	ALREADY_WRITE_REVIEW(HttpStatus.BAD_REQUEST, "이미 상품에 대한 리뷰를 작성했습니다."),
+
+	//
+	NOT_FOUND_ORDER(HttpStatus.BAD_REQUEST, "존재하지 않은 주문입니다.")
 	;
 
 	private final HttpStatus status;

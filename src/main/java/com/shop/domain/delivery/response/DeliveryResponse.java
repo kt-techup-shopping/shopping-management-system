@@ -18,24 +18,4 @@ public record DeliveryResponse(
 			delivery.getWaybillNo()
 		);
 	}
-
-	public boolean isPending() {
-		return deliveryStatus == DeliveryStatus.PENDING;
-	}
-
-	public boolean isReady() {
-		return deliveryStatus == DeliveryStatus.READY;
-	}
-
-	public boolean isShipping() {
-		return deliveryStatus == DeliveryStatus.SHIPPING;
-	}
-
-	public boolean isDelivered() {
-		return deliveryStatus == DeliveryStatus.DELIVERED;
-	}
-
-	public boolean hasWaybillNo() {
-		return waybillNo != null && !waybillNo.trim().isEmpty();
-	}
 }

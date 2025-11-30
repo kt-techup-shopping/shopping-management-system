@@ -1,5 +1,7 @@
 package com.shop.domain.order.repository;
 
+import static com.shop.domain.payment.model.QPayment.*;
+
 import java.util.List;
 
 import org.apache.logging.log4j.util.Strings;
@@ -16,6 +18,7 @@ import com.shop.domain.order.response.AdminOrderDetailUserQueryResponse;
 import com.shop.domain.order.response.OrderDetailQueryResponse;
 import com.shop.domain.order.response.OrderDetailUserQueryResponse;
 import com.shop.domain.order.response.QAdminOrderDetailQueryResponse;
+import com.shop.domain.order.response.QAdminOrderDetailUserQueryResponse;
 import com.shop.domain.order.response.QOrderDetailQueryResponse;
 import com.shop.domain.order.response.QOrderDetailUserQueryResponse;
 import com.shop.domain.orderproduct.model.QOrderProduct;
@@ -176,15 +179,15 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
 				product.price,
 				orderProduct.quantity,
 
-				order.payment.totalPrice,
-				order.payment.deliveryFee,
-				order.payment.type
+				payment.totalPrice,
+				payment.deliveryFee,
+				payment.type
 			))
 			.from(order)
 			.join(orderProduct).on(orderProduct.order.eq(order)
 				.and(orderProduct.isDeleted.eq(false)))
 			.join(product).on(orderProduct.product.eq(product))
-			.join(order.payment)
+			.join(payment).on(payment.order.eq(order))
 			.where(
 				order.id.eq(orderId),
 				order.user.id.eq(userId),
@@ -196,7 +199,40 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
 
 	@Override
 	public List<AdminOrderDetailUserQueryResponse> findAdminOrderDetailUser(Long orderId) {
-		return List.of();
+		return jpaQueryFactory
+			.select(new QAdminOrderDetailUserQueryResponse(
+				order.id,
+				order.user.id,
+				order.user.name,
+				order.user.email,
+				order.user.mobile,
+				order.receiver.name,
+				order.receiver.address,
+				order.receiver.mobile,
+				order.status,
+				order.deliveredAt,
+				order.createdAt,
+
+				product.id,
+				product.name,
+				product.price,
+				orderProduct.quantity,
+
+				payment.totalPrice,
+				payment.deliveryFee,
+				payment.type
+			))
+			.from(order)
+			.join(orderProduct).on(orderProduct.order.eq(order)
+				.and(orderProduct.isDeleted.eq(false)))
+			.join(product).on(orderProduct.product.eq(product))
+			.join(payment).on(payment.order.eq(order))
+			.where(
+				order.id.eq(orderId),
+				order.isDeleted.eq(false)
+			)
+			.orderBy(orderProduct.id.asc())
+			.fetch();
 	}
 
 	// 시작하는 '%keyword'

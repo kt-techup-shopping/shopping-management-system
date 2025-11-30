@@ -96,12 +96,18 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
 				order.deliveredAt
 			))
 			.from(order)
-			.join(orderProduct).on(orderProduct.order.eq(order))
+			.join(orderProduct).on(orderProduct.order.eq(order)
+				.and(orderProduct.isDeleted.eq(false))
+			)
 			.join(product).on(orderProduct.product.eq(product))
-			.where(order.user.id.eq(userId)) // ✅ userId 조건 추가
+			.where(
+				order.user.id.eq(userId),
+				order.isDeleted.eq(false)
+			)
 			.orderBy(order.createdAt.desc())
 			.fetch();
 	}
+
 
 
 	// 시작하는 '%keyword'

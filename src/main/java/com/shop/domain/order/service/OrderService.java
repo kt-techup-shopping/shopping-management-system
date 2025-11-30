@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.shop.domain.order.model.Order;
 import com.shop.domain.order.model.Receiver;
 import com.shop.domain.order.request.OrderCreateRequest;
+import com.shop.domain.order.request.OrderDeleteRequest;
 import com.shop.domain.order.request.OrderUpdateRequest;
 import com.shop.domain.order.response.OrderDetailQueryResponse;
 import com.shop.domain.order.response.OrderDetailResponse;
@@ -31,18 +32,11 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 @RequiredArgsConstructor
 public class OrderService{
-	private final RedisProperties redisProperties;
 	private final UserRepository userRepository;
 	private final ProductRepository productRepository;
 	private final OrderRepository orderRepository;
 	private final OrderProductRepository orderProductRepository;
-	private final RedissonClient redissonClient;
 
-	// reference , primitive
-	// 선택하는 기준 1번째 : null 가능?
-	// Long -> null, long -> 0
-	// Generic이냐 아니냐 -> Generic은 무조건 참조형
-	//주문생성
 	@Lock(key = Lock.Key.STOCK, index = 1, isList = true)
 	public void createOrder(
 		Long userId,
@@ -127,15 +121,6 @@ public class OrderService{
 		OrderUpdateRequest orderUpdateRequest
 	) {
 		var products = productRepository.findAllByIdOrThrow(productIds);
-
-		// 새로운 요청 수량 검증
-		products.forEach(product ->
-			Preconditions.validate(
-				product.canProvide(orderUpdateRequest.productQuantity().get(product.getId())),
-				ErrorCode.NOT_ENOUGH_STOCK
-			)
-		);
-
 		var user = userRepository.findByIdOrThrow(userId, ErrorCode.NOT_FOUND_USER);
 
 		var order = orderRepository.findByIdAndIsDeletedFalse(orderUpdateRequest.orderId())
@@ -153,7 +138,7 @@ public class OrderService{
 
 		// 기존 OrderProduct 정리 (재고 복구 + 논리삭제)
 		order.getOrderProducts().stream()
-			.filter(op -> productIds.contains(op.getProduct().getId())) // 이번 수정 대상만 필터링
+			.filter(op -> !op.getIsDeleted() && productIds.contains(op.getProduct().getId())) // 아직 삭제되지 않은 것만
 			.forEach(op -> {
 				var product = op.getProduct();
 
@@ -168,7 +153,10 @@ public class OrderService{
 		var newOrderProducts = products.stream()
 			.map(product -> {
 				Long newQuantity = orderUpdateRequest.productQuantity().get(product.getId());
-
+				Preconditions.validate(
+					product.canProvide(newQuantity),
+					ErrorCode.NOT_ENOUGH_STOCK
+				);
 				// 재고 차감
 				product.decreaseStock(newQuantity);
 
@@ -182,5 +170,38 @@ public class OrderService{
 				return orderProduct;
 			}).toList();
 	}
+
+	/**
+	 * 주문을 삭제하는 API
+	 */
+	@Lock(key = Lock.Key.STOCK, index = 1, isList = true)
+	public void deleteOrder(Long userId, List<Long> productIds, OrderDeleteRequest orderDeleteRequest) {
+
+		var user = userRepository.findByIdOrThrow(userId, ErrorCode.NOT_FOUND_USER);
+
+		var order = orderRepository.findByIdAndIsDeletedFalse(orderDeleteRequest.orderId())
+			.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ORDER));
+
+		// 본인 주문만 삭제 가능
+		Preconditions.validate(order.getUser().equals(user), ErrorCode.NOT_PURCHASED_PRODUCT);
+
+		// 1) OrderProduct 재고 복구 + 논리 삭제
+		order.getOrderProducts().stream()
+			.filter(op -> !op.getIsDeleted()) // 이미 삭제된 건 제외
+			.forEach(op -> {
+				var product = op.getProduct();
+
+				// 재고 되돌리기
+				product.increaseStock(op.getQuantity());
+
+				// OrderProduct 논리삭제
+				op.cancel();
+			});
+
+		// 2) Order 논리삭제
+		order.cancel();
+	}
+
+
 
 }

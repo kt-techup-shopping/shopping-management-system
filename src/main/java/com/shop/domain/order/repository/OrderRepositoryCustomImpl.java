@@ -5,11 +5,15 @@ import java.util.List;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import com.shop.domain.order.model.OrderStatus;
 import com.shop.domain.order.model.QOrder;
+import com.shop.domain.order.response.AdminOrderDetailQueryResponse;
 import com.shop.domain.order.response.OrderDetailQueryResponse;
+import com.shop.domain.order.response.QAdminOrderDetailQueryResponse;
 import com.shop.domain.order.response.QOrderDetailQueryResponse;
 import com.shop.domain.orderproduct.model.QOrderProduct;
 import com.shop.domain.product.model.QProduct;
@@ -103,6 +107,48 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
 			.fetch();
 	}
 
+	@Override
+	public Page<AdminOrderDetailQueryResponse> findAdminOrderDetail(
+		Long orderId, Long userId, OrderStatus status, PageRequest pageable
+	) {
+		BooleanBuilder builder = new BooleanBuilder();
+		builder.and(filterOrderId(orderId));
+		builder.and(filterUserId(userId));
+		builder.and(filterStatus(status));
+
+		var content = jpaQueryFactory
+			.select(new QAdminOrderDetailQueryResponse(
+				order.id,
+				order.user.id,
+				order.receiver.name,
+				order.receiver.address,
+				order.receiver.mobile,
+				product.name,
+				product.price,
+				orderProduct.quantity,
+				order.status.stringValue(),
+				order.deliveredAt
+			))
+			.from(order)
+			.join(orderProduct).on(orderProduct.order.eq(order))
+			.join(product).on(orderProduct.product.eq(product))
+			.where(builder)
+			.orderBy(order.id.desc())
+			.offset(pageable.getOffset())
+			.limit(pageable.getPageSize())
+			.fetch();
+
+		var total = jpaQueryFactory
+			.select(order.id.countDistinct())
+			.from(order)
+			.join(orderProduct).on(orderProduct.order.eq(order))
+			.join(product).on(orderProduct.product.eq(product))
+			.where(builder)
+			.fetchOne();
+		var totalCount = (total != null) ? total : 0L;
+
+		return new PageImpl<>(content, pageable, totalCount);
+	}
 
 	// 시작하는 '%keyword'
 	// 끝나는 'keyword%'
@@ -119,4 +165,17 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
 		// }
 		return Strings.isNotBlank(keyword) ? product.name.containsIgnoreCase(keyword) : null;
 	}
+
+	private BooleanExpression filterOrderId(Long orderId) {
+		return orderId != null ? order.id.eq(orderId) : null;
+	}
+
+	private BooleanExpression filterUserId(Long userId) {
+		return userId != null ? order.user.id.eq(userId) : null;
+	}
+
+	private BooleanExpression filterStatus(OrderStatus status) {
+		return status != null ? order.status.eq(status) : null;
+	}
+
 }

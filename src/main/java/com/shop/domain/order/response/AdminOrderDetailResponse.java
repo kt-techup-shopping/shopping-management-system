@@ -3,10 +3,9 @@ package com.shop.domain.order.response;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.shop.domain.order.model.OrderStatus;
-
-public record OrderDetailResponse(
+public record AdminOrderDetailResponse(
 	Long orderId,
+	Long userId,
 	String receiverName,
 	String receiverAddress,
 	String receiverMobile,

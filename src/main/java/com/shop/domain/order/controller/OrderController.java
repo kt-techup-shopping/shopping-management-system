@@ -14,6 +14,7 @@ import com.shop.domain.order.request.OrderCreateRequest;
 import com.shop.domain.order.request.OrderDeleteRequest;
 import com.shop.domain.order.request.OrderUpdateRequest;
 import com.shop.domain.order.response.OrderDetailResponse;
+import com.shop.domain.order.response.OrderDetailUserResponse;
 import com.shop.domain.order.service.OrderService;
 import com.shop.global.common.ApiResult;
 import com.shop.global.common.SwaggerAssistance;
@@ -81,5 +82,14 @@ public class OrderController extends SwaggerAssistance {
 			orderDeleteRequest
 		);
 		return ApiResult.ok();
+	}
+
+	@Operation(summary = "내 주문 상세 조회", description = "사용자가 자신의 특정 주문 내역을 상세 조회합니다.")
+	@GetMapping("/{id}/detail")
+	public ApiResult<OrderDetailUserResponse> getMyOrderDetail(
+		@AuthenticationPrincipal DefaultCurrentUser defaultCurrentUser,
+		Long id
+	) {
+		return ApiResult.ok(orderService.getMyOrderDetail(defaultCurrentUser.getId(), id));
 	}
 }

@@ -15,6 +15,7 @@ import com.shop.domain.order.request.OrderDeleteRequest;
 import com.shop.domain.order.request.OrderUpdateRequest;
 import com.shop.domain.order.response.OrderDetailQueryResponse;
 import com.shop.domain.order.response.OrderDetailResponse;
+import com.shop.domain.order.response.OrderDetailUserResponse;
 import com.shop.global.common.CustomException;
 import com.shop.global.common.ErrorCode;
 import com.shop.global.common.Lock;
@@ -202,6 +203,10 @@ public class OrderService{
 		order.cancel();
 	}
 
-
-
+	/**
+	 * 내 주문 상세 내역을 가져오는 API
+	 */
+	public OrderDetailUserResponse getMyOrderDetail(Long userId, Long orderId) {
+		return null;
+	}
 }

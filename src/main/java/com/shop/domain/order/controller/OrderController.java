@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.shop.domain.order.request.OrderCreateRequest;
+import com.shop.domain.order.request.OrderDeleteRequest;
 import com.shop.domain.order.request.OrderUpdateRequest;
 import com.shop.domain.order.response.OrderDetailResponse;
 import com.shop.domain.order.service.OrderService;
@@ -64,6 +65,20 @@ public class OrderController extends SwaggerAssistance {
 			// lock을 위해 리스트로
 			orderUpdateRequest.productQuantity().keySet().stream().toList(),
 			orderUpdateRequest
+		);
+		return ApiResult.ok();
+	}
+
+	@Operation(summary = "주문 삭제", description = "이미 생성한 주문의 수령인 정보 및 상품 정보를 삭제합니다.")
+	@PutMapping("/delete")
+	public ApiResult<Void> deleteOrder(
+		@AuthenticationPrincipal DefaultCurrentUser defaultCurrentUser,
+		@RequestBody @Valid OrderDeleteRequest orderDeleteRequest
+	) {
+		orderService.deleteOrder(
+			defaultCurrentUser.getId(),
+			orderDeleteRequest.productIds(),
+			orderDeleteRequest
 		);
 		return ApiResult.ok();
 	}

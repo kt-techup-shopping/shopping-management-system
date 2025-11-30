@@ -22,15 +22,20 @@ import com.shop.domain.category.model.Category;
 import com.shop.domain.category.repository.CategoryRepository;
 import com.shop.domain.discount.model.DiscountType;
 import com.shop.domain.discount.model.QDiscount;
+import com.shop.domain.order.model.OrderStatus;
+import com.shop.domain.order.model.QOrder;
+import com.shop.domain.orderproduct.model.QOrderProduct;
 import com.shop.domain.product.model.ProductStatus;
 import com.shop.domain.product.model.QProduct;
 import com.shop.domain.product.request.ProductSort;
 import com.shop.domain.product.response.AdminProductDetailQueryResponse;
 import com.shop.domain.product.response.AdminProductSearchResponse;
+import com.shop.domain.product.response.AdminProductStockResponse;
 import com.shop.domain.product.response.ProductDetailQueryResponse;
 import com.shop.domain.product.response.ProductSearchResponse;
 import com.shop.domain.product.response.QAdminProductDetailQueryResponse;
 import com.shop.domain.product.response.QAdminProductSearchResponse;
+import com.shop.domain.product.response.QAdminProductStockResponse;
 import com.shop.domain.product.response.QProductDetailQueryResponse;
 import com.shop.domain.product.response.QProductSearchResponse;
 
@@ -44,6 +49,8 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 	private final JPAQueryFactory jpaQueryFactory;
 	private final QProduct product = QProduct.product;
 	private final QDiscount discount = QDiscount.discount;
+	private final QOrderProduct orderProduct = QOrderProduct.orderProduct;
+	private final QOrder order = QOrder.order;
 
 	// 사용자 상품 목록 조회 (검색/카테고리/판매중/정렬 조건 적용)
 	@Override
@@ -137,6 +144,36 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 				discountedPriceExpression()
 			)
 		);
+	}
+
+	// 관리자 상품 재고 목록 조회 (검색 조건 적용)
+	@Override
+	public Page<AdminProductStockResponse> getStockList(String keyword, PageRequest pageable) {
+		var reservedStock = reservedStockExpression();
+		BooleanBuilder builder = new BooleanBuilder();
+		builder.and(stockKeywordFilter(keyword));			// 숫자면 상품 ID, 아니면 상품명 검색
+
+		var content = jpaQueryFactory
+			.select(new QAdminProductStockResponse(
+				product.id,
+				product.name,
+				product.stock.subtract(reservedStock),		// 사용 가능한 재고 = 전체 재고 - 예약된 재고
+				reservedStock,								// 예약된 재고 (주문 상태 PENDING 또는 COMPLETED)
+				product.stock								// 전체 재고 = 사용 가능한 재고 + 예약된 재고
+			))
+			.from(product)
+			.where(builder)
+			.orderBy(product.id.asc())
+			.offset(pageable.getOffset())
+			.limit(pageable.getPageSize())
+			.fetch();
+
+		long total = jpaQueryFactory
+			.select(product.id.count())
+			.from(product)
+			.fetch().size();
+
+		return new PageImpl<>(content, pageable, total);
 	}
 
 	// 공통 상품 검색 쿼리
@@ -260,6 +297,31 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 			.when(discount.type.eq(DiscountType.PERCENT)).then(rate)
 			.when(discount.type.eq(DiscountType.FIXED)).then(amount)
 			.otherwise(product.price);
+	}
+
+	// 예약된 재고 수량을 계산하는 표현식 (주문 상태 PENDING 또는 COMPLETED 수량)
+	private SubQueryExpression<Long> reservedStockExpression() {
+		return JPAExpressions
+			.select(orderProduct.quantity.sum().coalesce(0L))    // 없으면 0으로 처리
+			.from(orderProduct)
+			.join(orderProduct.order, order)
+			.where(
+				orderProduct.product.eq(product)
+					.and(order.status.in(
+						OrderStatus.PENDING,
+						OrderStatus.COMPLETED
+					))
+			);
+	}
+
+	// Stock 키워드 필터링 (숫자면 상품 ID, 아니면 상품명)
+	private BooleanExpression stockKeywordFilter(String keyword) {
+		if (Strings.isBlank(keyword))
+			return null;
+
+		return keyword.chars().allMatch(Character::isDigit)
+			? product.id.eq(Long.valueOf(keyword))
+			: product.name.containsIgnoreCase(keyword);
 	}
 
 }

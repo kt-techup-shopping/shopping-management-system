@@ -13,7 +13,7 @@ public record ProductUpdateRequest(
 	@NotBlank
 	String color,
 	@NotNull
-	Long deltaStock,
+	Long quantity,
 	@NotBlank
 	String status,
 	@NotNull

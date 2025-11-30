@@ -29,6 +29,7 @@ public enum ErrorCode {
 	NOT_USER_ROLE_ADMIN(HttpStatus.BAD_REQUEST, "해당 유저는 관리자 권한이 아닙니다."),
 	// Product
 	INVALID_PRODUCT_STATUS(HttpStatus.BAD_REQUEST, "유효하지 않은 상품 상태입니다."),
+	INVALID_STOCK_QUANTITY(HttpStatus.BAD_REQUEST, "재고 수량은 음수일 수 없습니다."),
 	// Review
 	NOT_PURCHASED_PRODUCT(HttpStatus.BAD_REQUEST, "구매한 적 없는 상품입니다."),
 	NOT_FOUND_REVIEW(HttpStatus.BAD_REQUEST, "존재하지 않는 리뷰입니다."),

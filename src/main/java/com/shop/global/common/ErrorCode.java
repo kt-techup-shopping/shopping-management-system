@@ -37,6 +37,7 @@ public enum ErrorCode {
 	// Order
 	INVALID_ORDER_STATUS(HttpStatus.BAD_REQUEST, "유효하지 않은 주문 상태입니다."),
 	NOT_FOUND_ORDER(HttpStatus.BAD_REQUEST, "존재하지 않은 주문입니다."),
+	INVALID_ORDER_OWNER(HttpStatus.BAD_REQUEST, "본인 주문만 조회할 수 있습니다."),
 	;
 
 	private final HttpStatus status;

@@ -13,8 +13,10 @@ import com.shop.domain.order.model.OrderStatus;
 import com.shop.domain.order.model.QOrder;
 import com.shop.domain.order.response.AdminOrderDetailQueryResponse;
 import com.shop.domain.order.response.OrderDetailQueryResponse;
+import com.shop.domain.order.response.OrderDetailUserQueryResponse;
 import com.shop.domain.order.response.QAdminOrderDetailQueryResponse;
 import com.shop.domain.order.response.QOrderDetailQueryResponse;
+import com.shop.domain.order.response.QOrderDetailUserQueryResponse;
 import com.shop.domain.orderproduct.model.QOrderProduct;
 import com.shop.domain.product.model.QProduct;
 import com.shop.domain.order.response.OrderResponse;
@@ -154,6 +156,43 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
 
 		return new PageImpl<>(content, pageable, totalCount);
 	}
+
+	// 내 주문 상세 조회
+	@Override
+	public List<OrderDetailUserQueryResponse> findOrderDetailByUserIdAndOrderId(Long userId, Long orderId) {
+		return jpaQueryFactory
+			.select(new QOrderDetailUserQueryResponse(
+				order.id,
+				order.receiver.name,
+				order.receiver.address,
+				order.receiver.mobile,
+				order.status,
+				order.deliveredAt,
+				order.createdAt,
+
+				product.id,
+				product.name,
+				product.price,
+				orderProduct.quantity,
+
+				order.payment.totalPrice,
+				order.payment.deliveryFee,
+				order.payment.type
+			))
+			.from(order)
+			.join(orderProduct).on(orderProduct.order.eq(order)
+				.and(orderProduct.isDeleted.eq(false)))
+			.join(product).on(orderProduct.product.eq(product))
+			.join(order.payment)
+			.where(
+				order.id.eq(orderId),
+				order.user.id.eq(userId),
+				order.isDeleted.eq(false)
+			)
+			.orderBy(orderProduct.id.asc())
+			.fetch();
+	}
+
 
 	// 시작하는 '%keyword'
 	// 끝나는 'keyword%'

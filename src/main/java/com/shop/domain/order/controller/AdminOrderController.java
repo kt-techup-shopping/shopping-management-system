@@ -1,20 +1,16 @@
 package com.shop.domain.order.controller;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.shop.domain.order.repository.OrderRepositoryCustom;
 import com.shop.domain.order.response.AdminOrderDetailResponse;
-import com.shop.domain.order.response.OrderDetailResponse;
 import com.shop.domain.order.service.AdminOrderService;
 import com.shop.global.common.ApiResult;
 import com.shop.global.common.Paging;
-import com.shop.domain.order.response.OrderResponse;
-import com.shop.domain.order.repository.OrderRepositoryCustom;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;

@@ -36,8 +36,10 @@ public enum ErrorCode {
 	ALREADY_WRITE_REVIEW(HttpStatus.BAD_REQUEST, "이미 상품에 대한 리뷰를 작성했습니다."),
 	// Order
 	INVALID_ORDER_STATUS(HttpStatus.BAD_REQUEST, "유효하지 않은 주문 상태입니다."),
+	NOT_FOUND_ORDER(HttpStatus.BAD_REQUEST, "존재하지 않은 주문입니다."),
 	;
 
 	private final HttpStatus status;
 	private final String message;
+
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -88,7 +89,7 @@ public class OrderController extends SwaggerAssistance {
 	@GetMapping("/{id}/detail")
 	public ApiResult<OrderDetailUserResponse> getMyOrderDetail(
 		@AuthenticationPrincipal DefaultCurrentUser defaultCurrentUser,
-		Long id
+		@PathVariable Long id
 	) {
 		return ApiResult.ok(orderService.getMyOrderDetail(defaultCurrentUser.getId(), id));
 	}

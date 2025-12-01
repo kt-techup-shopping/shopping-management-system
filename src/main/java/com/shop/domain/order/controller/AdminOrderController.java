@@ -6,10 +6,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.shop.domain.order.repository.OrderRepositoryCustom;
+import com.shop.domain.order.response.AdminOrderDetailResponse;
+import com.shop.domain.order.service.AdminOrderService;
 import com.shop.global.common.ApiResult;
 import com.shop.global.common.Paging;
-import com.shop.domain.order.response.OrderResponse;
-import com.shop.domain.order.repository.OrderRepositoryCustom;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
@@ -19,15 +20,27 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AdminOrderController {
 	private final OrderRepositoryCustom orderRepository;
+	private final AdminOrderService adminOrderService;
 
 	// 여기서 서비스에서 하는게 없음
 	// 1. 리포지토리 주입 바로 받아서 할거냐 -> 싱크홀 안티패턴 (v)
 	// 2. 그래도~ 서비스를 통해야한다.
+	// @GetMapping
+	// public ApiResult<Page<OrderResponse.Search>> search(
+	// 	@RequestParam(required = false) String keyword,
+	// 	@Parameter(hidden = true) Paging paging
+	// ) {
+	// 	return ApiResult.ok(orderRepository.search(keyword, paging.toPageable()));
+	// }
+
+	// 관리자 주문 목록 조회
 	@GetMapping
-	public ApiResult<Page<OrderResponse.Search>> search(
-		@RequestParam(required = false) String keyword,
-		@Parameter(hidden = true) Paging paging
+	public ApiResult<Page<AdminOrderDetailResponse>> getOrders(
+		@RequestParam(required = false) Long orderId,
+		@RequestParam(required = false) Long userId,
+		@RequestParam(required = false) String status,
+		@Parameter Paging paging
 	) {
-		return ApiResult.ok(orderRepository.search(keyword, paging.toPageable()));
+		return ApiResult.ok(adminOrderService.getOrders(orderId, userId, status, paging));
 	}
 }

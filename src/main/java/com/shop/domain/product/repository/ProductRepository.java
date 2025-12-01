@@ -1,5 +1,6 @@
 package com.shop.domain.product.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,6 +17,17 @@ public interface ProductRepository extends ProductRepositoryCustom, JpaRepositor
 	default Product findByIdOrThrow(Long id) {
 		return findById(id).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_PRODUCT));
 	}
+
+	default List<Product> findAllByIdOrThrow(List<Long> ids) {
+		List<Product> products = findAllById(ids);
+
+		if (products.size() != ids.size()) {
+			throw new CustomException(ErrorCode.NOT_FOUND_PRODUCT);
+		}
+
+		return products;
+	}
+
 
 	// select * from product where name = ?
 	Optional<Product> findByName(String name);

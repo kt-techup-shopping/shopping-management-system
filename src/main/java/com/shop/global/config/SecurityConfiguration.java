@@ -29,6 +29,8 @@ public class SecurityConfiguration {
 	private static final String[] GET_PERMIT_ALL = {
 		"/api/health/**", "/swagger-ui/**", "/v3/api-docs/**",
 		"/products", "/products/*",
+		"/reviews", "/reviews/user", "/reviews/single",
+		"/products", "/products/*",
 	};
 	private static final String[] POST_PERMIT_ALL = {
 		"/auth/login", "/auth/signup", "/auth/refresh",

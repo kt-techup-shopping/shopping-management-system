@@ -32,7 +32,7 @@ public class AdminDiscountController {
 	private final DiscountService adminProductService;
 
 	@Operation(summary = "관리자 상품 할인 등록")
-	@PostMapping("/discount")
+	@PostMapping
 	@ResponseStatus(HttpStatus.OK)
 	public ApiResult<Void> createDiscount(@RequestBody @Valid AdminDiscountCreateRequest request) {
 		adminProductService.createDiscount(

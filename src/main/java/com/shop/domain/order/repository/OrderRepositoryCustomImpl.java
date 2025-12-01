@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import com.querydsl.jpa.JPAExpressions;
 import com.shop.domain.order.model.OrderStatus;
 import com.shop.domain.order.model.QOrder;
 import com.shop.domain.order.response.AdminOrderDetailQueryResponse;
@@ -22,6 +23,8 @@ import com.shop.domain.order.response.QAdminOrderDetailUserQueryResponse;
 import com.shop.domain.order.response.QOrderDetailQueryResponse;
 import com.shop.domain.order.response.QOrderDetailUserQueryResponse;
 import com.shop.domain.orderproduct.model.QOrderProduct;
+import com.shop.domain.payment.model.PaymentStatus;
+import com.shop.domain.payment.model.QPayment;
 import com.shop.domain.product.model.QProduct;
 import com.shop.domain.order.response.OrderResponse;
 import com.shop.domain.order.response.QOrderResponse_Search;
@@ -39,6 +42,7 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
 	private final QOrder order = QOrder.order;
 	private final QOrderProduct orderProduct = QOrderProduct.orderProduct;
 	private final QProduct product = QProduct.product;
+	private final QPayment payment = QPayment.payment;
 
 	@Override
 	public Page<OrderResponse.Search> search(
@@ -164,6 +168,15 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
 	// 내 주문 상세 조회
 	@Override
 	public List<OrderDetailUserQueryResponse> findOrderDetailByUserIdAndOrderId(Long userId, Long orderId) {
+
+		QPayment paymentSub = new QPayment("paymentSub");
+
+		// 서브쿼리: 해당 주문의 최신 결제 ID
+		var latestPaymentIdSubQuery = JPAExpressions
+			.select(paymentSub.id.max())
+			.from(paymentSub)
+			.where(paymentSub.order.eq(order));
+
 		return jpaQueryFactory
 			.select(new QOrderDetailUserQueryResponse(
 				order.id,
@@ -179,7 +192,7 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
 				product.price,
 				orderProduct.quantity,
 
-				payment.totalPrice,
+				payment.totalAmount,
 				payment.deliveryFee,
 				payment.type
 			))
@@ -187,7 +200,9 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
 			.join(orderProduct).on(orderProduct.order.eq(order)
 				.and(orderProduct.isDeleted.eq(false)))
 			.join(product).on(orderProduct.product.eq(product))
-			.join(payment).on(payment.order.eq(order))
+			.leftJoin(payment).on(
+				payment.id.eq(latestPaymentIdSubQuery)
+			)
 			.where(
 				order.id.eq(orderId),
 				order.user.id.eq(userId),

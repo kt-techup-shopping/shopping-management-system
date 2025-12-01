@@ -4,10 +4,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.shop.domain.delivery.model.Delivery;
 import com.shop.domain.payment.model.Payment;
 import com.shop.global.common.BaseEntity;
 import com.shop.domain.orderproduct.model.OrderProduct;
 import com.shop.domain.user.model.User;
+import com.shop.global.common.BaseEntity;
 
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -17,6 +19,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.PostPersist;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,6 +35,17 @@ public class Order extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	private OrderStatus status;
 	private LocalDateTime deliveredAt;
+
+	@OneToOne(mappedBy = "order")
+	private Delivery delivery;
+
+	// Order 생성 시 Delivery 자동 생성
+	@PostPersist
+	private void createDelivery() {
+		if (this.delivery == null) {
+			this.delivery = new Delivery(this);
+		}
+	}
 
 	@ManyToOne
 	@JoinColumn(name = "user_id")

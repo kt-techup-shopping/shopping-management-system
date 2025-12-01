@@ -32,7 +32,7 @@ public class SecurityConfiguration {
 	};
 	private static final String[] POST_PERMIT_ALL = {
 		"/auth/login", "/auth/signup", "/auth/refresh",
-		"/admin/products", "/cart/*"
+		"/admin/products", "/cart/**"
 	};
 	private static final String[] PUT_PERMIT_ALL = {"/api/v1/public/**"};
 	private static final String[] PATCH_PERMIT_ALL = {"/api/v1/public/**"};

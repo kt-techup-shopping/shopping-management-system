@@ -9,24 +9,25 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.shop.domain.order.model.OrderStatus;
 import com.shop.domain.order.model.QOrder;
 import com.shop.domain.order.response.AdminOrderDetailQueryResponse;
+import com.shop.domain.order.response.AdminOrderDetailUserQueryResponse;
 import com.shop.domain.order.response.OrderDetailQueryResponse;
 import com.shop.domain.order.response.OrderDetailUserQueryResponse;
+import com.shop.domain.order.response.OrderResponse;
 import com.shop.domain.order.response.QAdminOrderDetailQueryResponse;
+import com.shop.domain.order.response.QAdminOrderDetailUserQueryResponse;
 import com.shop.domain.order.response.QOrderDetailQueryResponse;
 import com.shop.domain.order.response.QOrderDetailUserQueryResponse;
+import com.shop.domain.order.response.QOrderResponse_Search;
 import com.shop.domain.orderproduct.model.QOrderProduct;
-import com.shop.domain.payment.model.PaymentStatus;
 import com.shop.domain.payment.model.QPayment;
 import com.shop.domain.product.model.QProduct;
-import com.shop.domain.order.response.OrderResponse;
-import com.shop.domain.order.response.QOrderResponse_Search;
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
 
@@ -202,6 +203,44 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
 			.where(
 				order.id.eq(orderId),
 				order.user.id.eq(userId),
+				order.isDeleted.eq(false)
+			)
+			.orderBy(orderProduct.id.asc())
+			.fetch();
+	}
+
+	@Override
+	public List<AdminOrderDetailUserQueryResponse> findAdminOrderDetailUserById(Long orderId) {
+		return jpaQueryFactory
+			.select(new QAdminOrderDetailUserQueryResponse(
+				order.id,
+				order.user.id,
+				order.user.name,
+				order.user.email,
+				order.user.mobile,
+				order.receiver.name,
+				order.receiver.address,
+				order.receiver.mobile,
+				order.status,
+				order.deliveredAt,
+				order.createdAt,
+
+				product.id,
+				product.name,
+				product.price,
+				orderProduct.quantity,
+
+				payment.totalAmount,
+				payment.deliveryFee,
+				payment.type
+			))
+			.from(order)
+			.join(orderProduct).on(orderProduct.order.eq(order)
+				.and(orderProduct.isDeleted.eq(false)))
+			.join(product).on(orderProduct.product.eq(product))
+			.join(payment).on(payment.order.eq(order))
+			.where(
+				order.id.eq(orderId),
 				order.isDeleted.eq(false)
 			)
 			.orderBy(orderProduct.id.asc())

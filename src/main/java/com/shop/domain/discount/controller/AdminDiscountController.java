@@ -17,6 +17,7 @@ import com.shop.domain.discount.request.AdminDiscountCreateRequest;
 import com.shop.domain.discount.service.DiscountService;
 import com.shop.global.common.ApiResult;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,7 @@ public class AdminDiscountController {
 
 	private final DiscountService adminProductService;
 
-	// 관리자 상품 할인 등록
+	@Operation(summary = "관리자 상품 할인 등록")
 	@PostMapping("/discount")
 	@ResponseStatus(HttpStatus.OK)
 	public ApiResult<Void> createDiscount(@RequestBody @Valid AdminDiscountCreateRequest request) {

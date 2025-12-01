@@ -1,5 +1,7 @@
 package com.shop.domain.order.service;
 
+import java.util.List;
+
 import org.redisson.api.RedissonClient;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.stereotype.Service;
@@ -7,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.shop.domain.order.model.Order;
 import com.shop.domain.order.model.Receiver;
+import com.shop.domain.order.request.OrderCreateRequest;
 import com.shop.global.common.ErrorCode;
 import com.shop.global.common.Lock;
 import com.shop.global.common.Preconditions;
@@ -34,37 +37,44 @@ public class OrderService {
 	// Long -> null, long -> 0
 	// Generic이냐 아니냐 -> Generic은 무조건 참조형
 	//주문생성
-	@Lock(key = Lock.Key.STOCK, index = 1)
-	public void create(
+	@Lock(key = Lock.Key.STOCK, index = 1, isList = true)
+	public void createOrder(
 		Long userId,
-		Long productId,
-		String receiverName,
-		String receiverAddress,
-		String receiverMobile,
-		Long quantity
+		List<Long> productIds,
+		OrderCreateRequest orderCreateRequest
 	) {
-		// var product = productRepository.findByIdPessimistic(productId).orElseThrow();
-		var product = productRepository.findByIdOrThrow(productId);
+		var products = productRepository.findAllByIdOrThrow(productIds);
 
-		// 2. 여기서 획득
-		System.out.println(product.getStock());
-		Preconditions.validate(product.canProvide(quantity), ErrorCode.NOT_ENOUGH_STOCK);
+		// 각 상품이 충분한 재고를 제공할 수 있는지 검증
+		products.forEach(product ->
+			Preconditions.validate(product.canProvide(orderCreateRequest.productQuantity().get(product.getId())), ErrorCode.NOT_ENOUGH_STOCK)
+		);
+
 
 		var user = userRepository.findByIdOrThrow(userId, ErrorCode.NOT_FOUND_USER);
 
 		var receiver = new Receiver(
-			receiverName,
-			receiverAddress,
-			receiverMobile
+			orderCreateRequest.receiverName(),
+			orderCreateRequest.receiverAddress(),
+			orderCreateRequest.receiverMobile()
 		);
 
 		var order = orderRepository.save(Order.create(receiver, user));
-		var orderProduct = orderProductRepository.save(new OrderProduct(order, product, quantity));
 
-		// 주문생성완료
-		product.decreaseStock(quantity);
+		var orderProducts = products.stream()
+			.map(product -> {
+				var orderProduct = orderProductRepository.save(new OrderProduct(order, product, orderCreateRequest.productQuantity().get(product.getId())));
 
-		product.mapToOrderProduct(orderProduct);
-		order.mapToOrderProduct(orderProduct);
+				// 재고 감소
+				product.decreaseStock(orderCreateRequest.productQuantity().get(product.getId()));
+
+				// 연관관계 편의 메서드 호출
+				product.mapToOrderProduct(orderProduct);
+				order.mapToOrderProduct(orderProduct);
+
+				return orderProduct;
+			})
+			.toList();
+
 	}
 }

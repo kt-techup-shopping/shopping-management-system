@@ -38,6 +38,8 @@ public class OrderProduct extends BaseEntity {
 		this.quantity = quantity;
 	}
 
-	// 주문생성되면 오더프로덕트도 같이 생성
-
+	// 주문 수정 및 삭제 시
+	public void cancel(){
+		this.isDeleted = true;
+	}
 }

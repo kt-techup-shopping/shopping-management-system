@@ -1,16 +1,12 @@
 package com.shop.domain.order.model;
 
-import static jakarta.persistence.FetchType.*;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.shop.domain.delivery.model.Delivery;
-
-import com.shop.domain.payment.model.Payment;
-import com.shop.global.common.BaseEntity;
 import com.shop.domain.orderproduct.model.OrderProduct;
+import com.shop.domain.payment.model.Payment;
 import com.shop.domain.user.model.User;
 import com.shop.global.common.BaseEntity;
 
@@ -23,9 +19,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
-
 import jakarta.persistence.PostPersist;
-
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -56,8 +50,8 @@ public class Order extends BaseEntity {
 	@JoinColumn(name = "user_id")
 	private User user;
 
-	@OneToOne(mappedBy = "order", fetch = FetchType.LAZY)
-	private Payment payment;
+	// @OneToOne(mappedBy = "order", fetch = FetchType.LAZY)
+	// private Payment payment;
 
 	@OneToMany(mappedBy = "order")
 	private List<OrderProduct> orderProducts = new ArrayList<>();

@@ -12,11 +12,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 @Entity
 @Getter
-@RequiredArgsConstructor
 @NoArgsConstructor
 public class Delivery extends BaseEntity {
 	@OneToOne

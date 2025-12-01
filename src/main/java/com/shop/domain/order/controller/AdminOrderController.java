@@ -1,7 +1,11 @@
 package com.shop.domain.order.controller;
 
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -9,14 +13,20 @@ import org.springframework.web.bind.annotation.RestController;
 import com.shop.domain.order.repository.OrderRepositoryCustom;
 import com.shop.domain.order.response.AdminOrderDetailResponse;
 import com.shop.domain.order.service.AdminOrderService;
+import com.shop.domain.order.request.AdminOrderStatusChangeRequest;
 import com.shop.global.common.ApiResult;
 import com.shop.global.common.Paging;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "관리자 주문")
 @RestController
 @RequestMapping("/admin/orders")
+@PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
 public class AdminOrderController {
 	private final OrderRepositoryCustom orderRepository;
@@ -42,5 +52,24 @@ public class AdminOrderController {
 		@Parameter Paging paging
 	) {
 		return ApiResult.ok(adminOrderService.getOrders(orderId, userId, status, paging));
+	}
+
+	@Operation(summary = "주문 상태 변경", description = "관리자가 특정 주문의 상태를 변경합니다.")
+	@PutMapping("/{orderId}/update")
+	public ApiResult<Void> updateOrderStatus(
+		@RequestBody @Valid AdminOrderStatusChangeRequest adminOrderStatusChangeRequest,
+		@PathVariable Long orderId
+	) {
+		adminOrderService.updateOrderStatus(adminOrderStatusChangeRequest, orderId);
+		return ApiResult.ok();
+	}
+
+	@Operation(summary = "주문 취소", description = "관리자가 특정 주문을 취소(CANCELLED) 상태로 변경합니다.")
+	@PutMapping("/{orderId}/delete")
+	public ApiResult<Void> deleteOrder(
+		@PathVariable Long orderId
+	) {
+		adminOrderService.deleteOrder(orderId);
+		return ApiResult.ok();
 	}
 }

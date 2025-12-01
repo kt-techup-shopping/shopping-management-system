@@ -33,8 +33,16 @@ public class SecurityConfiguration {
 	private static final String[] POST_PERMIT_ALL = {
 		"/auth/login", "/auth/signup", "/auth/refresh",
 		"/admin/products", "/cart/**"
+		"/products", "/products/*",
+		"/reviews", "/reviews/user", "/reviews/single",
+		"/products", "/products/*",
 	};
-	private static final String[] PUT_PERMIT_ALL = {"/api/v1/public/**"};
+	private static final String[] POST_PERMIT_ALL = {
+		"/auth/login", "/auth/signup", "/auth/refresh",
+	};
+	private static final String[] PUT_PERMIT_ALL = {
+		"/api/v1/public/**",
+	};
 	private static final String[] PATCH_PERMIT_ALL = {"/api/v1/public/**"};
 	private static final String[] DELETE_PERMIT_ALL = {"/api/v1/public/**"};
 	private static final String[] ADMIN_PERMIT_ALL = {"/admin/**"};

@@ -49,8 +49,12 @@ public class Review extends BaseEntity {
 	private User user;
 
 	// 좋아요/싫어요 관계
-	@OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "review")
 	private List<ReviewLike> reviewLikes = new ArrayList<>();
+
+	// 좋아요/싫어요 관계
+	@OneToMany(mappedBy = "review")
+	private List<AdminReview> adminReviews = new ArrayList<>();
 
 	// 좋아요/싫어요 수
 	@NotNull

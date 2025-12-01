@@ -1,5 +1,7 @@
 package com.shop.domain.review.controller;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -7,10 +9,14 @@ import org.springframework.web.bind.annotation.*;
 
 import com.shop.domain.review.request.AdminReviewCreateRequest;
 import com.shop.domain.review.request.AdminReviewUpdateRequest;
+import com.shop.domain.review.response.AdminNoReviewResponse;
+import com.shop.domain.review.response.AdminReviewDetailResponse;
 import com.shop.domain.review.service.AdminReviewService;
 import com.shop.global.common.ApiResult;
+import com.shop.global.common.Paging;
 import com.shop.global.security.DefaultCurrentUser;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -74,6 +80,27 @@ public class AdminReviewController {
 	}
 
 	/**
+	 * 모든 리뷰 + AdminReview (1:1) 조회
+	 * 페이징/정렬 가능
+	 */
+	@GetMapping("/all")
+	public ApiResult<Page<AdminReviewDetailResponse>> getAllReviewsWithAdmin(
+		@Parameter Paging paging
+	) {
+		Page<AdminReviewDetailResponse> reviews = adminReviewService.getAllReviewsWithAdmin(paging.toPageable());
+		return ApiResult.ok(reviews);
+	}
+
+	/**
+	 * 리뷰는 있지만 AdminReview가 없는 것만 조회
+	 * 페이징/정렬 가능
+	 */
+	@GetMapping("/no-admin")
+	public ApiResult<Page<AdminNoReviewResponse>> getReviewsWithoutAdmin(
+		@Parameter Paging paging
+	) {
+		Page<AdminNoReviewResponse> reviews = adminReviewService.getReviewsWithoutAdmin(paging.toPageable());
+		return ApiResult.ok(reviews);
 	 * 사용자 리뷰 삭제
 	 */
 	@PutMapping("/{reviewId}/force-delete")

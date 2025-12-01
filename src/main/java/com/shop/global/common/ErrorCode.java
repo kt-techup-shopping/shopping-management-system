@@ -31,12 +31,27 @@ public enum ErrorCode {
 	NOT_USER_ROLE_ADMIN(HttpStatus.BAD_REQUEST, "해당 유저는 관리자 권한이 아닙니다."),
 	WAYBILL_NO_REQUIRED(HttpStatus.BAD_REQUEST, "송장번호는 필수입니다."),
 
+	// Product
+	INVALID_PRODUCT_STATUS(HttpStatus.BAD_REQUEST, "유효하지 않은 상품 상태입니다."),
+	INVALID_STOCK_QUANTITY(HttpStatus.BAD_REQUEST, "재고 수량은 음수일 수 없습니다."),
 	// Review
 	NOT_PURCHASED_PRODUCT(HttpStatus.BAD_REQUEST, "구매한 적 없는 상품입니다."),
 	NOT_FOUND_REVIEW(HttpStatus.BAD_REQUEST, "존재하지 않는 리뷰입니다."),
 	DOES_NOT_MATCH_USER_REVIEW(HttpStatus.BAD_REQUEST, "리뷰는 작성자만 삭제할 수 있습니다."),
 	ALREADY_WRITE_REVIEW(HttpStatus.BAD_REQUEST, "이미 상품에 대한 리뷰를 작성했습니다."),
+	NOT_FOUND_ADMIN_REVIEW(HttpStatus.BAD_REQUEST, "존재하지 않는 관리자 리뷰입니다."),
+	ALREADY_WRITE_ADMIN_REVIEW(HttpStatus.BAD_REQUEST, "이미 해당 리뷰에 대한 관리자 리뷰를 작성했습니다."),
 
+	// Order
+  	INVALID_ORDER_OWNER(HttpStatus.BAD_REQUEST, "본인 주문만 조회할 수 있습니다."),
+  //	INVALID_ORDER_STATUS(HttpStatus.BAD_REQUEST, "유효하지 않은 주문 상태입니다."),
+	INVALID_ORDER_STATUS(HttpStatus.BAD_REQUEST, "주문을 처리할 수 없습니다."), 
+	ALREADY_PENDING_ORDER(HttpStatus.BAD_REQUEST, "이미 결제 대기중인 주문입니다."),
+	ALREADY_PAID_ORDER(HttpStatus.BAD_REQUEST, "이미 주문에 대한 결제가 완료되었습니다."),
+
+	// Payment
+	NOT_FOUND_PAYMENT(HttpStatus.BAD_REQUEST, "해당 결제 내역이 존재하지 않습니다."),
+	INVALID_PAYMENT_STATUS(HttpStatus.BAD_REQUEST, "결제를 처리할 수 없습니다."),
 	;
 
 	private final HttpStatus status;

@@ -20,4 +20,10 @@ public class Receiver {
 	// receiver_mobile
 	@Column(name = "receiver_mobile")
 	private String mobile;
+
+	public void update(String name, String address, String mobile){
+		this.name = name;
+		this.address = address;
+		this.mobile = mobile;
+	}
 }

@@ -17,14 +17,13 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class AdminDeliveryService {
 
 	private final OrderRepository orderRepository;
 	private final DeliveryRepository deliveryRepository;
 
 	// Pending 상태로 변경하는 APi
-	@Transactional
 	@Lock(key = Lock.Key.ORDER, index = 0, waitTime = 1000, leaseTime = 500, timeUnit = TimeUnit.MILLISECONDS)
 	public DeliveryResponse updateToPending(Long orderId) {
 		Delivery delivery = getDeliveryByOrderId(orderId);
@@ -33,7 +32,6 @@ public class AdminDeliveryService {
 	}
 
 	// Ready 상태로 변경하는 API
-	@Transactional
 	@Lock(key = Lock.Key.ORDER, index = 0, waitTime = 1000, leaseTime = 500, timeUnit = TimeUnit.MILLISECONDS)
 	public DeliveryResponse updateToReady(Long orderId, DeliveryReadyRequest request) {
 		Delivery delivery = getDeliveryByOrderId(orderId);
@@ -42,7 +40,6 @@ public class AdminDeliveryService {
 	}
 
 	// Shipping 상태로 변경하는 API
-	@Transactional
 	@Lock(key = Lock.Key.ORDER, index = 0, waitTime = 1000, leaseTime = 500, timeUnit = TimeUnit.MILLISECONDS)
 	public DeliveryResponse updateToShipping(Long orderId) {
 		Delivery delivery = getDeliveryByOrderId(orderId);
@@ -51,7 +48,6 @@ public class AdminDeliveryService {
 	}
 
 	// Delivered 상태로 변경하는 API
-	@Transactional
 	@Lock(key = Lock.Key.ORDER, index = 0, waitTime = 1000, leaseTime = 500, timeUnit = TimeUnit.MILLISECONDS)
 	public DeliveryResponse updateToDelivered(Long orderId) {
 		Delivery delivery = getDeliveryByOrderId(orderId);

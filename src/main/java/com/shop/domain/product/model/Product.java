@@ -81,7 +81,7 @@ public class Product extends BaseEntity {
 		Long price,
 		String description,
 		String color,
-		Long deltaStock,
+		Long quantity,
 		ProductStatus status,
 		Category category
 	) {
@@ -89,13 +89,13 @@ public class Product extends BaseEntity {
 		Preconditions.validate(Strings.isNotBlank(description), ErrorCode.INVALID_PARAMETER);
 		Preconditions.validate(Strings.isNotBlank(color), ErrorCode.INVALID_PARAMETER);
 		Preconditions.validate(price >= 0, ErrorCode.INVALID_PARAMETER);
-		Preconditions.validate(this.stock + deltaStock >= 0, ErrorCode.INVALID_PARAMETER);
+		Preconditions.validate(quantity >= 0, ErrorCode.INVALID_STOCK_QUANTITY);
 
 		this.name = name;
 		this.price = price;
 		this.description = description;
 		this.color = color;
-		this.stock += deltaStock;
+		this.stock = quantity;
 		this.status = status;
 		this.category = category;
 	}
@@ -115,6 +115,7 @@ public class Product extends BaseEntity {
 	public void delete() {
 		// 논리삭제
 		this.status = ProductStatus.DELETED;
+		this.isDeleted = true;
 	}
 
 	public void decreaseStock(Long quantity) {
@@ -153,5 +154,10 @@ public class Product extends BaseEntity {
 		this.status = this.status == ProductStatus.SOLD_OUT
 			? ProductStatus.ACTIVATED
 			: ProductStatus.SOLD_OUT;
+	}
+
+	public void updateStock(Long quantity) {
+		Preconditions.validate(quantity >= 0, ErrorCode.INVALID_STOCK_QUANTITY);
+		this.stock = quantity;
 	}
 }

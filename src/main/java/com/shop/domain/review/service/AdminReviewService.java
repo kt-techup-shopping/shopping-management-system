@@ -44,7 +44,8 @@ public class AdminReviewService {
 		Preconditions.validate(!review.getIsDeleted(), ErrorCode.NOT_FOUND_REVIEW);
 
 		// 하나의 리뷰에 대해 하나만 작성 가능
-		Preconditions.validate(!adminReviewRepository.existsByReviewIdAndIsDeletedFalse(reviewId), ErrorCode.ALREADY_WRITE_ADMIN_REVIEW);
+		Preconditions.validate(!adminReviewRepository.existsByReviewIdAndIsDeletedFalse(reviewId),
+			ErrorCode.ALREADY_WRITE_ADMIN_REVIEW);
 
 		var user = userRepository.findByIdOrThrow(userId, ErrorCode.NOT_FOUND_USER);
 		var adminReview = new AdminReview(
@@ -69,7 +70,6 @@ public class AdminReviewService {
 		var adminAdminReview = adminReviewRepository.findByReviewIdAndIsDeletedFalse(reviewId)
 			.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ADMIN_REVIEW));
 
-
 		userRepository.findByIdOrThrow(userId, ErrorCode.NOT_FOUND_USER);
 
 		adminAdminReview.update(adminReviewUpdateRequest.title(), adminReviewUpdateRequest.content());
@@ -79,7 +79,7 @@ public class AdminReviewService {
 	 * 어드민 유저의 리뷰를 삭제하는 API
 	 */
 	@Transactional
-	public void deleteAdminReview(Long reviewId, Long userId){
+	public void deleteAdminReview(Long reviewId, Long userId) {
 		var adminAdminReview = adminReviewRepository.findByReviewIdAndIsDeletedFalse(reviewId)
 			.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ADMIN_REVIEW));
 
@@ -125,11 +125,13 @@ public class AdminReviewService {
 
 		long total = adminReviewRepository.countReviewsWithoutAdmin();
 		return new PageImpl<>(responseList, pageable, total);
+	}
+
 	/**
 	 * 사용자 리뷰를 삭제하는 API
 	 */
 	@Transactional
-	public void deleteReview(Long reviewId, Long userId){
+	public void deleteReview(Long reviewId, Long userId) {
 		var review = reviewRepository.findById(reviewId)
 			.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_REVIEW));
 

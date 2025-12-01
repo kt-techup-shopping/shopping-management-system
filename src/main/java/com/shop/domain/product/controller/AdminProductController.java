@@ -55,10 +55,10 @@ public class AdminProductController {
 		@RequestParam(required = false) String keyword,
 		@RequestParam(required = false) Long categoryId,
 		@RequestParam(required = false) Boolean activeOnly,
-		@RequestParam(required = false) String productSort,
+		@RequestParam(required = false) String sort,
 		@Parameter Paging paging
 	) {
-		return ApiResult.ok(adminProductService.getAdminSearchList(keyword, categoryId, activeOnly, productSort, paging.toPageable()));
+		return ApiResult.ok(adminProductService.getAdminSearchList(keyword, categoryId, activeOnly, sort, paging.toPageable()));
 	}
 
 	// 관리자 상품 상세 조회
@@ -101,6 +101,14 @@ public class AdminProductController {
 	@ResponseStatus(HttpStatus.OK)
 	public ApiResult<Void> updateInActivated(@PathVariable Long id) {
 		adminProductService.updateInActivated(id);
+		return ApiResult.ok();
+	}
+
+	// 관리자 상품 품절 (토글)
+	@PutMapping("/{id}/toggle-sold-out")
+	@ResponseStatus(HttpStatus.OK)
+	public ApiResult<Void> updateSoldOut(@PathVariable Long id) {
+		adminProductService.updateSoldOutToggle(id);
 		return ApiResult.ok();
 	}
 }

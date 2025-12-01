@@ -9,13 +9,18 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import com.querydsl.jpa.JPAExpressions;
 import com.shop.domain.order.model.OrderStatus;
 import com.shop.domain.order.model.QOrder;
 import com.shop.domain.order.response.AdminOrderDetailQueryResponse;
 import com.shop.domain.order.response.OrderDetailQueryResponse;
+import com.shop.domain.order.response.OrderDetailUserQueryResponse;
 import com.shop.domain.order.response.QAdminOrderDetailQueryResponse;
 import com.shop.domain.order.response.QOrderDetailQueryResponse;
+import com.shop.domain.order.response.QOrderDetailUserQueryResponse;
 import com.shop.domain.orderproduct.model.QOrderProduct;
+import com.shop.domain.payment.model.PaymentStatus;
+import com.shop.domain.payment.model.QPayment;
 import com.shop.domain.product.model.QProduct;
 import com.shop.domain.order.response.OrderResponse;
 import com.shop.domain.order.response.QOrderResponse_Search;
@@ -33,6 +38,7 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
 	private final QOrder order = QOrder.order;
 	private final QOrderProduct orderProduct = QOrderProduct.orderProduct;
 	private final QProduct product = QProduct.product;
+	private final QPayment payment = QPayment.payment;
 
 	@Override
 	public Page<OrderResponse.Search> search(
@@ -153,6 +159,53 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
 		var totalCount = (total != null) ? total : 0L;
 
 		return new PageImpl<>(content, pageable, totalCount);
+	}
+
+	// 내 주문 상세 조회
+	@Override
+	public List<OrderDetailUserQueryResponse> findOrderDetailByUserIdAndOrderId(Long userId, Long orderId) {
+
+		QPayment paymentSub = new QPayment("paymentSub");
+
+		// 서브쿼리: 해당 주문의 최신 결제 ID
+		var latestPaymentIdSubQuery = JPAExpressions
+			.select(paymentSub.id.max())
+			.from(paymentSub)
+			.where(paymentSub.order.eq(order));
+
+		return jpaQueryFactory
+			.select(new QOrderDetailUserQueryResponse(
+				order.id,
+				order.receiver.name,
+				order.receiver.address,
+				order.receiver.mobile,
+				order.status,
+				order.deliveredAt,
+				order.createdAt,
+
+				product.id,
+				product.name,
+				product.price,
+				orderProduct.quantity,
+
+				payment.totalAmount,
+				payment.deliveryFee,
+				payment.type
+			))
+			.from(order)
+			.join(orderProduct).on(orderProduct.order.eq(order)
+				.and(orderProduct.isDeleted.eq(false)))
+			.join(product).on(orderProduct.product.eq(product))
+			.leftJoin(payment).on(
+				payment.id.eq(latestPaymentIdSubQuery)
+			)
+			.where(
+				order.id.eq(orderId),
+				order.user.id.eq(userId),
+				order.isDeleted.eq(false)
+			)
+			.orderBy(orderProduct.id.asc())
+			.fetch();
 	}
 
 	// 시작하는 '%keyword'

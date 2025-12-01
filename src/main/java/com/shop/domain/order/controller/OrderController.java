@@ -18,6 +18,7 @@ import com.shop.domain.order.request.OrderCreateRequest;
 import com.shop.domain.order.request.OrderDeleteRequest;
 import com.shop.domain.order.request.OrderUpdateRequest;
 import com.shop.domain.order.response.OrderDetailResponse;
+import com.shop.domain.order.response.OrderDetailUserResponse;
 import com.shop.domain.order.service.OrderService;
 import com.shop.domain.payment.request.PaymentCreateRequest;
 import com.shop.domain.payment.response.PaymentResponse;
@@ -91,6 +92,15 @@ public class OrderController extends SwaggerAssistance {
 		return ApiResult.ok();
 	}
 
+	@Operation(summary = "내 주문 상세 조회", description = "사용자가 자신의 특정 주문 내역을 상세 조회합니다.")
+	@GetMapping("/{id}/detail")
+	public ApiResult<OrderDetailUserResponse> getMyOrderDetail(
+		@AuthenticationPrincipal DefaultCurrentUser defaultCurrentUser,
+		@PathVariable Long id
+	) {
+		return ApiResult.ok(orderService.getMyOrderDetail(defaultCurrentUser.getId(), id));
+	}
+
 	@PostMapping("/{orderId}/payments")
 	@ResponseStatus(HttpStatus.CREATED)
 	public ApiResult<Void> createPayment(
@@ -98,7 +108,6 @@ public class OrderController extends SwaggerAssistance {
 		@RequestBody PaymentCreateRequest request
 	) {
 		paymentService.createPayment(orderId, request.type());
-
 		return ApiResult.ok();
 	}
 
@@ -106,7 +115,7 @@ public class OrderController extends SwaggerAssistance {
 	@ResponseStatus(HttpStatus.OK)
 	public ApiResult<List<PaymentResponse>> getPaymentInfo(@PathVariable Long orderId) {
 		var payments = paymentService.getPayment(orderId);
-
 		return ApiResult.ok(payments);
 	}
+
 }

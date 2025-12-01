@@ -43,7 +43,7 @@ public enum ErrorCode {
 	ALREADY_WRITE_ADMIN_REVIEW(HttpStatus.BAD_REQUEST, "이미 해당 리뷰에 대한 관리자 리뷰를 작성했습니다."),
 
 	// Order
-	NOT_FOUND_ORDER(HttpStatus.BAD_REQUEST, "존재하지 않는 주문입니다."),
+  	INVALID_ORDER_OWNER(HttpStatus.BAD_REQUEST, "본인 주문만 조회할 수 있습니다."),
   //	INVALID_ORDER_STATUS(HttpStatus.BAD_REQUEST, "유효하지 않은 주문 상태입니다."),
 	INVALID_ORDER_STATUS(HttpStatus.BAD_REQUEST, "주문을 처리할 수 없습니다."), 
 	ALREADY_PENDING_ORDER(HttpStatus.BAD_REQUEST, "이미 결제 대기중인 주문입니다."),

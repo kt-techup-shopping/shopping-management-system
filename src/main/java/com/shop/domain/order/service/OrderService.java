@@ -15,6 +15,7 @@ import com.shop.domain.order.request.OrderDeleteRequest;
 import com.shop.domain.order.request.OrderUpdateRequest;
 import com.shop.domain.order.response.OrderDetailQueryResponse;
 import com.shop.domain.order.response.OrderDetailResponse;
+import com.shop.domain.order.response.OrderDetailUserResponse;
 import com.shop.global.common.CustomException;
 import com.shop.global.common.ErrorCode;
 import com.shop.global.common.Lock;
@@ -31,7 +32,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class OrderService{
+public class OrderService {
 	private final UserRepository userRepository;
 	private final ProductRepository productRepository;
 	private final OrderRepository orderRepository;
@@ -47,9 +48,9 @@ public class OrderService{
 
 		// 각 상품이 충분한 재고를 제공할 수 있는지 검증
 		products.forEach(product ->
-			Preconditions.validate(product.canProvide(orderCreateRequest.productQuantity().get(product.getId())), ErrorCode.NOT_ENOUGH_STOCK)
+			Preconditions.validate(product.canProvide(orderCreateRequest.productQuantity().get(product.getId())),
+				ErrorCode.NOT_ENOUGH_STOCK)
 		);
-
 
 		var user = userRepository.findByIdOrThrow(userId, ErrorCode.NOT_FOUND_USER);
 
@@ -63,7 +64,8 @@ public class OrderService{
 
 		var orderProducts = products.stream()
 			.map(product -> {
-				var orderProduct = orderProductRepository.save(new OrderProduct(order, product, orderCreateRequest.productQuantity().get(product.getId())));
+				var orderProduct = orderProductRepository.save(
+					new OrderProduct(order, product, orderCreateRequest.productQuantity().get(product.getId())));
 
 				// 재고 감소
 				product.decreaseStock(orderCreateRequest.productQuantity().get(product.getId()));
@@ -202,6 +204,51 @@ public class OrderService{
 		order.cancel();
 	}
 
+	/**
+	 * 내 주문 상세 내역을 가져오는 API
+	 */
+	public OrderDetailUserResponse getMyOrderDetail(Long userId, Long orderId) {
+		// 유저 및 주문 유효성 검사
+		var user = userRepository.findByIdOrThrow(userId, ErrorCode.NOT_FOUND_USER);
+		var order = orderRepository.findByIdOrThrow(orderId, ErrorCode.NOT_FOUND_ORDER);
+		Preconditions.validate(user.getId().equals(order.getUser().getId()), ErrorCode.INVALID_ORDER_OWNER);
 
+		// 주문 상세 내역 쿼리 조회
+		var queryResults = orderRepository.findOrderDetailByUserIdAndOrderId(user.getId(), order.getId());
+
+		// 주문 공통 정보 추출
+		var orderInfo = queryResults.stream()
+			.findFirst()
+			.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ORDER));
+
+		// 주문 상품 목록 변환
+		var products = queryResults.stream()
+			.map(r -> new OrderDetailUserResponse.OrderProductInfo(
+				r.productId(),
+				r.productName(),
+				r.productPrice(),
+				r.quantity()
+			)).toList();
+
+		// 결제 정보 변환
+		var paymentInfo = new OrderDetailUserResponse.PaymentInfo(
+			orderInfo.paymentAmount(),
+			orderInfo.deliveryFee(),
+			orderInfo.paymentType()
+		);
+
+		// 최종 반환
+		return new OrderDetailUserResponse(
+			orderInfo.orderId(),
+			orderInfo.receiverName(),
+			orderInfo.receiverAddress(),
+			orderInfo.receiverMobile(),
+			orderInfo.orderStatus(),
+			orderInfo.deliveredAt(),
+			orderInfo.orderedAt(),
+			products,
+			paymentInfo
+		);
+	}
 
 }

@@ -50,6 +50,7 @@ public class ReviewController {
 		ErrorCode.NOT_FOUND_USER,
 		ErrorCode.ALREADY_WRITE_REVIEW
 	})
+	@PostMapping("/{orderProductId}")
 	@ResponseStatus(HttpStatus.CREATED)
 	public ApiResult<Void> createReview(
 		@AuthenticationPrincipal DefaultCurrentUser defaultCurrentUser,

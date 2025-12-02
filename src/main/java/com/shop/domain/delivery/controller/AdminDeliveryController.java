@@ -11,6 +11,9 @@ import com.shop.domain.delivery.request.DeliveryReadyRequest;
 import com.shop.domain.delivery.response.DeliveryResponse;
 import com.shop.domain.delivery.service.AdminDeliveryService;
 import com.shop.global.common.ApiResult;
+import com.shop.global.common.ErrorCode;
+import com.shop.global.docs.ApiErrorCodeExample;
+import com.shop.global.docs.ApiErrorCodeExamples;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,8 +29,11 @@ import lombok.RequiredArgsConstructor;
 public class AdminDeliveryController {
 	private final AdminDeliveryService adminDeliveryService;
 
-	// Pending 상태로 변경하는 API
-	@Operation(summary = "주문 확인 상태로 변경")
+	@Operation(summary = "주문 확인 상태로 변경", description = "Pending 상태로 변경하는 API")
+	@ApiErrorCodeExamples({
+		ErrorCode.NOT_FOUND_ORDER,
+		ErrorCode.NOT_FOUND_DELIVERY,
+	})
 	@PutMapping("/{orderId}/delivery-status/pending")
 	public ApiResult<DeliveryResponse> updateToPending(
 		@PathVariable @Min(1) Long orderId) {
@@ -35,8 +41,11 @@ public class AdminDeliveryController {
 		return ApiResult.ok(response);
 	}
 
-	// READY 상태로 변경하는 API , 송장을 이 단계에서 등록하여야함
-	@Operation(summary = "배송 준비 상태로 변경")
+	@Operation(summary = "배송 준비 상태로 변경", description = "READY 상태로 변경하는 API, 송장을 이 단계에서 등록하여야함")
+	@ApiErrorCodeExamples({
+		ErrorCode.NOT_FOUND_ORDER,
+		ErrorCode.NOT_FOUND_DELIVERY,
+	})
 	@PutMapping("/{orderId}/delivery-status/ready")
 	public ApiResult<DeliveryResponse> updateToReady(
 		@PathVariable Long orderId,
@@ -45,8 +54,11 @@ public class AdminDeliveryController {
 		return ApiResult.ok(response);
 	}
 
-	// SHIPPING 상태로 변경하는 API
-	@Operation(summary = "주문 확인 상태로 변경")
+	@Operation(summary = "주문 확인 상태로 변경", description = "SHIPPING 상태로 변경하는 API")
+	@ApiErrorCodeExamples({
+		ErrorCode.NOT_FOUND_ORDER,
+		ErrorCode.NOT_FOUND_DELIVERY,
+	})
 	@PutMapping("/{orderId}/delivery-status/shipping")
 	public ApiResult<DeliveryResponse> updateToShipping(
 		@PathVariable @Min(1) Long orderId) {
@@ -54,8 +66,11 @@ public class AdminDeliveryController {
 		return ApiResult.ok(response);
 	}
 
-	// DELIVERED 상태로 변경하는 API
-	@Operation(summary = "주문 확인 상태로 변경")
+	@Operation(summary = "주문 확인 상태로 변경", description = "DELIVERED 상태로 변경하는 API")
+	@ApiErrorCodeExamples({
+		ErrorCode.NOT_FOUND_ORDER,
+		ErrorCode.NOT_FOUND_DELIVERY,
+	})
 	@PutMapping("/{orderId}/delivery-status/delivered")
 	public ApiResult<DeliveryResponse> updateToDelivered(
 		@PathVariable @Min(1) Long orderId) {

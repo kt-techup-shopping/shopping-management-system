@@ -3,6 +3,7 @@ package com.shop.domain.category.controller;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,7 +30,7 @@ public class AdminCategoryController {
 	@Operation(summary = "카테고리 만들기", description = "관리자가 카테고리를 등록하는 API")
 	@ApiErrorCodeExample(ErrorCode.NOT_FOUND_CATEGORY)
 	@PostMapping
-	public ApiResult<Void> createCategory(AdminCategoryCreateRequest request) {
+	public ApiResult<Void> createCategory(@RequestBody AdminCategoryCreateRequest request) {
 		categoryService.createCategory(request.name(), request.parentCategoryId());
 		return ApiResult.ok();
 	}

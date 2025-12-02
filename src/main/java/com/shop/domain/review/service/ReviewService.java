@@ -42,26 +42,22 @@ public class ReviewService {
 	private final ReviewLikeRepository reviewLikeRepository;
 
 	// TODO : Lock 필요성 고민
+
 	/**
 	 * 사용자가 리뷰를 등록하는 API
 	 * 하나의 상품 구매 내역에 대해 하나의 리뷰만 작성 가능
 	 * 삭제 후 재작성 가능
 	 */
 	@Transactional
-	public void createReview(ReviewCreateRequest reviewCreateRequest, Long orderProductId, Long userId){
+	public void createReview(ReviewCreateRequest reviewCreateRequest, Long orderProductId, Long userId) {
 		var orderProduct = orderProductRepository
 			.findById(orderProductId)
 			.orElseThrow(() -> new CustomException(ErrorCode.NOT_PURCHASED_PRODUCT));
 
-
 		var user = userRepository.findByIdOrThrow(userId, ErrorCode.NOT_FOUND_USER);
-
-		// 상품을 구매한 적이 없다면 에러처리
-		Preconditions.validate(orderProduct.getOrder().getUser().equals(user), ErrorCode.NOT_PURCHASED_PRODUCT);
 
 		// 이미 리뷰를 작성했다면 에러처리
 		Preconditions.validate(!reviewRepository.existsByUserIdAndOrderProductIdAndIsDeletedFalse(userId, orderProductId), ErrorCode.ALREADY_WRITE_REVIEW);
-
 
 		// TODO : 구매한 사용자가 맞는지 확인
 
@@ -79,7 +75,7 @@ public class ReviewService {
 	 * 사용자가 리뷰를 삭제하는 API
 	 */
 	@Transactional
-	public void deleteReview(Long reviewId, Long userId){
+	public void deleteReview(Long reviewId, Long userId) {
 		var review = reviewRepository.findById(reviewId)
 			.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_REVIEW));
 
@@ -98,7 +94,7 @@ public class ReviewService {
 	 * 리뷰가 삭제되지 않은 경우에만 가능
 	 */
 	@Transactional
-	public void updateReview(ReviewUpdateRequest reviewUpdateRequest, Long reviewId, Long userId){
+	public void updateReview(ReviewUpdateRequest reviewUpdateRequest, Long reviewId, Long userId) {
 		var review = reviewRepository.findById(reviewId)
 			.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_REVIEW));
 
@@ -210,7 +206,7 @@ public class ReviewService {
 		List<ReviewPageQueryResponse> daoList = reviewRepository.findReviewsByUser(
 			targetUserId,
 			loginUserId,
-			(int) pageable.getOffset(),
+			(int)pageable.getOffset(),
 			pageable.getPageSize()
 		);
 
@@ -263,16 +259,20 @@ public class ReviewService {
 		ReviewLike newLike = new ReviewLike(review, user, reviewLikeType);
 		reviewLikeRepository.save(newLike);
 
-		if (reviewLikeType == ReviewLikeType.LIKE) review.incrementLike();
-		else if (reviewLikeType == ReviewLikeType.DISLIKE) review.incrementDislike();
+		if (reviewLikeType == ReviewLikeType.LIKE)
+			review.incrementLike();
+		else if (reviewLikeType == ReviewLikeType.DISLIKE)
+			review.incrementDislike();
 	}
 
 	// 좋아요 정보 취소
 	private void cancelLike(ReviewLike like, Review review, ReviewLikeType reviewLikeType) {
 		like.cancel();
 
-		if (reviewLikeType == ReviewLikeType.LIKE) review.decrementLike();
-		else if (reviewLikeType == ReviewLikeType.DISLIKE) review.decrementDislike();
+		if (reviewLikeType == ReviewLikeType.LIKE)
+			review.decrementLike();
+		else if (reviewLikeType == ReviewLikeType.DISLIKE)
+			review.decrementDislike();
 	}
 
 }

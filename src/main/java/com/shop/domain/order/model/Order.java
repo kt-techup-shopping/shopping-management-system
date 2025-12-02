@@ -10,6 +10,7 @@ import com.shop.domain.payment.model.Payment;
 import com.shop.domain.user.model.User;
 import com.shop.global.common.BaseEntity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -29,20 +30,28 @@ import lombok.NoArgsConstructor;
 @Table(name = "orders")
 @NoArgsConstructor
 public class Order extends BaseEntity {
+
 	@Embedded
 	private Receiver receiver;
+
 	@Enumerated(EnumType.STRING)
 	private OrderStatus status;
+
 	private LocalDateTime deliveredAt;
 
-	@OneToOne(mappedBy = "order")
+	/**
+	 * Delivery는 Order 생성 시 자동 생성됨
+	 * - @PostPersist 사용 (기존 로직 유지)
+	 * - Delivery 저장 안 되어 발생한 TransientObjectException 해결을 위해 cascade 추가
+	 */
+	@OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Delivery delivery;
 
 	// Order 생성 시 Delivery 자동 생성
 	@PostPersist
 	private void createDelivery() {
 		if (this.delivery == null) {
-			this.delivery = new Delivery(this);
+			this.delivery = new Delivery(this); // Order → Delivery 생성
 		}
 	}
 
@@ -87,21 +96,21 @@ public class Order extends BaseEntity {
 	public Long calculateTotalAmount() {
 		return orderProducts
 			.stream()
-			.mapToLong(op -> op
-				.getProduct()
-				.getPrice() * op.getQuantity())
+			.mapToLong(op -> op.getProduct().getPrice() * op.getQuantity())
 			.sum();
 	}
-	public void cancel(){
+
+	public void cancel() {
 		this.isDeleted = true;
 	}
 
-	public void updateStatus(OrderStatus orderStatus){
+	public void updateStatus(OrderStatus orderStatus) {
 		this.status = orderStatus;
 	}
-	//하나의 오더는 여러개의 상품을 가질수있음
+
+	// 하나의 오더는 여러개의 상품을 가질수있음
 	// 1:N
-	//하나의 상품은 여러개의 오더를 가질수있음
+	// 하나의 상품은 여러개의 오더를 가질수있음
 	// 1:N
 
 	public void addPayment(Payment payment) {

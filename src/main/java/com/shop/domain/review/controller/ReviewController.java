@@ -50,14 +50,14 @@ public class ReviewController {
 		ErrorCode.NOT_FOUND_USER,
 		ErrorCode.ALREADY_WRITE_REVIEW
 	})
-	@PostMapping("/{productId}")
+	@PostMapping("/{orderProductId}")
 	@ResponseStatus(HttpStatus.CREATED)
 	public ApiResult<Void> createReview(
 		@AuthenticationPrincipal DefaultCurrentUser defaultCurrentUser,
 		@RequestBody @Valid ReviewCreateRequest reviewCreateRequest,
-		@PathVariable Long productId
-	){
-		reviewService.createReview(reviewCreateRequest, productId, defaultCurrentUser.getId());
+		@PathVariable Long orderProductId
+	) {
+		reviewService.createReview(reviewCreateRequest, orderProductId, defaultCurrentUser.getId());
 		return ApiResult.ok();
 	}
 
@@ -71,7 +71,7 @@ public class ReviewController {
 	public ApiResult<Void> deleteReview(
 		@AuthenticationPrincipal DefaultCurrentUser defaultCurrentUser,
 		@PathVariable Long reviewId
-	){
+	) {
 		reviewService.deleteReview(reviewId, defaultCurrentUser.getId());
 		return ApiResult.ok();
 	}
@@ -87,7 +87,7 @@ public class ReviewController {
 		@AuthenticationPrincipal DefaultCurrentUser defaultCurrentUser,
 		@RequestBody @Valid ReviewUpdateRequest reviewUpdateRequest,
 		@PathVariable Long reviewId
-	){
+	) {
 		reviewService.updateReview(reviewUpdateRequest, reviewId, defaultCurrentUser.getId());
 		return ApiResult.ok();
 	}
@@ -102,7 +102,7 @@ public class ReviewController {
 		@AuthenticationPrincipal DefaultCurrentUser defaultCurrentUser,
 		@RequestBody @Valid ReviewLikeRequest reviewLikeRequest,
 		@PathVariable Long reviewId
-	){
+	) {
 		reviewService.updateReviewLike(reviewLikeRequest, reviewId, defaultCurrentUser.getId());
 		return ApiResult.ok();
 	}
@@ -154,5 +154,6 @@ public class ReviewController {
 			.orElse(null);
 		return ApiResult.ok(reviewService.getReview(reviewId, userId));
 	}
+
 }
 

@@ -25,4 +25,9 @@ public class Discount extends BaseEntity {
 	@JoinColumn(name = "product_id")
 	private Product product;
 
+	public Discount(Product product, Long value, DiscountType type) {
+		this.product = product;
+		this.value = value;
+		this.type = type;
+	}
 }

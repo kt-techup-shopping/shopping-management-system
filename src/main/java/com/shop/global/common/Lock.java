@@ -13,6 +13,8 @@ public @interface Lock {
 
 	int index() default 0;
 
+	boolean isList() default false;
+
 	long waitTime() default 2L;
 
 	long leaseTime() default 1L;
@@ -22,6 +24,6 @@ public @interface Lock {
 	enum Key {
 		PRODUCT,
 		STOCK,
-		USER_EVENT
+		ORDER, USER_EVENT
 	}
 }

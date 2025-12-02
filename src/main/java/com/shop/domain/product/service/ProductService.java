@@ -3,7 +3,6 @@ package com.shop.domain.product.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.shop.domain.category.service.CategoryService;
 import com.shop.domain.product.repository.ProductRepository;
@@ -14,17 +13,10 @@ import com.shop.domain.product.response.ProductSearchResponse;
 import lombok.RequiredArgsConstructor;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class ProductService {
 	private final ProductRepository productRepository;
 	private final CategoryService categoryService;
-
-	public void update(Long id, String name, Long price, Long quantity) {
-		var product = productRepository.findByIdOrThrow(id);
-
-		product.update(name, price, quantity);
-	}
 
 	public void soldOut(Long id) {
 		var product = productRepository.findByIdOrThrow(id);

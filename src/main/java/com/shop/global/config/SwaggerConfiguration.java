@@ -58,6 +58,7 @@ public class SwaggerConfiguration {
 		return GroupedOpenApi.builder()
 			.group("Admin")
 			.pathsToMatch("/admin/**")
+			.addOperationCustomizer(customize())  // ★ 추가!
 			.build();
 	}
 
@@ -65,10 +66,12 @@ public class SwaggerConfiguration {
 	public GroupedOpenApi userApi() {
 		return GroupedOpenApi.builder()
 			.group("User")
-			.pathsToExclude("/admin/**")   // admin은 제외
-			.pathsToMatch("/**")          // 나머지 전체
+			.pathsToExclude("/admin/**")
+			.pathsToMatch("/**")
+			.addOperationCustomizer(customize())  // ★ 추가!
 			.build();
 	}
+
 
 	@Bean
 	public OperationCustomizer customize() {

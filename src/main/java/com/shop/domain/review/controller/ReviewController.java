@@ -23,26 +23,33 @@ import com.shop.domain.review.response.ReviewResponse;
 import com.shop.domain.review.service.ReviewService;
 import com.shop.domain.user.model.User;
 import com.shop.global.common.ApiResult;
+import com.shop.global.common.ErrorCode;
 import com.shop.global.common.Paging;
+import com.shop.global.docs.ApiErrorCodeExample;
+import com.shop.global.docs.ApiErrorCodeExamples;
 import com.shop.global.security.DefaultCurrentUser;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "리뷰", description = "상품 리뷰 관리 API")
 @RestController
-@RequestMapping("/reviews")
 @RequiredArgsConstructor
+@RequestMapping("/reviews")
 public class ReviewController {
 
 	private final ReviewService reviewService;
 
-	/**
-	 * 사용자가 리뷰를 등록하는 API
-	 * 하나의 상품 구매 내역에 대해 하나의 리뷰만 작성 가능
-	 * 삭제 후 재작성 가능
-	 */
-	@PostMapping("/{orderProductId}")
+	@Operation(summary = "리뷰 등록", description = "사용자가 구매한 상품에 대해 리뷰를 작성합니다. 하나의 상품당 하나의 리뷰만 작성 가능하며, 삭제 후 재작성 가능")
+	@ApiErrorCodeExamples({
+		ErrorCode.NOT_PURCHASED_PRODUCT,
+		ErrorCode.NOT_FOUND_USER,
+		ErrorCode.ALREADY_WRITE_REVIEW
+	})
 	@ResponseStatus(HttpStatus.CREATED)
 	public ApiResult<Void> createReview(
 		@AuthenticationPrincipal DefaultCurrentUser defaultCurrentUser,
@@ -53,9 +60,12 @@ public class ReviewController {
 		return ApiResult.ok();
 	}
 
-	/**
-	 * 사용자가 리뷰를 삭제하는 API
-	 */
+	@Operation(summary = "리뷰 삭제", description = "사용자가 작성한 리뷰를 삭제합니다.")
+	@ApiErrorCodeExamples({
+		ErrorCode.NOT_FOUND_REVIEW,
+		ErrorCode.NOT_FOUND_USER,
+		ErrorCode.DOES_NOT_MATCH_USER_REVIEW,
+	})
 	@PutMapping("/{reviewId}/delete")
 	public ApiResult<Void> deleteReview(
 		@AuthenticationPrincipal DefaultCurrentUser defaultCurrentUser,
@@ -65,10 +75,12 @@ public class ReviewController {
 		return ApiResult.ok();
 	}
 
-	/**
-	 * 사용자가 리뷰를 수정하는 API
-	 * 리뷰가 삭제되지 않은 경우에만 가능
-	 */
+	@Operation(summary = "리뷰 수정", description = "삭제되지 않은 리뷰만 수정 가능합니다.")
+	@ApiErrorCodeExamples({
+		ErrorCode.NOT_FOUND_REVIEW,
+		ErrorCode.NOT_FOUND_USER,
+		ErrorCode.DOES_NOT_MATCH_USER_REVIEW,
+	})
 	@PutMapping("/{reviewId}/update")
 	public ApiResult<Void> updateReview(
 		@AuthenticationPrincipal DefaultCurrentUser defaultCurrentUser,
@@ -79,10 +91,11 @@ public class ReviewController {
 		return ApiResult.ok();
 	}
 
-	/**
-	 * 사용자가 좋아요를 설정하는 API
-	 * 단일 API를 통한 모든 상태전환 가능
-	 */
+	@Operation(summary = "리뷰 좋아요/좋아요 취소", description = "단일 API로 좋아요 상태를 토글할 수 있습니다.")
+	@ApiErrorCodeExamples({
+		ErrorCode.NOT_FOUND_REVIEW,
+		ErrorCode.NOT_FOUND_USER,
+	})
 	@PutMapping("/{reviewId}/like")
 	public ApiResult<Void> updateReviewLike(
 		@AuthenticationPrincipal DefaultCurrentUser defaultCurrentUser,
@@ -93,11 +106,8 @@ public class ReviewController {
 		return ApiResult.ok();
 	}
 
-	/**
-	 * 특정 상품에 대한 리뷰를 조회하는 API
-	 * 좋아요순, 최신순, 오래된순(기본값) 에 대한 정렬 가능
-	 * 페이지네이션 적용
-	 */
+	@Operation(summary = "상품 리뷰 조회", description = "특정 상품에 대한 리뷰 목록을 조회합니다. 정렬(좋아요순, 최신순, 오래된순)과 페이지네이션 지원")
+	@SecurityRequirements(value = {})
 	@GetMapping("")
 	@ResponseStatus(HttpStatus.OK)
 	public ApiResult<Page<ReviewPageResponse>> getReviews(
@@ -115,10 +125,9 @@ public class ReviewController {
 		return ApiResult.ok(reviewPage);
 	}
 
-	/**
-	 * 특정 사용자 리뷰 조회하는 API
-	 * 페이지네이션 적용
-	 */
+	@Operation(summary = "사용자 리뷰 조회", description = "특정 사용자가 작성한 리뷰 목록을 조회합니다. 페이지네이션 지원")
+	@SecurityRequirements(value = {})
+	@ApiErrorCodeExample(ErrorCode.NOT_FOUND_USER)
 	@GetMapping("/user")
 	public ApiResult<Page<ReviewPageResponse>> getUserReviews(
 		@RequestParam String userUUID,
@@ -131,9 +140,9 @@ public class ReviewController {
 		return ApiResult.ok(reviewService.getUserReviewsByUuid(userUUID, userId, paging.toPageable()));
 	}
 
-	/**
-	 * 단일 리뷰 조회하는 API
-	 */
+	@Operation(summary = "단일 리뷰 조회", description = "리뷰 ID를 통해 단일 리뷰를 조회합니다.")
+	@SecurityRequirements(value = {})
+	@ApiErrorCodeExample(ErrorCode.NOT_FOUND_REVIEW)
 	@GetMapping("/single")
 	public ApiResult<ReviewResponse> getReview(
 		@RequestParam Long reviewId,
@@ -146,3 +155,4 @@ public class ReviewController {
 	}
 
 }
+

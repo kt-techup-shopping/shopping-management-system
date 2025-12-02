@@ -3,6 +3,7 @@ package com.shop.domain.category.service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +40,7 @@ public class CategoryService {
 	// 관리자 카테고리 등록
 	@Transactional
 	public void createCategory(String name, Long parentCategoryId) {
-		Category parentCategory = categoryRepository.findByIdOrThrow(parentCategoryId, ErrorCode.NOT_FOUND_CATEGORY);
+		var parentCategory = categoryRepository.findById(parentCategoryId).orElse(null);
 		categoryRepository.save(
 			new Category(
 				name,

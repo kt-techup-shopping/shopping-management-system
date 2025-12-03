@@ -10,6 +10,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Version;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -21,6 +22,9 @@ public class Delivery extends BaseEntity {
 	@OneToOne
 	@JoinColumn(name = "order_id")
 	private Order order;
+
+	@Version
+	private Long version;
 
 	@Enumerated(EnumType.STRING)
 	private DeliveryStatus deliveryStatus;

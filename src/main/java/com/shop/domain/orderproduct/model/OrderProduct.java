@@ -12,6 +12,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Version;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -20,6 +21,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class OrderProduct extends BaseEntity {
 	private Long quantity;
+
+	@Version
+	private Long version;
 
 	@ManyToOne
 	@JoinColumn(name = "order_id")

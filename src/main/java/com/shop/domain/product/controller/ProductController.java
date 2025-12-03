@@ -61,35 +61,35 @@ public class ProductController{
 		return ApiResult.ok(productService.getDetailById(id));
 	}
 
-	@Operation(summary = "상품 품절 처리", description = "상품을 품절 상태로 변경합니다.")
-	@ApiErrorCodeExample(ErrorCode.NOT_FOUND_PRODUCT)
-	@PatchMapping("/{id}/sold-out")
-	public void soldOut(@PathVariable Long id) {
-		productService.soldOut(id);
-	}
-
-	@Operation(summary = "상품 활성화", description = "상품을 활성 상태로 변경합니다.")
-	@ApiErrorCodeExample(ErrorCode.NOT_FOUND_PRODUCT)
-	@PatchMapping("/{id}/activate")
-	public ApiResult<Void> activate(@PathVariable Long id) {
-		productService.activate(id);
-		return ApiResult.ok();
-	}
-
-	@Operation(summary = "상품 비활성화", description = "상품을 비활성 상태로 변경합니다.")
-	@ApiErrorCodeExample(ErrorCode.NOT_FOUND_PRODUCT)
-	@PatchMapping("/{id}/in-activate")
-	public ApiResult<Void> inActivate(@PathVariable Long id) {
-		productService.inActivate(id);
-		return ApiResult.ok();
-	}
-
-	@Operation(summary = "상품 삭제", description = "상품을 데이터베이스에서 삭제합니다.")
-	@ApiErrorCodeExample(ErrorCode.NOT_FOUND_PRODUCT)
-	@DeleteMapping("/{id}")
-	public ApiResult<Void> remove(@PathVariable Long id) {
-		productService.delete(id);
-		return ApiResult.ok();
-	}
+	// @Operation(summary = "상품 품절 처리", description = "상품을 품절 상태로 변경합니다.")
+	// @ApiErrorCodeExample(ErrorCode.NOT_FOUND_PRODUCT)
+	// @PatchMapping("/{id}/sold-out")
+	// public void soldOut(@PathVariable Long id) {
+	// 	productService.soldOut(id);
+	// }
+	//
+	// @Operation(summary = "상품 활성화", description = "상품을 활성 상태로 변경합니다.")
+	// @ApiErrorCodeExample(ErrorCode.NOT_FOUND_PRODUCT)
+	// @PatchMapping("/{id}/activate")
+	// public ApiResult<Void> activate(@PathVariable Long id) {
+	// 	productService.activate(id);
+	// 	return ApiResult.ok();
+	// }
+	//
+	// @Operation(summary = "상품 비활성화", description = "상품을 비활성 상태로 변경합니다.")
+	// @ApiErrorCodeExample(ErrorCode.NOT_FOUND_PRODUCT)
+	// @PatchMapping("/{id}/in-activate")
+	// public ApiResult<Void> inActivate(@PathVariable Long id) {
+	// 	productService.inActivate(id);
+	// 	return ApiResult.ok();
+	// }
+	//
+	// @Operation(summary = "상품 삭제", description = "상품을 데이터베이스에서 삭제합니다.")
+	// @ApiErrorCodeExample(ErrorCode.NOT_FOUND_PRODUCT)
+	// @DeleteMapping("/{id}")
+	// public ApiResult<Void> remove(@PathVariable Long id) {
+	// 	productService.delete(id);
+	// 	return ApiResult.ok();
+	// }
 }
 

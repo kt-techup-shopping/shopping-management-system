@@ -23,7 +23,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 	private static final String TOKEN_PREFIX = "Bearer ";
-	private static final String BASE_LOGINID = "baseLoginId";
 
 	private final JwtService jwtService;
 	private final UserRepository userRepository;

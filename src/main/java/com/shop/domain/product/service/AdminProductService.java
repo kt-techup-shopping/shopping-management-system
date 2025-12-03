@@ -17,6 +17,7 @@ import com.shop.domain.product.request.ProductSort;
 import com.shop.domain.product.response.AdminProductDetailResponse;
 import com.shop.domain.product.response.AdminProductSearchResponse;
 import com.shop.domain.product.response.AdminProductStockResponse;
+import com.shop.domain.product.response.ProductInfoResponse;
 import com.shop.global.common.ErrorCode;
 import com.shop.global.common.Lock;
 import com.shop.global.common.Preconditions;
@@ -33,9 +34,9 @@ public class AdminProductService {
 
 	// 관리자 상품 등록
 	@Transactional
-	public void create(String name, Long price, Long stock, String description, String color, Long categoryId) {
+	public ProductInfoResponse create(String name, Long price, Long stock, String description, String color, Long categoryId) {
 		var category = categoryRepository.findByIdOrThrow(categoryId, ErrorCode.NOT_FOUND_CATEGORY);
-		productRepository.save(new Product(
+		var product = productRepository.save(new Product(
 			name,
 			price,
 			stock,
@@ -43,6 +44,12 @@ public class AdminProductService {
 			color,
 			category
 		));
+		return new ProductInfoResponse(
+			product.getId(),
+			product.getName(),
+			product.getPrice(),
+			product.getDescription()
+		);
 	}
 
 	// 관리자 상품 목록 조회

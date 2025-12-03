@@ -20,6 +20,7 @@ import com.shop.domain.product.request.ProductUpdateRequest;
 import com.shop.domain.product.response.AdminProductDetailResponse;
 import com.shop.domain.product.response.AdminProductSearchResponse;
 import com.shop.domain.product.response.AdminProductStockResponse;
+import com.shop.domain.product.response.ProductInfoResponse;
 import com.shop.domain.product.service.AdminProductService;
 import com.shop.global.common.ApiResult;
 import com.shop.global.common.ErrorCode;
@@ -45,8 +46,8 @@ public class AdminProductController {
 	@ApiErrorCodeExample(ErrorCode.NOT_FOUND_CATEGORY)
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public ApiResult<Void> create(@RequestBody @Valid ProductCreateRequest request) {
-		adminProductService.create(
+	public ApiResult<ProductInfoResponse> create(@RequestBody @Valid ProductCreateRequest request) {
+		var product = adminProductService.create(
 			request.name(),
 			request.price(),
 			request.stock(),
@@ -54,7 +55,8 @@ public class AdminProductController {
 			request.color(),
 			request.categoryId()
 		);
-		return ApiResult.ok();
+
+		return ApiResult.ok(product);
 	}
 
 	@Operation(summary = "상품 목록 조회", description = "관리자가 상품 목록을 조회하며 필터, 정렬, 페이징을 지원합니다.")

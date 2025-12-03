@@ -79,7 +79,8 @@ public class AdminProductController {
 	}
 
 	@ApiErrorCodeExamples({
-		ErrorCode.NOT_FOUND_PRODUCT
+		ErrorCode.NOT_FOUND_PRODUCT,
+		ErrorCode.NOT_FOUND_CATEGORY
 	})
 	@Operation(summary = "상품 상세 조회", description = "관리자가 상품 ID로 상세 정보를 조회합니다.")
 	@GetMapping("/{id}")

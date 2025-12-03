@@ -47,7 +47,8 @@ public class ProductController{
 	}
 
 	@ApiErrorCodeExamples({
-		ErrorCode.NOT_FOUND_PRODUCT
+		ErrorCode.NOT_FOUND_PRODUCT,
+		ErrorCode.NOT_FOUND_CATEGORY
 	})
 	@Operation(summary = "상품 상세 조회", description = "상품 ID를 통해 상세 정보를 조회합니다.")
 	@SecurityRequirements(value = {})

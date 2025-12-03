@@ -112,10 +112,6 @@ public class User extends BaseEntity {
 		this.isDeleted = true;
 	}
 
-	public void promoteToAdmin() {
-		this.role = Role.ADMIN;
-	}
-
 	public void demoteToUser() {
 		this.role = Role.USER;
 	}

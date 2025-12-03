@@ -60,8 +60,9 @@ public class UserService {
 		userRepository.save(newAdmin);
 	}
 
-	public boolean isDuplicateLoginId(String loginId) {
-		return userRepository.existsByLoginId(loginId);
+	public void isDuplicateLoginId(String loginId) {
+		var result = userRepository.existsByLoginId(loginId);
+		Preconditions.validate(!result, ErrorCode.EXIST_LOGINID);
 	}
 
 	public void changePassword(Long id, String oldPassword, String newPassword) {

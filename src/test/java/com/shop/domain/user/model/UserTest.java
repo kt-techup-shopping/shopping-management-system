@@ -59,9 +59,33 @@ class UserTest {
 			LocalDate.now()
 		);
 
-		final String NEW_PASSWORD = "newPassword";
+		String NEW_PASSWORD = "newPassword";
 		user.changePassword(NEW_PASSWORD);
 
 		assertThat(user.getPassword()).isEqualTo(NEW_PASSWORD);
+	}
+
+	@Test
+	void 유저_정보_수정() {
+		var user = User.normalUser(
+			"testUser",
+			UUID.randomUUID(),
+			"password",
+			"test",
+			"test@test.com",
+			"010-0000-0000",
+			Gender.MALE,
+			LocalDate.now()
+		);
+
+		String newName = "newName";
+		String newEmail = "newEmail";
+		String newMobile = "010-1111-1111";
+
+		user.update(newName, newEmail, newMobile);
+
+		assertThat(user.getName()).isEqualTo(newName);
+		assertThat(user.getEmail()).isEqualTo(newEmail);
+		assertThat(user.getMobile()).isEqualTo(newMobile);
 	}
 }

@@ -3,13 +3,20 @@ package com.shop.service.user;
 import static org.mockito.BDDMockito.*;
 import static org.assertj.core.api.Assertions.*;
 
+import java.time.LocalDate;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.shop.domain.user.model.Gender;
+import com.shop.domain.user.model.User;
 import com.shop.domain.user.repository.UserRepository;
 import com.shop.domain.user.service.UserService;
 import com.shop.global.common.CustomException;
@@ -22,12 +29,23 @@ class UserServiceTest {
 	@Mock
 	private UserRepository userRepository;
 
+	@Mock
+	private PasswordEncoder passwordEncoder;
+
 	@InjectMocks
 	private UserService userService;
 
-	@BeforeEach
-	void setup() {
-		userRepository.deleteAll();
+	private User createUser() {
+		return User.normalUser(
+			"testUser",
+			UUID.randomUUID(),
+			"Test1234@",
+			"test",
+			"test@test.com",
+			"010-0000-0000",
+			Gender.MALE,
+			LocalDate.now()
+		);
 	}
 
 	@Test
@@ -58,5 +76,54 @@ class UserServiceTest {
 			.existsByLoginId(loginId);
 	}
 
+	@Test
+	void 비밀번호_변경_성공() {
+		Long userId = 1L;
+		String oldPassword = "oldPassword";
+		String newPassword = "newPassword";
 
+		User user = createUser();
+		System.out.println(user.getPassword());
+
+		given(userRepository.findByIdOrThrow(userId, ErrorCode.NOT_FOUND_USER)).willReturn(user);
+		given(passwordEncoder.matches(oldPassword, user.getPassword())).willReturn(true);
+		given(passwordEncoder.encode(newPassword)).willReturn("encodedNewPW");
+
+		userService.changePassword(userId, oldPassword, newPassword);
+
+		assertThat(user.getPassword()).isEqualTo("encodedNewPW");
+	}
+
+	@Test
+	void 기존_비밀번호와_다르면_실패() {
+		Long userId = 1L;
+		String oldPassword = "wrongPW";
+
+		User user = createUser();
+
+		given(userRepository.findByIdOrThrow(userId, ErrorCode.NOT_FOUND_USER)).willReturn(user);
+		given(passwordEncoder.matches(oldPassword, user.getPassword())).willReturn(false);
+
+		assertThatThrownBy(() -> userService.changePassword(userId, oldPassword, "newPW"))
+			.isInstanceOf(CustomException.class)
+			.extracting("errorCode")
+			.isEqualTo(ErrorCode.DOES_NOT_MATCH_OLD_PASSWORD);
+	}
+
+	@Test
+	void 새로운_비밀번호와_동일하면_실패() {
+		Long userId = 1L;
+		String oldPassword = "samePW";
+		String newPassword = "samePW";
+
+		User user = createUser();
+
+		given(userRepository.findByIdOrThrow(userId, ErrorCode.NOT_FOUND_USER)).willReturn(user);
+		given(passwordEncoder.matches(oldPassword, user.getPassword())).willReturn(true);
+
+		assertThatThrownBy(() -> userService.changePassword(userId, oldPassword, newPassword))
+			.isInstanceOf(CustomException.class)
+			.extracting("errorCode")
+			.isEqualTo(ErrorCode.CAN_NOT_ALLOWED_SAME_PASSWORD);
+	}
 }

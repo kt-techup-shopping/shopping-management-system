@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.SubQueryExpression;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
@@ -152,6 +153,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 		var reservedStock = reservedStockExpression();
 		BooleanBuilder builder = new BooleanBuilder();
 		builder.and(stockKeywordFilter(keyword));			// 숫자면 상품 ID, 아니면 상품명 검색
+		builder.and(isNotDeleted());
 
 		var content = jpaQueryFactory
 			.select(new QAdminProductStockResponse(
@@ -190,6 +192,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 		builder.and(filterActive(activeOnly));
 		builder.and(containsProductName(keyword));
 		builder.and(categoryIn(categoryId));
+		builder.and(isNotDeleted());
 
 		var content = jpaQueryFactory
 			.select(projection)
@@ -227,8 +230,15 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 			.on(discount.product.eq(product)
 				.and(discount.id.eq(latestDiscountIdSubQuery()))
 			)
-			.where(product.id.eq(productId))
+			.where(product.id.eq(productId)
+				.and(isNotDeleted())
+			)
 			.fetchOne();
+	}
+
+	// 삭제되지 않은 상품 필터링 조건 생성
+	private BooleanExpression isNotDeleted(){
+		return product.isDeleted.isFalse();
 	}
 
 	// 상품명에 키워드가 포함되는지 검색 조건 생성

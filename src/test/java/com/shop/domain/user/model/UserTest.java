@@ -107,4 +107,23 @@ class UserTest {
 		assertThat(user.getIsDeleted()).isTrue();
 		assertThat(user.getStatus()).isEqualTo(Status.INACTIVE);
 	}
+
+	@Test
+	void 유저_비활성화() {
+		var user = User.normalUser(
+			"testUser",
+			UUID.randomUUID(),
+			"password",
+			"test",
+			"test@test.com",
+			"010-0000-0000",
+			Gender.MALE,
+			LocalDate.now()
+		);
+
+		user.deactivate();
+
+		assertThat(user.getIsDeleted()).isFalse();
+		assertThat(user.getStatus()).isEqualTo(Status.INACTIVE);
+	}
 }

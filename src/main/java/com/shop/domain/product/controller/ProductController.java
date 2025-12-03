@@ -32,10 +32,8 @@ public class ProductController{
 
 	private final ProductService productService;
 
-	@ApiErrorCodeExamples({
-		ErrorCode.INVALID_SORT_OPTION
-	})
 	@Operation(summary = "상품 검색/목록 조회", description = "상품을 검색하거나 목록을 조회합니다. 필터링, 정렬, 페이징 지원.")
+	@ApiErrorCodeExamples(ErrorCode.INVALID_SORT_OPTION)
 	@SecurityRequirements(value = {})
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
@@ -49,11 +47,11 @@ public class ProductController{
 		return ApiResult.ok(productService.getSearchList(keyword, categoryId, activeOnly, sort, paging.toPageable()));
 	}
 
+	@Operation(summary = "상품 상세 조회", description = "상품 ID를 통해 상세 정보를 조회합니다.")
 	@ApiErrorCodeExamples({
 		ErrorCode.NOT_FOUND_PRODUCT,
 		ErrorCode.NOT_FOUND_CATEGORY
 	})
-	@Operation(summary = "상품 상세 조회", description = "상품 ID를 통해 상세 정보를 조회합니다.")
 	@SecurityRequirements(value = {})
 	@GetMapping("/{id}")
 	@ResponseStatus(HttpStatus.OK)

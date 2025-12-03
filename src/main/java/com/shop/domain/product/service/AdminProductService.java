@@ -51,6 +51,7 @@ public class AdminProductService {
 		return productRepository.getAdminSearchList(keyword, categoryId, activeOnly, ProductSort.from(sort), pageable);
 	}
 
+	// 관리자 상품 상세 조회
 	public AdminProductDetailResponse getAdminDetailById(Long id) {
 		var	isExisted = productRepository.existsById(id);
 		Preconditions.validate(isExisted, ErrorCode.NOT_FOUND_PRODUCT);
@@ -114,7 +115,11 @@ public class AdminProductService {
 	// 관리자 상품 상태 다중 품절
 	@Transactional
 	public void updateSoldOutList(List<Long> ids) {
+		// 상품 리스트 유효성 검사
 		var products = productRepository.findAllById(ids);
+		Preconditions.validate(products.size() == ids.size(), ErrorCode.NOT_FOUND_PRODUCT);
+
+		// 품절 업데이트
 		products.forEach(Product::soldOut);
 	}
 

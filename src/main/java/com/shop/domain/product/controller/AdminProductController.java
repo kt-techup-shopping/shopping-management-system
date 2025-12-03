@@ -57,10 +57,8 @@ public class AdminProductController {
 		return ApiResult.ok();
 	}
 
-	@ApiErrorCodeExamples({
-		ErrorCode.INVALID_SORT_OPTION
-	})
 	@Operation(summary = "상품 목록 조회", description = "관리자가 상품 목록을 조회하며 필터, 정렬, 페이징을 지원합니다.")
+	@ApiErrorCodeExamples(ErrorCode.INVALID_SORT_OPTION)
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
 	public ApiResult<Page<AdminProductSearchResponse>> getAdminSearchList(
@@ -81,11 +79,11 @@ public class AdminProductController {
 		);
 	}
 
+	@Operation(summary = "상품 상세 조회", description = "관리자가 상품 ID로 상세 정보를 조회합니다.")
 	@ApiErrorCodeExamples({
 		ErrorCode.NOT_FOUND_PRODUCT,
 		ErrorCode.NOT_FOUND_CATEGORY
 	})
-	@Operation(summary = "상품 상세 조회", description = "관리자가 상품 ID로 상세 정보를 조회합니다.")
 	@GetMapping("/{id}")
 	@ResponseStatus(HttpStatus.OK)
 	public ApiResult<AdminProductDetailResponse> getAdminDetailById(@PathVariable Long id) {
@@ -141,6 +139,7 @@ public class AdminProductController {
 	}
 
 	@Operation(summary = "상품 다중 품절 처리", description = "관리자가 선택한 상품들을 한 번에 품절 처리합니다.")
+	@ApiErrorCodeExample(ErrorCode.NOT_FOUND_PRODUCT)
 	@PutMapping("/sold-out")
 	@ResponseStatus(HttpStatus.OK)
 	public ApiResult<Void> updateSoldOutList(@RequestBody ProductSoldOutRequest request) {

@@ -57,6 +57,9 @@ public class AdminProductController {
 		return ApiResult.ok();
 	}
 
+	@ApiErrorCodeExamples({
+		ErrorCode.INVALID_SORT_OPTION
+	})
 	@Operation(summary = "상품 목록 조회", description = "관리자가 상품 목록을 조회하며 필터, 정렬, 페이징을 지원합니다.")
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)

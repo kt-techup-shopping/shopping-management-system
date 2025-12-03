@@ -32,6 +32,9 @@ public class ProductController{
 
 	private final ProductService productService;
 
+	@ApiErrorCodeExamples({
+		ErrorCode.INVALID_SORT_OPTION
+	})
 	@Operation(summary = "상품 검색/목록 조회", description = "상품을 검색하거나 목록을 조회합니다. 필터링, 정렬, 페이징 지원.")
 	@SecurityRequirements(value = {})
 	@GetMapping

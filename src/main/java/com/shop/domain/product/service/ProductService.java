@@ -67,6 +67,8 @@ public class ProductService {
 		var	existedProduct = productRepository.existsById(id);
 		Preconditions.validate(existedProduct, ErrorCode.NOT_FOUND_PRODUCT);
 		var product = productRepository.findDetailById(id);
+
+		Preconditions.validate(product.category() != null, ErrorCode.NOT_FOUND_CATEGORY);
 		var categoryList = categoryService.getCategoryHierarchy(product.category());
 
 		// ProductDetailProjection + CategoryList

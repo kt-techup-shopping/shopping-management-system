@@ -12,7 +12,6 @@ class UserTest {
 
 	@Test
 	void 일반_유저_생성() {
-
 		var user = User.normalUser(
 			"testUser",
 			UUID.randomUUID(),
@@ -45,5 +44,24 @@ class UserTest {
 		assertThat(admin.getRole()).isEqualTo(Role.ADMIN);
 		assertThat(admin.getStatus()).isEqualTo(Status.ACTIVE);
 		assertThat(admin.getIsDeleted()).isFalse();
+	}
+
+	@Test
+	void 비밀번호_변경() {
+		var user = User.normalUser(
+			"testUser",
+			UUID.randomUUID(),
+			"password",
+			"test",
+			"test@test.com",
+			"010-0000-0000",
+			Gender.MALE,
+			LocalDate.now()
+		);
+
+		final String NEW_PASSWORD = "newPassword";
+		user.changePassword(NEW_PASSWORD);
+
+		assertThat(user.getPassword()).isEqualTo(NEW_PASSWORD);
 	}
 }

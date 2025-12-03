@@ -1,34 +1,25 @@
 package com.shop.domain.product.controller;
 
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.shop.domain.product.request.ProductRequest;
 import com.shop.domain.product.response.ProductDetailResponse;
 import com.shop.domain.product.response.ProductSearchResponse;
 import com.shop.domain.product.service.ProductService;
 import com.shop.global.common.ApiResult;
-import com.shop.global.common.ErrorCode;
 import com.shop.global.common.Paging;
-import com.shop.global.common.SwaggerAssistance;
-import com.shop.global.docs.ApiErrorCodeExample;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @Tag(name = "상품", description = "상품을 관리하는 API")
@@ -48,7 +39,7 @@ public class ProductController{
 		@RequestParam(required = false) Long categoryId,
 		@RequestParam(required = false) Boolean activeOnly,
 		@RequestParam(required = false) String sort,
-		@Parameter Paging paging
+		@ParameterObject Paging paging
 	) {
 		return ApiResult.ok(productService.getSearchList(keyword, categoryId, activeOnly, sort, paging.toPageable()));
 	}

@@ -1,5 +1,6 @@
 package com.shop.domain.product.controller;
 
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,7 +27,6 @@ import com.shop.global.common.Paging;
 import com.shop.global.docs.ApiErrorCodeExample;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -64,7 +64,7 @@ public class AdminProductController {
 		@RequestParam(required = false) Long categoryId,
 		@RequestParam(required = false) Boolean activeOnly,
 		@RequestParam(required = false) String sort,
-		@Parameter Paging paging
+		@ParameterObject Paging paging
 	) {
 		return ApiResult.ok(
 			adminProductService.getAdminSearchList(
@@ -145,7 +145,7 @@ public class AdminProductController {
 	@ResponseStatus(HttpStatus.OK)
 	public ApiResult<Page<AdminProductStockResponse>> getStockDetailList(
 		@RequestParam(required = false) String keyword,
-		@Parameter Paging paging
+		@ParameterObject Paging paging
 	) {
 		return ApiResult.ok(adminProductService.getStockList(keyword, paging.toPageable()));
 	}

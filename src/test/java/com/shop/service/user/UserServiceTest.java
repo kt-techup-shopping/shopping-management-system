@@ -13,11 +13,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.shop.domain.user.model.Gender;
+import com.shop.domain.user.model.Role;
 import com.shop.domain.user.model.User;
 import com.shop.domain.user.repository.UserRepository;
+import com.shop.domain.user.response.UserSearchResponse;
 import com.shop.domain.user.service.UserService;
 import com.shop.global.common.CustomException;
 import com.shop.global.common.ErrorCode;
@@ -125,5 +129,32 @@ class UserServiceTest {
 			.isInstanceOf(CustomException.class)
 			.extracting("errorCode")
 			.isEqualTo(ErrorCode.CAN_NOT_ALLOWED_SAME_PASSWORD);
+	}
+
+	@Test
+	void 유저_리스트_조회_성공() {
+		String keyword = "test";
+		Gender gender = Gender.MALE;
+		Boolean activeOnly = true;
+		String sort = "name";
+		PageRequest pageable = PageRequest.of(0, 10);
+
+		Page<UserSearchResponse> expectedPage = mock(Page.class);
+
+		given(userRepository.search(keyword, gender, activeOnly, Role.USER, sort, pageable))
+			.willReturn(expectedPage);
+
+		var result = userService.searchUsers(keyword, gender, activeOnly, sort, pageable);
+
+		then(userRepository).should().search(
+			keyword,
+			gender,
+			activeOnly,
+			Role.USER,
+			sort,
+			pageable
+		);
+
+		assertThat(result).isSameAs(expectedPage);
 	}
 }

@@ -87,7 +87,6 @@ class UserServiceTest {
 		String newPassword = "newPassword";
 
 		User user = createUser();
-		System.out.println(user.getPassword());
 
 		given(userRepository.findByIdOrThrow(userId, ErrorCode.NOT_FOUND_USER)).willReturn(user);
 		given(passwordEncoder.matches(oldPassword, user.getPassword())).willReturn(true);

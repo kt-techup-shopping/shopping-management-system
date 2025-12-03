@@ -126,4 +126,22 @@ class UserTest {
 		assertThat(user.getIsDeleted()).isFalse();
 		assertThat(user.getStatus()).isEqualTo(Status.INACTIVE);
 	}
+
+	@Test
+	void 관리자_권한_삭제() {
+		var admin = User.admin(
+			"adminUser",
+			UUID.randomUUID(),
+			"password",
+			"test",
+			"test@test.com",
+			"010-0000-0000",
+			Gender.MALE,
+			LocalDate.now()
+		);
+
+		admin.demoteToUser();
+
+		assertThat(admin.getRole()).isEqualTo(Role.USER);
+	}
 }

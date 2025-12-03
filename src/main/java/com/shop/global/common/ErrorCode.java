@@ -13,6 +13,7 @@ public enum ErrorCode {
 	NOT_FOUND_CATEGORY(HttpStatus.BAD_REQUEST, "카테고리를 찾을 수 없습니다."),
 	NOT_FOUND_ORDER(HttpStatus.BAD_REQUEST, "주문을 찾을 수 없습니다."),
 	NOT_FOUND_DELIVERY(HttpStatus.BAD_REQUEST, "배송 정보를 찾을 수 없습니다."),
+	EXIST_EMAIL(HttpStatus.BAD_REQUEST, "이미 존재하는 이메일입니다."),
 	EXIST_USER(HttpStatus.BAD_REQUEST, "이미 존재하는 회원입니다."),
 	FAIL_LOGIN(HttpStatus.BAD_REQUEST, "아이디 혹은 비밀번호가 일치하지 않습니다."),
 	DOES_NOT_MATCH_OLD_PASSWORD(HttpStatus.BAD_REQUEST, "기존 비밀번호가 일치하지 않습니다."),

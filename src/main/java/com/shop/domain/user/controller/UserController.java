@@ -36,9 +36,9 @@ public class UserController {
 	@Operation(summary = "로그인 ID 중복 체크", description = "입력한 로그인 ID가 이미 존재하는지 확인합니다.")
 	@GetMapping("/duplicate-login-id")
 	@ResponseStatus(HttpStatus.OK)
-	public ApiResult<Boolean> isDuplicateLoginId(@RequestParam String loginId) {
-		var result = userService.isDuplicateLoginId(loginId);
-		return ApiResult.ok(result);
+	public ApiResult<Void> isDuplicateLoginId(@RequestParam String loginId) {
+		userService.isDuplicateLoginId(loginId);
+		return ApiResult.ok();
 	}
 
 	@Operation(summary = "사용자 삭제 (관리자용)", description = "관리자가 특정 사용자를 삭제합니다.")

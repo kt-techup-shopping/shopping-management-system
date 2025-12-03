@@ -25,6 +25,7 @@ import com.shop.global.common.ApiResult;
 import com.shop.global.common.ErrorCode;
 import com.shop.global.common.Paging;
 import com.shop.global.docs.ApiErrorCodeExample;
+import com.shop.global.docs.ApiErrorCodeExamples;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -77,6 +78,9 @@ public class AdminProductController {
 		);
 	}
 
+	@ApiErrorCodeExamples({
+		ErrorCode.NOT_FOUND_PRODUCT
+	})
 	@Operation(summary = "상품 상세 조회", description = "관리자가 상품 ID로 상세 정보를 조회합니다.")
 	@GetMapping("/{id}")
 	@ResponseStatus(HttpStatus.OK)

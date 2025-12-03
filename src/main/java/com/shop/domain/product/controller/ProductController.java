@@ -14,7 +14,9 @@ import com.shop.domain.product.response.ProductDetailResponse;
 import com.shop.domain.product.response.ProductSearchResponse;
 import com.shop.domain.product.service.ProductService;
 import com.shop.global.common.ApiResult;
+import com.shop.global.common.ErrorCode;
 import com.shop.global.common.Paging;
+import com.shop.global.docs.ApiErrorCodeExamples;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -44,6 +46,9 @@ public class ProductController{
 		return ApiResult.ok(productService.getSearchList(keyword, categoryId, activeOnly, sort, paging.toPageable()));
 	}
 
+	@ApiErrorCodeExamples({
+		ErrorCode.NOT_FOUND_PRODUCT
+	})
 	@Operation(summary = "상품 상세 조회", description = "상품 ID를 통해 상세 정보를 조회합니다.")
 	@SecurityRequirements(value = {})
 	@GetMapping("/{id}")

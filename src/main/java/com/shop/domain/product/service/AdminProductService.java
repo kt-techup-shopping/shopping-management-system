@@ -19,6 +19,7 @@ import com.shop.domain.product.response.AdminProductSearchResponse;
 import com.shop.domain.product.response.AdminProductStockResponse;
 import com.shop.global.common.ErrorCode;
 import com.shop.global.common.Lock;
+import com.shop.global.common.Preconditions;
 
 import lombok.RequiredArgsConstructor;
 
@@ -51,6 +52,8 @@ public class AdminProductService {
 	}
 
 	public AdminProductDetailResponse getAdminDetailById(Long id) {
+		var	isExisted = productRepository.existsById(id);
+		Preconditions.validate(isExisted, ErrorCode.NOT_FOUND_PRODUCT);
 		var product = productRepository.findAdminDetailById(id);
 		var categoryList = categoryService.getCategoryHierarchy(product.category());
 

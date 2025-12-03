@@ -1,6 +1,6 @@
 package com.shop.domain.product.response;
 
-public record ProductInfoResponse(
+public record AdminProductInfoResponse(
 	Long id,
 	String name,
 	Long price,

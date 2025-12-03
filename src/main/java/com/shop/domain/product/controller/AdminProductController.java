@@ -1,5 +1,7 @@
 package com.shop.domain.product.controller;
 
+import java.util.List;
+
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -20,7 +22,8 @@ import com.shop.domain.product.request.ProductUpdateRequest;
 import com.shop.domain.product.response.AdminProductDetailResponse;
 import com.shop.domain.product.response.AdminProductSearchResponse;
 import com.shop.domain.product.response.AdminProductStockResponse;
-import com.shop.domain.product.response.ProductInfoResponse;
+import com.shop.domain.product.response.AdminProductInfoResponse;
+import com.shop.domain.product.response.AdminProductStatusResponse;
 import com.shop.domain.product.service.AdminProductService;
 import com.shop.global.common.ApiResult;
 import com.shop.global.common.ErrorCode;
@@ -46,7 +49,7 @@ public class AdminProductController {
 	@ApiErrorCodeExample(ErrorCode.NOT_FOUND_CATEGORY)
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public ApiResult<ProductInfoResponse> create(@RequestBody @Valid ProductCreateRequest request) {
+	public ApiResult<AdminProductInfoResponse> create(@RequestBody @Valid ProductCreateRequest request) {
 		var product = adminProductService.create(
 			request.name(),
 			request.price(),
@@ -117,36 +120,32 @@ public class AdminProductController {
 	@ApiErrorCodeExample(ErrorCode.NOT_FOUND_PRODUCT)
 	@PutMapping("/{id}/activate")
 	@ResponseStatus(HttpStatus.OK)
-	public ApiResult<Void> updateActivated(@PathVariable Long id) {
-		adminProductService.updateActivated(id);
-		return ApiResult.ok();
+	public ApiResult<AdminProductStatusResponse> updateActivated(@PathVariable Long id) {
+		return ApiResult.ok(adminProductService.updateActivated(id));
 	}
 
 	@Operation(summary = "상품 비활성화", description = "관리자가 상품을 비활성 상태로 변경합니다.")
 	@ApiErrorCodeExample(ErrorCode.NOT_FOUND_PRODUCT)
 	@PutMapping("/{id}/in-activate")
 	@ResponseStatus(HttpStatus.OK)
-	public ApiResult<Void> updateInActivated(@PathVariable Long id) {
-		adminProductService.updateInActivated(id);
-		return ApiResult.ok();
+	public ApiResult<AdminProductStatusResponse> updateInActivated(@PathVariable Long id) {
+		return ApiResult.ok(adminProductService.updateInActivated(id));
 	}
 
 	@Operation(summary = "상품 품절 토글", description = "관리자가 상품의 품절 상태를 토글합니다.")
 	@ApiErrorCodeExample(ErrorCode.NOT_FOUND_PRODUCT)
 	@PutMapping("/{id}/toggle-sold-out")
 	@ResponseStatus(HttpStatus.OK)
-	public ApiResult<Void> updateSoldOut(@PathVariable Long id) {
-		adminProductService.updateSoldOutToggle(id);
-		return ApiResult.ok();
+	public ApiResult<AdminProductStatusResponse> updateSoldOut(@PathVariable Long id) {
+		return ApiResult.ok(adminProductService.updateSoldOutToggle(id));
 	}
 
 	@Operation(summary = "상품 다중 품절 처리", description = "관리자가 선택한 상품들을 한 번에 품절 처리합니다.")
 	@ApiErrorCodeExample(ErrorCode.NOT_FOUND_PRODUCT)
 	@PutMapping("/sold-out")
 	@ResponseStatus(HttpStatus.OK)
-	public ApiResult<Void> updateSoldOutList(@RequestBody ProductSoldOutRequest request) {
-		adminProductService.updateSoldOutList(request.productIds());
-		return ApiResult.ok();
+	public ApiResult<List<AdminProductStatusResponse>> updateSoldOutList(@RequestBody ProductSoldOutRequest request) {
+		return ApiResult.ok(adminProductService.updateSoldOutList(request.productIds()));
 	}
 
 	@Operation(summary = "상품 재고 목록 조회", description = "관리자가 상품 재고를 조회하며, 이름/ID로 검색 가능하고 페이징 지원.")
@@ -175,9 +174,8 @@ public class AdminProductController {
 	@ApiErrorCodeExample(ErrorCode.NOT_FOUND_PRODUCT)
 	@PutMapping("/{id}/delete")
 	@ResponseStatus(HttpStatus.OK)
-	public ApiResult<Void> deleteProduct(@PathVariable Long id) {
-		adminProductService.deleteProduct(id);
-		return ApiResult.ok();
+	public ApiResult<AdminProductStatusResponse> deleteProduct(@PathVariable Long id) {
+		return ApiResult.ok(adminProductService.deleteProduct(id));
 	}
 }
 

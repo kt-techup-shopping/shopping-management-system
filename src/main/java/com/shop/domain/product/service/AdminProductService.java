@@ -17,7 +17,8 @@ import com.shop.domain.product.request.ProductSort;
 import com.shop.domain.product.response.AdminProductDetailResponse;
 import com.shop.domain.product.response.AdminProductSearchResponse;
 import com.shop.domain.product.response.AdminProductStockResponse;
-import com.shop.domain.product.response.ProductInfoResponse;
+import com.shop.domain.product.response.AdminProductInfoResponse;
+import com.shop.domain.product.response.AdminProductStatusResponse;
 import com.shop.global.common.ErrorCode;
 import com.shop.global.common.Lock;
 import com.shop.global.common.Preconditions;
@@ -34,7 +35,8 @@ public class AdminProductService {
 
 	// 관리자 상품 등록
 	@Transactional
-	public ProductInfoResponse create(String name, Long price, Long stock, String description, String color, Long categoryId) {
+	public AdminProductInfoResponse create(String name, Long price, Long stock, String description, String color,
+		Long categoryId) {
 		var category = categoryRepository.findByIdOrThrow(categoryId, ErrorCode.NOT_FOUND_CATEGORY);
 		var product = productRepository.save(new Product(
 			name,
@@ -44,7 +46,7 @@ public class AdminProductService {
 			color,
 			category
 		));
-		return new ProductInfoResponse(
+		return new AdminProductInfoResponse(
 			product.getId(),
 			product.getName(),
 			product.getPrice(),
@@ -60,7 +62,7 @@ public class AdminProductService {
 
 	// 관리자 상품 상세 조회
 	public AdminProductDetailResponse getAdminDetailById(Long id) {
-		var	isExisted = productRepository.existsById(id);
+		var isExisted = productRepository.existsById(id);
 		Preconditions.validate(isExisted, ErrorCode.NOT_FOUND_PRODUCT);
 		var product = productRepository.findAdminDetailById(id);
 		var categoryList = categoryService.getCategoryHierarchy(product.category());
@@ -100,34 +102,52 @@ public class AdminProductService {
 
 	// 관리자 상품 상태 비활성화
 	@Transactional
-	public void updateActivated(Long id) {
+	public AdminProductStatusResponse updateActivated(Long id) {
 		var product = productRepository.findByIdOrThrow(id);
 		product.activate();
+		return new AdminProductStatusResponse(
+			product.getId(),
+			product.getStatus().name()
+		);
 	}
 
 	// 관리자 상품 상태 비활성화
 	@Transactional
-	public void updateInActivated(Long id) {
+	public AdminProductStatusResponse updateInActivated(Long id) {
 		var product = productRepository.findByIdOrThrow(id);
 		product.inActivate();
+		return new AdminProductStatusResponse(
+			product.getId(),
+			product.getStatus().name()
+		);
 	}
 
 	// 관리자 상품 상태 품절 토글
 	@Transactional
-	public void updateSoldOutToggle(Long id) {
+	public AdminProductStatusResponse updateSoldOutToggle(Long id) {
 		var product = productRepository.findByIdOrThrow(id);
 		product.toggleSoldOut();
+		return new AdminProductStatusResponse(
+			product.getId(),
+			product.getStatus().name()
+		);
 	}
 
 	// 관리자 상품 상태 다중 품절
 	@Transactional
-	public void updateSoldOutList(List<Long> ids) {
+	public List<AdminProductStatusResponse> updateSoldOutList(List<Long> ids) {
 		// 상품 리스트 유효성 검사
 		var products = productRepository.findAllById(ids);
 		Preconditions.validate(products.size() == ids.size(), ErrorCode.NOT_FOUND_PRODUCT);
-
 		// 품절 업데이트
 		products.forEach(Product::soldOut);
+
+		return products.stream()
+			.map(product -> new AdminProductStatusResponse(
+				product.getId(),
+				product.getStatus().name()
+			))
+			.toList();
 	}
 
 	// 관리자 상품 재고 목록 조회
@@ -143,8 +163,12 @@ public class AdminProductService {
 	}
 
 	@Transactional
-	public void deleteProduct(Long id) {
+	public AdminProductStatusResponse deleteProduct(Long id) {
 		var product = productRepository.findByIdOrThrow(id);
 		product.delete();
+		return new AdminProductStatusResponse(
+			product.getId(),
+			product.getStatus().name()
+		);
 	}
 }

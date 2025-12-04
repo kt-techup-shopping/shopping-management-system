@@ -4,7 +4,8 @@ public record AdminProductInfoResponse(
 	Long id,
 	String name,
 	Long price,
-	String description
+	String description,
+	Long stock
 ) {
 
 }

@@ -15,10 +15,10 @@ import com.shop.domain.product.model.ProductStatus;
 import com.shop.domain.product.repository.ProductRepository;
 import com.shop.domain.product.request.ProductSort;
 import com.shop.domain.product.response.AdminProductDetailResponse;
-import com.shop.domain.product.response.AdminProductSearchResponse;
-import com.shop.domain.product.response.AdminProductStockResponse;
 import com.shop.domain.product.response.AdminProductInfoResponse;
+import com.shop.domain.product.response.AdminProductSearchResponse;
 import com.shop.domain.product.response.AdminProductStatusResponse;
+import com.shop.domain.product.response.AdminProductStockResponse;
 import com.shop.global.common.ErrorCode;
 import com.shop.global.common.Lock;
 import com.shop.global.common.Preconditions;
@@ -50,7 +50,8 @@ public class AdminProductService {
 			product.getId(),
 			product.getName(),
 			product.getPrice(),
-			product.getDescription()
+			product.getDescription(),
+			product.getStock()
 		);
 	}
 
@@ -84,7 +85,7 @@ public class AdminProductService {
 
 	// 관리자 상품 정보 수정
 	@Lock(key = Lock.Key.PRODUCT, index = 0, waitTime = 1000, leaseTime = 500, timeUnit = TimeUnit.MILLISECONDS)
-	public void updateDetail(Long id, String name, Long price, String description, String color, Long deltaStock,
+	public AdminProductInfoResponse updateDetail(Long id, String name, Long price, String description, String color, Long deltaStock,
 		String status, Long categoryId) {
 		var product = productRepository.findByIdOrThrow(id);
 		var category = categoryRepository.findByIdOrThrow(categoryId, ErrorCode.NOT_FOUND_CATEGORY);
@@ -97,6 +98,13 @@ public class AdminProductService {
 			deltaStock,
 			ProductStatus.from(status),
 			category
+		);
+		return new AdminProductInfoResponse(
+			product.getId(),
+			product.getName(),
+			product.getPrice(),
+			product.getDescription(),
+			product.getStock()
 		);
 	}
 
@@ -157,9 +165,16 @@ public class AdminProductService {
 
 	// 관리자 상품 재고 수정
 	@Lock(key = Lock.Key.PRODUCT, index = 0, waitTime = 1000, leaseTime = 500, timeUnit = TimeUnit.MILLISECONDS)
-	public void updateStock(Long id, Long quantity) {
+	public AdminProductInfoResponse updateStock(Long id, Long quantity) {
 		var product = productRepository.findByIdOrThrow(id);
 		product.updateStock(quantity);
+		return new AdminProductInfoResponse(
+			product.getId(),
+			product.getName(),
+			product.getPrice(),
+			product.getDescription(),
+			product.getStock()
+		);
 	}
 
 	@Transactional

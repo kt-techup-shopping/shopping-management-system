@@ -20,10 +20,10 @@ import com.shop.domain.product.request.ProductCreateRequest;
 import com.shop.domain.product.request.ProductSoldOutRequest;
 import com.shop.domain.product.request.ProductUpdateRequest;
 import com.shop.domain.product.response.AdminProductDetailResponse;
-import com.shop.domain.product.response.AdminProductSearchResponse;
-import com.shop.domain.product.response.AdminProductStockResponse;
 import com.shop.domain.product.response.AdminProductInfoResponse;
+import com.shop.domain.product.response.AdminProductSearchResponse;
 import com.shop.domain.product.response.AdminProductStatusResponse;
+import com.shop.domain.product.response.AdminProductStockResponse;
 import com.shop.domain.product.service.AdminProductService;
 import com.shop.global.common.ApiResult;
 import com.shop.global.common.ErrorCode;
@@ -99,11 +99,11 @@ public class AdminProductController {
 	@ApiErrorCodeExample(ErrorCode.NOT_FOUND_CATEGORY)
 	@PutMapping("/{id}")
 	@ResponseStatus(HttpStatus.OK)
-	public ApiResult<Void> updateDetail(
+	public ApiResult<AdminProductInfoResponse> updateDetail(
 		@PathVariable Long id,
 		@RequestBody @Valid ProductUpdateRequest request
 	) {
-		adminProductService.updateDetail(
+		var product = adminProductService.updateDetail(
 			id,
 			request.name(),
 			request.price(),
@@ -113,7 +113,7 @@ public class AdminProductController {
 			request.status(),
 			request.categoryId()
 		);
-		return ApiResult.ok();
+		return ApiResult.ok(product);
 	}
 
 	@Operation(summary = "상품 활성화", description = "관리자가 상품을 활성 상태로 변경합니다.")
@@ -162,12 +162,11 @@ public class AdminProductController {
 	@ApiErrorCodeExample(ErrorCode.NOT_FOUND_PRODUCT)
 	@PutMapping("/{id}/stock/{quantity}")
 	@ResponseStatus(HttpStatus.OK)
-	public ApiResult<Void> updateStock(
+	public ApiResult<AdminProductInfoResponse> updateStock(
 		@PathVariable Long id,
 		@PathVariable Long quantity
 	) {
-		adminProductService.updateStock(id, quantity);
-		return ApiResult.ok();
+		return ApiResult.ok(adminProductService.updateStock(id, quantity));
 	}
 
 	@Operation(summary = "상품 삭제", description = "관리자가 상품을 삭제 처리합니다.")

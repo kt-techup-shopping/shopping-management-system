@@ -3,15 +3,16 @@ package com.shop.domain.category.service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.shop.domain.category.model.Category;
 import com.shop.domain.category.repository.CategoryRepository;
 import com.shop.domain.category.response.AdminCategoryListResponse;
 import com.shop.domain.category.response.AdminCategoryResponse;
 import com.shop.domain.category.response.CategoryDetailResponse;
-import com.shop.domain.category.model.Category;
 import com.shop.global.common.ErrorCode;
 
 import lombok.RequiredArgsConstructor;
@@ -38,13 +39,20 @@ public class CategoryService {
 
 	// 관리자 카테고리 등록
 	@Transactional
-	public void createCategory(String name, Long parentCategoryId) {
-		Category parentCategory = categoryRepository.findByIdOrThrow(parentCategoryId, ErrorCode.NOT_FOUND_CATEGORY);
-		categoryRepository.save(
+	public CategoryDetailResponse createCategory(String name, Long parentCategoryId) {
+		var parentCategory = Optional.ofNullable(parentCategoryId)
+			.map(id -> categoryRepository.findByIdOrThrow(id, ErrorCode.NOT_FOUND_CATEGORY))
+			.orElse(null);
+
+		var category = categoryRepository.save(
 			new Category(
 				name,
 				parentCategory
 			)
+		);
+		return new CategoryDetailResponse(
+			category.getId(),
+			category.getName()
 		);
 	}
 

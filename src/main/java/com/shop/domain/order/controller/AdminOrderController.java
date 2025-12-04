@@ -17,7 +17,9 @@ import com.shop.domain.order.response.AdminOrderDetailUserResponse;
 import com.shop.domain.order.service.AdminOrderService;
 import com.shop.domain.order.request.AdminOrderStatusChangeRequest;
 import com.shop.global.common.ApiResult;
+import com.shop.global.common.ErrorCode;
 import com.shop.global.common.Paging;
+import com.shop.global.docs.ApiErrorCodeExample;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -27,10 +29,10 @@ import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "관리자 주문", description = "관리자 주문 API")
 @RestController
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
-@Tag(name = "관리자 주문 API")
 @RequestMapping("/admin/orders")
 public class AdminOrderController {
 	private final OrderRepositoryCustom orderRepository;
@@ -47,8 +49,8 @@ public class AdminOrderController {
 	// 	return ApiResult.ok(orderRepository.search(keyword, paging.toPageable()));
 	// }
 
-	@GetMapping
 	@Operation(summary = "관리자 주문 목록 조회", description = "관리자가 주문 ID, 사용자 ID, 주문 상태를 조건으로 주문 목록을 조회합니다.")
+	@GetMapping
 	public ApiResult<Page<AdminOrderDetailResponse>> getOrders(
 		@RequestParam(required = false) Long orderId,
 		@RequestParam(required = false) Long userId,
@@ -58,13 +60,15 @@ public class AdminOrderController {
 		return ApiResult.ok(adminOrderService.getOrders(orderId, userId, status, paging));
 	}
 
-	@GetMapping("/{id}/detail")
 	@Operation(summary = "관리자 주문 상세 조회", description = "관리자가 특정 주문 ID의 상세 정보를 조회합니다.")
+	@ApiErrorCodeExample(ErrorCode.NOT_FOUND_ORDER)
+	@GetMapping("/{id}/detail")
 	public ApiResult<AdminOrderDetailUserResponse> getAdminOrderDetailById(@PathVariable Long id) {
 		return ApiResult.ok(adminOrderService.getAdminOrderDetailById(id));
 	}
 
 	@Operation(summary = "주문 상태 변경", description = "관리자가 특정 주문의 상태를 변경합니다.")
+	@ApiErrorCodeExample(ErrorCode.NOT_FOUND_ORDER)
 	@PutMapping("/{orderId}/update")
 	public ApiResult<Void> updateOrderStatus(
 		@RequestBody @Valid AdminOrderStatusChangeRequest adminOrderStatusChangeRequest,
@@ -75,6 +79,7 @@ public class AdminOrderController {
 	}
 
 	@Operation(summary = "주문 취소", description = "관리자가 특정 주문을 취소(CANCELLED) 상태로 변경합니다.")
+	@ApiErrorCodeExample(ErrorCode.NOT_FOUND_ORDER)
 	@PutMapping("/{orderId}/delete")
 	public ApiResult<Void> deleteOrder(
 		@PathVariable Long orderId

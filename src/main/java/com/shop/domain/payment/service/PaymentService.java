@@ -24,9 +24,8 @@ public class PaymentService {
 
 	public void createPayment(Long orderId, PaymentType type) {
 		var order = orderRepository.findByIdOrThrow(orderId, ErrorCode.NOT_FOUND_ORDER);
-
+		Preconditions.validate(!order.isCompleted(), ErrorCode.ALREADY_PAID_ORDER);
 		Preconditions.validate(order.canRequestPayment(), ErrorCode.ALREADY_PENDING_ORDER);
-		Preconditions.validate(order.isCompleted(), ErrorCode.ALREADY_PAID_ORDER);
 
 		Long totalAmount = order.calculateTotalAmount();
 		// TODO: 쿠폰이나 멤버쉽 구현 이후 적용

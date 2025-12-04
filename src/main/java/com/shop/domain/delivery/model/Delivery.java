@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public class Delivery extends BaseEntity {
+
 	@OneToOne
 	@JoinColumn(name = "order_id")
 	private Order order;

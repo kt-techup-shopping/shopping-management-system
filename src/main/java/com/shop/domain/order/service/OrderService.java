@@ -25,7 +25,6 @@ import com.shop.domain.order.repository.OrderRepository;
 import com.shop.domain.orderproduct.repository.OrderProductRepository;
 import com.shop.domain.product.repository.ProductRepository;
 import com.shop.domain.user.repository.UserRepository;
-import com.shop.global.common.SwaggerAssistance;
 
 import lombok.RequiredArgsConstructor;
 

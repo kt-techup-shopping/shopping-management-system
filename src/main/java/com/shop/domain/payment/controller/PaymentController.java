@@ -9,16 +9,27 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.shop.domain.payment.service.PaymentService;
 import com.shop.global.common.ApiResult;
+import com.shop.global.common.ErrorCode;
+import com.shop.global.docs.ApiErrorCodeExamples;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "결제", description = "결제를 관리하는 API")
 @RestController
-@RequestMapping("/payments")
 @RequiredArgsConstructor
+@RequestMapping("/payments")
 public class PaymentController {
 	private final PaymentService paymentService;
 
 	// 결제 완료 처리
+	@Operation(summary = "결제 완료", description = "결제 완료 처리를 진행합니다.")
+	@ApiErrorCodeExamples({
+		ErrorCode.NOT_FOUND_PAYMENT,
+		ErrorCode.INVALID_PAYMENT_STATUS,
+		ErrorCode.INVALID_ORDER_STATUS,
+	})
 	@PutMapping("/internal/{paymentId}/complete")
 	@ResponseStatus(HttpStatus.OK)
 	public ApiResult<Void> completePayment(@PathVariable Long paymentId) {
@@ -28,6 +39,12 @@ public class PaymentController {
 	}
 
 	// 결제 취소 처리
+	@Operation(summary = "결제 취소", description = "결제 취소 처리를 진행합니다.")
+	@ApiErrorCodeExamples({
+		ErrorCode.NOT_FOUND_PAYMENT,
+		ErrorCode.INVALID_PAYMENT_STATUS,
+		ErrorCode.INVALID_ORDER_STATUS,
+	})
 	@PutMapping("{paymentId}/cancel")
 	@ResponseStatus(HttpStatus.OK)
 	public ApiResult<Void> cancelPayment(@PathVariable Long paymentId) {

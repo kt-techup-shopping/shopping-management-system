@@ -9,6 +9,8 @@ import com.shop.domain.product.repository.ProductRepository;
 import com.shop.domain.product.request.ProductSort;
 import com.shop.domain.product.response.ProductDetailResponse;
 import com.shop.domain.product.response.ProductSearchResponse;
+import com.shop.global.common.ErrorCode;
+import com.shop.global.common.Preconditions;
 
 import lombok.RequiredArgsConstructor;
 
@@ -62,7 +64,11 @@ public class ProductService {
 
 	// 상품 상세 조회
 	public ProductDetailResponse getDetailById(Long id) {
+		var	existedProduct = productRepository.existsById(id);
+		Preconditions.validate(existedProduct, ErrorCode.NOT_FOUND_PRODUCT);
 		var product = productRepository.findDetailById(id);
+
+		Preconditions.validate(product.category() != null, ErrorCode.NOT_FOUND_CATEGORY);
 		var categoryList = categoryService.getCategoryHierarchy(product.category());
 
 		// ProductDetailProjection + CategoryList

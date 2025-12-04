@@ -13,25 +13,32 @@ import com.shop.domain.review.response.AdminNoReviewResponse;
 import com.shop.domain.review.response.AdminReviewDetailResponse;
 import com.shop.domain.review.service.AdminReviewService;
 import com.shop.global.common.ApiResult;
+import com.shop.global.common.ErrorCode;
 import com.shop.global.common.Paging;
+import com.shop.global.docs.ApiErrorCodeExamples;
 import com.shop.global.security.DefaultCurrentUser;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "관리자 리뷰", description = "관리자가 리뷰를 관리하는 API")
 @RestController
+@RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
 @RequestMapping("/admin/reviews")
-@RequiredArgsConstructor
 public class AdminReviewController {
 
 	private final AdminReviewService adminReviewService;
 
-	/**
-	 * 관리자 리뷰 등록
-	 * 하나의 리뷰당 하나만 작성 가능
-	 */
+	@Operation(summary = "관리자 리뷰 등록", description = "하나의 리뷰에 대해 관리자 리뷰를 등록합니다.")
+	@ApiErrorCodeExamples({
+		ErrorCode.NOT_FOUND_REVIEW,
+		ErrorCode.ALREADY_WRITE_ADMIN_REVIEW,
+		ErrorCode.NOT_FOUND_USER,
+	})
 	@PostMapping("/{reviewId}")
 	@ResponseStatus(HttpStatus.CREATED)
 	public ApiResult<Void> createAdminReview(
@@ -47,9 +54,14 @@ public class AdminReviewController {
 		return ApiResult.ok();
 	}
 
-	/**
-	 * 관리자 리뷰 수정
-	 */
+	// 작성자 외 다른 어드민도 되게 하는게 맞는지 확인.(그렇다면 ID업데이트 해줘야하는지)
+	@Operation(summary = "관리자 리뷰 수정", description = "등록된 관리자 리뷰를 수정합니다.")
+	@ApiErrorCodeExamples({
+		ErrorCode.NOT_FOUND_REVIEW,
+		ErrorCode.NOT_FOUND_ADMIN_REVIEW,
+		ErrorCode.NOT_FOUND_USER,
+		ErrorCode.DOES_NOT_MATCH_USER_REVIEW
+	})
 	@PutMapping("/{reviewId}/update")
 	public ApiResult<Void> updateAdminReview(
 		@AuthenticationPrincipal DefaultCurrentUser defaultCurrentUser,
@@ -64,9 +76,13 @@ public class AdminReviewController {
 		return ApiResult.ok();
 	}
 
-	/**
-	 * 관리자 리뷰 삭제
-	 */
+	// 삭제는 어떤 어드민이든 할 수 있지만, 수정은 본인만 가능
+	@Operation(summary = "관리자 리뷰 삭제", description = "관리자 리뷰를 삭제합니다.")
+	@ApiErrorCodeExamples({
+		ErrorCode.NOT_FOUND_REVIEW,
+		ErrorCode.NOT_FOUND_ADMIN_REVIEW,
+		ErrorCode.NOT_FOUND_USER,
+	})
 	@PutMapping("/{reviewId}/delete")
 	public ApiResult<Void> deleteAdminReview(
 		@AuthenticationPrincipal DefaultCurrentUser defaultCurrentUser,
@@ -79,10 +95,7 @@ public class AdminReviewController {
 		return ApiResult.ok();
 	}
 
-	/**
-	 * 모든 리뷰 + AdminReview (1:1) 조회
-	 * 페이징/정렬 가능
-	 */
+	@Operation(summary = "모든 리뷰 + 관리자 리뷰 조회", description = "모든 사용자 리뷰와 1:1로 매칭된 관리자 리뷰를 조회합니다. 페이징/정렬 가능")
 	@GetMapping("/all")
 	public ApiResult<Page<AdminReviewDetailResponse>> getAllReviewsWithAdmin(
 		@Parameter Paging paging
@@ -91,10 +104,7 @@ public class AdminReviewController {
 		return ApiResult.ok(reviews);
 	}
 
-	/**
-	 * 리뷰는 있지만 AdminReview가 없는 것만 조회
-	 * 페이징/정렬 가능
-	 */
+	@Operation(summary = "관리자 리뷰 없는 리뷰 조회", description = "사용자 리뷰는 있지만 관리자 리뷰가 없는 리뷰만 조회합니다. 페이징/정렬 가능")
 	@GetMapping("/no-admin")
 	public ApiResult<Page<AdminNoReviewResponse>> getReviewsWithoutAdmin(
 		@Parameter Paging paging
@@ -103,9 +113,11 @@ public class AdminReviewController {
 		return ApiResult.ok(reviews);
 	}
 
-	/**
-	 * 사용자 리뷰 삭제
-	 */
+	@Operation(summary = "사용자 리뷰 강제 삭제", description = "관리자가 사용자 리뷰를 강제로 삭제합니다.")
+	@ApiErrorCodeExamples({
+		ErrorCode.NOT_FOUND_REVIEW,
+		ErrorCode.NOT_FOUND_USER
+	})
 	@PutMapping("/{reviewId}/force-delete")
 	public ApiResult<Void> deleteReview(
 		@AuthenticationPrincipal DefaultCurrentUser defaultCurrentUser,
@@ -118,3 +130,4 @@ public class AdminReviewController {
 		return ApiResult.ok();
 	}
 }
+

@@ -16,22 +16,26 @@ import org.springframework.web.bind.annotation.RestController;
 import com.shop.domain.discount.request.AdminDiscountCreateRequest;
 import com.shop.domain.discount.service.DiscountService;
 import com.shop.global.common.ApiResult;
+import com.shop.global.common.ErrorCode;
+import com.shop.global.docs.ApiErrorCodeExample;
+import com.shop.global.docs.ApiErrorCodeExamples;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "관리자 할인", description = "관리자 할인 API")
 @RestController
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
 @RequestMapping("/admin/discounts")
-@Tag(name = "관리자 할인 API")
 public class AdminDiscountController {
 
 	private final DiscountService adminProductService;
 
 	@Operation(summary = "관리자 상품 할인 등록")
+	@ApiErrorCodeExample(ErrorCode.NOT_FOUND_PRODUCT)
 	@PostMapping
 	@ResponseStatus(HttpStatus.OK)
 	public ApiResult<Void> createDiscount(@RequestBody @Valid AdminDiscountCreateRequest request) {

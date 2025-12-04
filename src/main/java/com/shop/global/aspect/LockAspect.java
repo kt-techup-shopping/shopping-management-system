@@ -58,7 +58,7 @@ public class LockAspect {
 			.map(redissonClient::getLock)
 			.toArray(RLock[]::new);
 
-		RLock finalLock = rLocks.length == 1 ? rLocks[0] : redissonClient.getMultiLock(rLocks); // ⭐ 다중 락 처리
+		RLock finalLock = rLocks.length == 1 ? rLocks[0] : redissonClient.getMultiLock(rLocks); //  다중 락 처리
 
 		try {
 			// 3. 락 획득 시도 (MultiLock은 내부적으로 모든 락에 대해 시도)

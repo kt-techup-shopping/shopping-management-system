@@ -70,7 +70,9 @@ public class AdminReviewService {
 		var adminAdminReview = adminReviewRepository.findByReviewIdAndIsDeletedFalse(reviewId)
 			.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ADMIN_REVIEW));
 
-		userRepository.findByIdOrThrow(userId, ErrorCode.NOT_FOUND_USER);
+		var user = userRepository.findByIdOrThrow(userId, ErrorCode.NOT_FOUND_USER);
+
+		Preconditions.validate(user.equals(adminAdminReview.getUser()), ErrorCode.DOES_NOT_MATCH_USER_REVIEW);
 
 		adminAdminReview.update(adminReviewUpdateRequest.title(), adminReviewUpdateRequest.content());
 	}
@@ -80,12 +82,14 @@ public class AdminReviewService {
 	 */
 	@Transactional
 	public void deleteAdminReview(Long reviewId, Long userId) {
+		var review = reviewRepository.findById(reviewId)
+			.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_REVIEW));
+
+		// 삭제 여부 검사
+		Preconditions.validate(!review.getIsDeleted(), ErrorCode.NOT_FOUND_REVIEW);
+
 		var adminAdminReview = adminReviewRepository.findByReviewIdAndIsDeletedFalse(reviewId)
 			.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ADMIN_REVIEW));
-
-		var user = userRepository.findByIdOrThrow(userId, ErrorCode.NOT_FOUND_USER);
-
-		Preconditions.validate(user.equals(adminAdminReview.getUser()), ErrorCode.DOES_NOT_MATCH_USER_REVIEW);
 
 		adminAdminReview.delete();
 	}

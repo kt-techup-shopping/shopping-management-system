@@ -48,8 +48,8 @@ public class Product extends BaseEntity {
 	@JoinColumn(name = "category_id")
 	private Category category;
 
-	@OneToMany(mappedBy = "product")
-	private List<Discount> discounts = new ArrayList<>();
+	// @OneToMany(mappedBy = "product")
+	// private List<Discount> discounts = new ArrayList<>();
 
 	public Product(String name, Long price, Long stock, String description, String color, Category category) {
 		Preconditions.validate(Strings.isNotBlank(name), ErrorCode.INVALID_PARAMETER);

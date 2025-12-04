@@ -75,7 +75,8 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 				discount.value,
 				discount.type,
 				discountedPriceExpression()
-			)
+			),
+			true
 		);
 	}
 
@@ -94,7 +95,8 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 				discount.value,
 				discount.type,
 				discountedPriceExpression()
-			)
+			),
+			true
 		);
 	}
 
@@ -122,7 +124,8 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 				discount.value,
 				discount.type,
 				discountedPriceExpression()
-			)
+			),
+			false
 		);
 	}
 
@@ -142,7 +145,8 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 				discount.value,
 				discount.type,
 				discountedPriceExpression()
-			)
+			),
+			false
 		);
 	}
 
@@ -151,15 +155,16 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 	public Page<AdminProductStockResponse> getStockList(String keyword, PageRequest pageable) {
 		var reservedStock = reservedStockExpression();
 		BooleanBuilder builder = new BooleanBuilder();
-		builder.and(stockKeywordFilter(keyword));			// 숫자면 상품 ID, 아니면 상품명 검색
+		builder.and(stockKeywordFilter(keyword)); 					// 숫자면 상품 ID, 아니면 상품명 검색
+		builder.and(filterDeleted(false)); 							// 삭제된 상품 포함
 
 		var content = jpaQueryFactory
 			.select(new QAdminProductStockResponse(
 				product.id,
 				product.name,
-				product.stock.subtract(reservedStock),		// 사용 가능한 재고 = 전체 재고 - 예약된 재고
-				reservedStock,								// 예약된 재고 (주문 상태 PENDING 또는 COMPLETED)
-				product.stock								// 전체 재고 = 사용 가능한 재고 + 예약된 재고
+				product.stock.subtract(reservedStock), 				// 사용 가능한 재고 = 전체 재고 - 예약된 재고
+				reservedStock, 										// 예약된 재고 (주문 상태 PENDING 또는 COMPLETED)
+				product.stock 										// 전체 재고 = 사용 가능한 재고 + 예약된 재고
 			))
 			.from(product)
 			.where(builder)
@@ -168,12 +173,13 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 			.limit(pageable.getPageSize())
 			.fetch();
 
-		long total = jpaQueryFactory
+		Long total = jpaQueryFactory
 			.select(product.id.count())
 			.from(product)
-			.fetch().size();
+			.where(builder)
+			.fetchOne();
 
-		return new PageImpl<>(content, pageable, total);
+		return new PageImpl<>(content, pageable, total != null ? total : 0L);
 	}
 
 	// 공통 상품 검색 쿼리
@@ -183,13 +189,15 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 		Boolean activeOnly,
 		ProductSort sort,
 		PageRequest pageable,
-		Expression<T> projection
+		Expression<T> projection,
+		boolean filterDeleted
 	) {
 		// 검색 조건 빌더
 		var builder = new BooleanBuilder();
 		builder.and(filterActive(activeOnly));
 		builder.and(containsProductName(keyword));
 		builder.and(categoryIn(categoryId));
+		builder.and(filterDeleted(filterDeleted));
 
 		var content = jpaQueryFactory
 			.select(projection)
@@ -205,20 +213,25 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 			.limit(pageable.getPageSize())
 			.fetch();
 
-		long total = jpaQueryFactory
+		var total = jpaQueryFactory
 			.select(product.id.count())
 			.from(product)
 			.where(builder)
-			.fetch().size();
+			.fetchOne();
 
-		return new PageImpl<>(content, pageable, total);
+		return new PageImpl<>(content, pageable, total != null ? total : 0L);
 	}
 
 	// 공통 상품 상세 조회 쿼리
 	private <T> T findProductDetail(
 		Long productId,
-		Expression<T> projection
+		Expression<T> projection,
+		boolean filterDeleted
 	) {
+		var builder = new BooleanBuilder();
+		builder.and(product.id.eq(productId));
+		builder.and(filterDeleted(filterDeleted));
+
 		return jpaQueryFactory
 			.select(projection)
 			.from(product)
@@ -227,8 +240,15 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 			.on(discount.product.eq(product)
 				.and(discount.id.eq(latestDiscountIdSubQuery()))
 			)
-			.where(product.id.eq(productId))
+			.where(builder)
 			.fetchOne();
+	}
+
+	// 삭제된 상품 필터링 조건 생성
+	private BooleanExpression filterDeleted(boolean filterDeleted) {
+		return filterDeleted
+			? product.isDeleted.isFalse()  // 삭제 제외
+			: null;                        // 삭제 포함
 	}
 
 	// 상품명에 키워드가 포함되는지 검색 조건 생성

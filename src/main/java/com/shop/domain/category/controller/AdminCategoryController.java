@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.shop.domain.category.request.AdminCategoryCreateRequest;
 import com.shop.domain.category.response.AdminCategoryListResponse;
+import com.shop.domain.category.response.AdminCategoryResponse;
+import com.shop.domain.category.response.CategoryDetailResponse;
 import com.shop.domain.category.service.CategoryService;
 import com.shop.global.common.ApiResult;
 import com.shop.global.common.ErrorCode;
@@ -30,9 +32,9 @@ public class AdminCategoryController {
 	@Operation(summary = "카테고리 만들기", description = "관리자가 카테고리를 등록하는 API")
 	@ApiErrorCodeExample(ErrorCode.NOT_FOUND_CATEGORY)
 	@PostMapping
-	public ApiResult<Void> createCategory(@RequestBody AdminCategoryCreateRequest request) {
-		categoryService.createCategory(request.name(), request.parentCategoryId());
-		return ApiResult.ok();
+	public ApiResult<CategoryDetailResponse> createCategory(@RequestBody AdminCategoryCreateRequest request) {
+		var category = categoryService.createCategory(request.name(), request.parentCategoryId());
+		return ApiResult.ok(category);
 	}
 
 	@Operation(summary = "카테고리 조회", description = "관리자 카테고리 목록 조회")

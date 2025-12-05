@@ -86,10 +86,23 @@ class CartTest {
 		var cartItem1 = new CartItem(2L, cart, product1);
 		var cartItem2 = new CartItem(3L, cart, product2);
 
-		// When
 		int totalCount = cart.getTotalItemCount();
 
-		// Then
 		assertThat(totalCount).isEqualTo(5);
+	}
+
+	@Test
+	void 카트_비우기() {
+		var user = new User("QWER", UUID.randomUUID(), "Qwer!234",
+			"QWER", "test@example.com", "010-1234-4567",
+			Gender.MALE, LocalDate.now(), Role.USER, Status.ACTIVE);
+		var cart = new Cart(user);
+		var product = new Product("테스트상품", 10000L, 100L);
+		var cartItem = new CartItem(3L, cart, product);
+		cart.addCartItem(cartItem);
+
+		cart.clearCartItems();
+
+		assertThat(cart.getCartItems()).isEmpty();
 	}
 }

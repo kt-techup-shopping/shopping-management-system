@@ -102,4 +102,20 @@ class CartItemTest {
 		);
 	}
 
+	@Test
+	void 전체_가격_계산() {
+		var user = new User("QWER", UUID.randomUUID(), "Qwer!234",
+			"QWER", "test@example.com", "010-1234-4567",
+			Gender.MALE, LocalDate.now(), Role.USER, Status.ACTIVE);
+		var cart = new Cart(user);
+		var product = new Product("테스트상품", 10000L, 100L);
+		var cartItem = new CartItem(5L, cart, product);
+
+		// When
+		Long totalPrice = cartItem.getTotalPrice();
+
+		// Then
+		assertThat(totalPrice).isEqualTo(50000L);
+	}
+
 }

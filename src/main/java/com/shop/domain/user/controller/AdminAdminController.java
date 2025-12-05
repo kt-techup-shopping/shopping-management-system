@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.shop.domain.user.model.User;
 import com.shop.domain.user.request.UserCreateRequest;
 import com.shop.domain.user.request.UserUpdateRequest;
+import com.shop.domain.user.response.UserStatusResponse;
 import com.shop.domain.user.response.UserUpdateResponse;
 import com.shop.domain.user.service.AdminService;
 import com.shop.domain.user.service.UserService;
@@ -66,8 +67,8 @@ public class AdminAdminController {
 	})
 	@ResponseStatus(HttpStatus.OK)
 	@Operation(summary = "관리자 권한 삭제", description = "관리자 계정의 권한을 일반 사용자로 변경합니다.")
-	public ApiResult<Void> updateUserRoleToUser(@PathVariable Long id) {
-		adminService.updateUserRoleToUser(id);
-		return ApiResult.ok();
+	public ApiResult<UserStatusResponse> updateUserRoleToUser(@PathVariable Long id) {
+		var user = adminService.updateUserRoleToUser(id);
+		return ApiResult.ok(UserStatusResponse.of(user));
 	}
 }

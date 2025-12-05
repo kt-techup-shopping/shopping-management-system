@@ -98,9 +98,11 @@ public class UserService {
 		user.delete();
 	}
 
-	public void deactivateUser(Long id) {
+	public User deactivateUser(Long id) {
 		var user = userRepository.findByIdOrThrow(id, ErrorCode.NOT_FOUND_USER);
 
 		user.deactivate();
+
+		return user;
 	}
 }

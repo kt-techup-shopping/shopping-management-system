@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.shop.domain.user.model.Gender;
 import com.shop.domain.user.response.UserDetailResponse;
 import com.shop.domain.user.response.UserSearchResponse;
+import com.shop.domain.user.response.UserStatusResponse;
+import com.shop.domain.user.response.UserUpdateResponse;
 import com.shop.domain.user.service.UserService;
 import com.shop.global.common.ApiResult;
 import com.shop.global.common.ErrorCode;
@@ -59,11 +61,7 @@ public class AdminUserController {
 	@ResponseStatus(HttpStatus.OK)
 	public ApiResult<UserDetailResponse> detail(@PathVariable Long id) {
 		var user = userService.detail(id);
-		return ApiResult.ok(new UserDetailResponse(
-			user.getId(),
-			user.getName(),
-			user.getEmail()
-		));
+		return ApiResult.ok(UserDetailResponse.of(user));
 	}
 
 	// 유저 정보 수정
@@ -71,9 +69,9 @@ public class AdminUserController {
 	@ApiErrorCodeExample(ErrorCode.NOT_FOUND_USER)
 	@PutMapping("/{id}")
 	@ResponseStatus(HttpStatus.OK)
-	public ApiResult<Void> update(@PathVariable Long id, @RequestBody @Valid UserUpdateRequest request) {
-		userService.update(id, request.name(), request.email(), request.mobile());
-		return ApiResult.ok();
+	public ApiResult<UserUpdateResponse> update(@PathVariable Long id, @RequestBody @Valid UserUpdateRequest request) {
+		var user = userService.update(id, request.name(), request.email(), request.mobile());
+		return ApiResult.ok(UserUpdateResponse.of(user));
 	}
 
 	// 유저 비활성화
@@ -81,9 +79,9 @@ public class AdminUserController {
 	@ApiErrorCodeExample(ErrorCode.NOT_FOUND_USER)
 	@PostMapping("/{id}/inactivate")
 	@ResponseStatus(HttpStatus.OK)
-	public ApiResult<Void> updateUserStatusInactive(@PathVariable Long id) {
-		userService.deactivateUser(id);
-		return ApiResult.ok();
+	public ApiResult<UserStatusResponse> updateUserStatusInactive(@PathVariable Long id) {
+		var user = userService.deactivateUser(id);
+		return ApiResult.ok(UserStatusResponse.of(user));
 	}
 }
 

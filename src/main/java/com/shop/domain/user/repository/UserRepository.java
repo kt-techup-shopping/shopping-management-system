@@ -20,6 +20,8 @@ public interface UserRepository extends UserRepositoryCustom, JpaRepository<User
 
 	Optional<User> findByUuid(UUID uuid);
 
+	Optional<User> findByIdAndIsDeletedFalse(Long id);
+
 	@Query("""
 	SELECT exists (SELECT u FROM User u WHERE u.loginId = ?1)
 """)

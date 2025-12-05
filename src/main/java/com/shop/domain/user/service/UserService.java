@@ -26,7 +26,7 @@ public class UserService {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 
-	public void create(UserCreateRequest request) {
+	public User create(UserCreateRequest request) {
 		Preconditions.validate(!userRepository.existsByLoginId(request.loginId()), ErrorCode.EXIST_USER);
 
 		var newUser = User.normalUser(
@@ -40,10 +40,12 @@ public class UserService {
 			request.birthday()
 		);
 
-			userRepository.save(newUser);
+		userRepository.save(newUser);
+
+		return newUser;
 	}
 
-	public void createAdmin(UserCreateRequest request) {
+	public User createAdmin(UserCreateRequest request) {
 		Preconditions.validate(!userRepository.existsByLoginId(request.loginId()), ErrorCode.EXIST_USER);
 
 		var newAdmin = User.admin(
@@ -58,10 +60,13 @@ public class UserService {
 		);
 
 		userRepository.save(newAdmin);
+
+		return newAdmin;
 	}
 
-	public boolean isDuplicateLoginId(String loginId) {
-		return userRepository.existsByLoginId(loginId);
+	public void isDuplicateLoginId(String loginId) {
+		var result = userRepository.existsByLoginId(loginId);
+		Preconditions.validate(!result, ErrorCode.EXIST_LOGINID);
 	}
 
 	public void changePassword(Long id, String oldPassword, String newPassword) {
@@ -83,10 +88,12 @@ public class UserService {
 		return userRepository.findByIdOrThrow(id, ErrorCode.NOT_FOUND_USER);
 	}
 
-	public void update(Long id, String name, String email, String mobile) {
+	public User update(Long id, String name, String email, String mobile) {
 		var user = userRepository.findByIdOrThrow(id, ErrorCode.NOT_FOUND_USER);
 
 		user.update(name, email, mobile);
+
+		return user;
 	}
 
 	public void delete(Long id) {
@@ -95,9 +102,11 @@ public class UserService {
 		user.delete();
 	}
 
-	public void deactivateUser(Long id) {
+	public User deactivateUser(Long id) {
 		var user = userRepository.findByIdOrThrow(id, ErrorCode.NOT_FOUND_USER);
 
 		user.deactivate();
+
+		return user;
 	}
 }

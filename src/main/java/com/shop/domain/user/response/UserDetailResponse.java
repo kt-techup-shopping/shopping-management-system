@@ -7,7 +7,7 @@ public record UserDetailResponse(
 	String name,
 	String email
 ) {
-	public static UserDetailResponse of(User user) {
+	public static UserDetailResponse from(User user) {
 		return new UserDetailResponse(
 			user.getId(),
 			user.getName(),

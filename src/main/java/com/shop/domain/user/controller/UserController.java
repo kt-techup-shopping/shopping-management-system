@@ -5,7 +5,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.shop.domain.user.model.User;
 import com.shop.domain.user.request.UserUpdateRequest;
+import com.shop.domain.user.response.UserUpdateResponse;
 import com.shop.domain.user.service.UserService;
 import com.shop.global.common.ApiResult;
 import com.shop.global.common.ErrorCode;
@@ -36,9 +36,9 @@ public class UserController {
 	@Operation(summary = "로그인 ID 중복 체크", description = "입력한 로그인 ID가 이미 존재하는지 확인합니다.")
 	@GetMapping("/duplicate-login-id")
 	@ResponseStatus(HttpStatus.OK)
-	public ApiResult<Boolean> isDuplicateLoginId(@RequestParam String loginId) {
-		var result = userService.isDuplicateLoginId(loginId);
-		return ApiResult.ok(result);
+	public ApiResult<Void> isDuplicateLoginId(@RequestParam String loginId) {
+		userService.isDuplicateLoginId(loginId);
+		return ApiResult.ok();
 	}
 
 	@Operation(summary = "사용자 삭제 (관리자용)", description = "관리자가 특정 사용자를 삭제합니다.")
@@ -65,12 +65,12 @@ public class UserController {
 	@ApiErrorCodeExample(ErrorCode.NOT_FOUND_USER)
 	@PutMapping("/my-info")
 	@ResponseStatus(HttpStatus.OK)
-	public ApiResult<Void> putMyInfo(
+	public ApiResult<UserUpdateResponse> putMyInfo(
 		@AuthenticationPrincipal CurrentUser currentUser,
 		@RequestBody @Valid UserUpdateRequest request
 	) {
-		userService.update(currentUser.getId(), request.name(), request.email(), request.mobile());
-		return ApiResult.ok();
+		var user = userService.update(currentUser.getId(), request.name(), request.email(), request.mobile());
+		return ApiResult.ok(UserUpdateResponse.from(user));
 	}
 
 	@Operation(summary = "회원 탈퇴", description = "현재 로그인한 사용자가 계정을 탈퇴합니다.")

@@ -166,7 +166,7 @@ class PaymentServiceTest {
 	}
 
 	@Test
-	void 결제_대기가_아닌_경우_실패() {
+	void 결제_대기가_아닌_경우_결제_완료_실패() {
 		Long paymentId = 1L;
 
 		Payment payment = Mockito.mock(Payment.class);
@@ -187,7 +187,7 @@ class PaymentServiceTest {
 	}
 
 	@Test
-	void 주문이_결제_대기가_아닌_경우_실패() {
+	void 주문이_결제_대기가_아닌_경우_결제_완료_실패() {
 		Long paymentId = 1L;
 
 		Payment payment = Mockito.mock(Payment.class);
@@ -203,8 +203,69 @@ class PaymentServiceTest {
 			.isInstanceOf(CustomException.class)
 			.extracting("errorCode")
 			.isEqualTo(ErrorCode.INVALID_ORDER_STATUS);
-		
+
 		verify(payment, never()).complete();
 		verify(order, never()).completePayment();
+	}
+
+	@Test
+	void 결제_실패_성공() {
+		Long paymentId = 1L;
+
+		Payment payment = Mockito.mock(Payment.class);
+		Order order = Mockito.mock(Order.class);
+
+		given(paymentRepository.findByIdOrThrow(paymentId, ErrorCode.NOT_FOUND_PAYMENT)).willReturn(payment);
+		given(payment.getOrder()).willReturn(order);
+		given(payment.isPending()).willReturn(true);
+		given(order.isPending()).willReturn(true);
+
+		paymentService.cancelPayment(paymentId);
+
+		verify(payment).cancel();
+		verify(order).resetToPending();
+	}
+
+	@Test
+	void 결제_대기가_아닌_경우_결제_취소_실패() {
+		Long paymentId = 1L;
+
+		Payment payment = Mockito.mock(Payment.class);
+		Order order = Mockito.mock(Order.class);
+
+		given(paymentRepository.findByIdOrThrow(paymentId, ErrorCode.NOT_FOUND_PAYMENT)).willReturn(payment);
+		given(payment.getOrder()).willReturn(order);
+
+		given(payment.isPending()).willReturn(false);
+
+		assertThatThrownBy(() -> paymentService.cancelPayment(paymentId))
+			.isInstanceOf(CustomException.class)
+			.extracting("errorCode")
+			.isEqualTo(ErrorCode.INVALID_PAYMENT_STATUS);
+
+		verify(payment, never()).cancel();
+		verify(order, never()).resetToPending();
+	}
+
+	@Test
+	void 주문이_결제_대기가_아닌_경우_결제_취소_실패() {
+		Long paymentId = 1L;
+
+		Payment payment = Mockito.mock(Payment.class);
+		Order order = Mockito.mock(Order.class);
+
+		given(paymentRepository.findByIdOrThrow(paymentId, ErrorCode.NOT_FOUND_PAYMENT)).willReturn(payment);
+		given(payment.getOrder()).willReturn(order);
+
+		given(payment.isPending()).willReturn(true);
+		given(order.isPending()).willReturn(false);
+
+		assertThatThrownBy(() -> paymentService.cancelPayment(paymentId))
+			.isInstanceOf(CustomException.class)
+			.extracting("errorCode")
+			.isEqualTo(ErrorCode.INVALID_ORDER_STATUS);
+
+		verify(payment, never()).cancel();
+		verify(order, never()).resetToPending();
 	}
 }

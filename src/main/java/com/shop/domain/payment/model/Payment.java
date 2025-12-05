@@ -2,6 +2,8 @@ package com.shop.domain.payment.model;
 
 import com.shop.global.common.BaseEntity;
 import com.shop.domain.order.model.Order;
+import com.shop.global.common.ErrorCode;
+import com.shop.global.common.Preconditions;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -45,6 +47,8 @@ public class Payment extends BaseEntity {
 	}
 
 	public static Payment create(Long totalAmount, Long discountAmount, Long deliveryFee, PaymentType type, Order order) {
+		Preconditions.validate(order != null, ErrorCode.REQUIRED_ORDER_FOR_PAYMENT);
+
 		Long finalAmount = totalAmount - discountAmount + deliveryFee;
 
 		return new Payment(

@@ -47,12 +47,24 @@ class DeliveryTest {
 
 	@ParameterizedTest
 	@NullAndEmptySource
-	void READY로_변경_실패_null_empty(String waybillNo) {
+	void READY로_변경_실패_NULL_EMPTY(String waybillNo) {
 		var order = new Order();
 		var delivery = new Delivery(order);
 
 		assertThrowsExactly(CustomException.class,
 			() -> delivery.updateReady(waybillNo)
 		);
+	}
+
+	@Test
+	void 배송_상태_SHIPPING으로_변경() {
+		var order = new Order();
+		var delivery = new Delivery(order);
+
+		delivery.updateReady("CJ-123-456-7890");
+		delivery.updateShipping();
+
+		assertThat(delivery.getDeliveryStatus()).isEqualTo(DeliveryStatus.SHIPPING);
+		assertThat(delivery.getWaybillNo()).isEqualTo("CJ-123-456-7890");
 	}
 }

@@ -26,7 +26,7 @@ public class UserService {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 
-	public void create(UserCreateRequest request) {
+	public User create(UserCreateRequest request) {
 		Preconditions.validate(!userRepository.existsByLoginId(request.loginId()), ErrorCode.EXIST_USER);
 
 		var newUser = User.normalUser(
@@ -40,7 +40,9 @@ public class UserService {
 			request.birthday()
 		);
 
-			userRepository.save(newUser);
+		userRepository.save(newUser);
+
+		return newUser;
 	}
 
 	public User createAdmin(UserCreateRequest request) {

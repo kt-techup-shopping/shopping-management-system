@@ -7,6 +7,7 @@ import com.shop.domain.auth.request.RefreshTokenRequest;
 import com.shop.domain.auth.service.AuthService;
 import com.shop.domain.user.request.UserCreateRequest;
 import com.shop.domain.user.request.UserUpdatePasswordRequest;
+import com.shop.domain.user.response.UserCreateResponse;
 import com.shop.domain.user.service.UserService;
 import com.shop.global.common.ApiResult;
 import com.shop.domain.auth.request.LoginRequest;
@@ -44,9 +45,9 @@ public class AuthController {
 	@ApiErrorCodeExample(ErrorCode.EXIST_USER)
 	@PostMapping("/signup")
 	@ResponseStatus(HttpStatus.CREATED)
-	public ApiResult<Void> signup(@RequestBody @Valid UserCreateRequest request) {
-		userService.create(request);
-		return ApiResult.ok();
+	public ApiResult<UserCreateResponse> signup(@RequestBody @Valid UserCreateRequest request) {
+		var user = userService.create(request);
+		return ApiResult.ok(UserCreateResponse.of(user));
 	}
 
 	@Operation(summary = "토큰 재발급", description = "Refresh Token을 이용해 Access Token을 재발급합니다.")

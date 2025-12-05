@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.shop.domain.user.model.User;
 import com.shop.domain.user.request.UserCreateRequest;
 import com.shop.domain.user.request.UserUpdateRequest;
+import com.shop.domain.user.response.UserCreateResponse;
 import com.shop.domain.user.response.UserStatusResponse;
 import com.shop.domain.user.response.UserUpdateResponse;
 import com.shop.domain.user.service.AdminService;
@@ -41,9 +41,9 @@ public class AdminAdminController {
 	@ApiErrorCodeExample(ErrorCode.EXIST_USER)
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public ApiResult<User> create(@RequestBody @Valid UserCreateRequest request) {
+	public ApiResult<UserCreateResponse> create(@RequestBody @Valid UserCreateRequest request) {
 		var admin = userService.createAdmin(request);
-		return ApiResult.ok(admin);
+		return ApiResult.ok(UserCreateResponse.of(admin));
 	}
 
 	// 관리자 정보 수정

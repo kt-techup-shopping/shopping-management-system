@@ -39,7 +39,21 @@ class CartTest {
 		cart.addCartItem(cartItem);
 
 		assertThat(cart.getCartItems()).hasSize(2);
+		//CartItem의 setCart 메서드로 인하여 기본적으로 추가되는 것이 있어서 사이즈가 2
 		assertThat(cart.getCartItems()).contains(cartItem);
 	}
 
+	@Test
+	void 카트_상품_제거() {
+		var user = new User("QWER", UUID.randomUUID(), "Qwer!234",
+			"QWER", "test@example.com", "010-1234-4567",
+			Gender.MALE, LocalDate.now(), Role.USER, Status.ACTIVE);
+		var cart = new Cart(user);
+		var product = new Product("테스트상품", 10000L, 100L);
+		var cartItem = new CartItem(5L, cart, product);
+
+		cart.removeCartItem(cartItem);
+
+		assertThat(cart.getCartItems()).isEmpty();
+	}
 }

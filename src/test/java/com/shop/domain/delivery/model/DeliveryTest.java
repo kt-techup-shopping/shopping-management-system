@@ -1,10 +1,14 @@
 package com.shop.domain.delivery.model;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 import com.shop.domain.order.model.Order;
+import com.shop.global.common.CustomException;
 
 class DeliveryTest {
 
@@ -39,5 +43,16 @@ class DeliveryTest {
 
 		assertThat(delivery.getDeliveryStatus()).isEqualTo(DeliveryStatus.READY);
 		assertThat(delivery.getWaybillNo()).isEqualTo("CJ-123-456-7890");
+	}
+
+	@ParameterizedTest
+	@NullAndEmptySource
+	void READY로_변경_실패_null_empty(String waybillNo) {
+		var order = new Order();
+		var delivery = new Delivery(order);
+
+		assertThrowsExactly(CustomException.class,
+			() -> delivery.updateReady(waybillNo)
+		);
 	}
 }

@@ -67,4 +67,17 @@ class DeliveryTest {
 		assertThat(delivery.getDeliveryStatus()).isEqualTo(DeliveryStatus.SHIPPING);
 		assertThat(delivery.getWaybillNo()).isEqualTo("CJ-123-456-7890");
 	}
+
+	@Test
+	void 배송_상태_DELIVERED로_변경() {
+		var order = new Order();
+		var delivery = new Delivery(order);
+
+		delivery.updateReady("CJ-123-456-7890");
+		delivery.updateShipping();
+		delivery.updateDelivered();
+
+		assertThat(delivery.getDeliveryStatus()).isEqualTo(DeliveryStatus.DELIVERED);
+		assertThat(delivery.getWaybillNo()).isEqualTo("CJ-123-456-7890");
+	}
 }

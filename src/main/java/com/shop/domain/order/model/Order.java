@@ -22,6 +22,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -38,7 +39,9 @@ public class Order extends BaseEntity {
 	private OrderStatus status;
 
 	private LocalDateTime deliveredAt;
-
+	
+	@Version
+	private Long version;
 	/**
 	 * Delivery는 Order 생성 시 자동 생성됨
 	 * - @PostPersist 사용 (기존 로직 유지)

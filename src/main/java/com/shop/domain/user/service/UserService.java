@@ -43,7 +43,7 @@ public class UserService {
 			userRepository.save(newUser);
 	}
 
-	public void createAdmin(UserCreateRequest request) {
+	public User createAdmin(UserCreateRequest request) {
 		Preconditions.validate(!userRepository.existsByLoginId(request.loginId()), ErrorCode.EXIST_USER);
 
 		var newAdmin = User.admin(
@@ -58,6 +58,8 @@ public class UserService {
 		);
 
 		userRepository.save(newAdmin);
+
+		return newAdmin;
 	}
 
 	public void isDuplicateLoginId(String loginId) {

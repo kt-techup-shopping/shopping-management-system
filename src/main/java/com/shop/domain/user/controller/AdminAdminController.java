@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.shop.domain.user.model.User;
 import com.shop.domain.user.request.UserCreateRequest;
 import com.shop.domain.user.request.UserUpdateRequest;
 import com.shop.domain.user.service.AdminService;
@@ -22,7 +23,6 @@ import com.shop.global.docs.ApiErrorCodeExamples;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 
 @Tag(name = "관리자(관리자용)", description = "관리자 계정 관리 API")
@@ -39,9 +39,9 @@ public class AdminAdminController {
 	@ApiErrorCodeExample(ErrorCode.EXIST_USER)
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public ApiResult<Void> create(@RequestBody @Valid UserCreateRequest request) {
-		userService.createAdmin(request);
-		return ApiResult.ok();
+	public ApiResult<User> create(@RequestBody @Valid UserCreateRequest request) {
+		var admin = userService.createAdmin(request);
+		return ApiResult.ok(admin);
 	}
 
 	// 관리자 정보 수정

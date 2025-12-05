@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.shop.domain.user.model.User;
 import com.shop.domain.user.request.UserCreateRequest;
 import com.shop.domain.user.request.UserUpdateRequest;
+import com.shop.domain.user.response.UserUpdateResponse;
 import com.shop.domain.user.service.AdminService;
 import com.shop.domain.user.service.UserService;
 import com.shop.global.common.ApiResult;
@@ -49,12 +50,12 @@ public class AdminAdminController {
 	@ApiErrorCodeExample(ErrorCode.NOT_FOUND_USER)
 	@PutMapping("/{id}")
 	@ResponseStatus(HttpStatus.OK)
-	public ApiResult<Void> updateAdminInfo(
+	public ApiResult<UserUpdateResponse> updateAdminInfo(
 		@RequestBody @Valid UserUpdateRequest request,
 		@PathVariable Long id
 	) {
-		userService.update(id, request.name(), request.email(), request.mobile());
-		return ApiResult.ok();
+		var user = userService.update(id, request.name(), request.email(), request.mobile());
+		return ApiResult.ok(UserUpdateResponse.of(user));
 	}
 
 	// 관리자 권한 삭제

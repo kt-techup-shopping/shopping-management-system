@@ -80,4 +80,16 @@ class DeliveryTest {
 		assertThat(delivery.getDeliveryStatus()).isEqualTo(DeliveryStatus.DELIVERED);
 		assertThat(delivery.getWaybillNo()).isEqualTo("CJ-123-456-7890");
 	}
+
+	@Test
+	void 송장번호_변경() {
+		var order = new Order();
+		var delivery = new Delivery(order);
+		delivery.updateReady("CJ-123-456-7890");
+
+		delivery.updateReady("HJ-987-654-3210");
+
+		assertThat(delivery.getDeliveryStatus()).isEqualTo(DeliveryStatus.READY);
+		assertThat(delivery.getWaybillNo()).isEqualTo("HJ-987-654-3210");
+	}
 }

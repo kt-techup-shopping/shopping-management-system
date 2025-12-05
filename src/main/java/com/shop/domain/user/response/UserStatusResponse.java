@@ -7,7 +7,7 @@ public record UserStatusResponse(
 	Long id,
 	Status status
 ) {
-	public static UserStatusResponse of(User user) {
+	public static UserStatusResponse from(User user) {
 		return new UserStatusResponse(
 			user.getId(),
 			user.getStatus()

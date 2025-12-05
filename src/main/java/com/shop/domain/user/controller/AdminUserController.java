@@ -61,7 +61,7 @@ public class AdminUserController {
 	@ResponseStatus(HttpStatus.OK)
 	public ApiResult<UserDetailResponse> detail(@PathVariable Long id) {
 		var user = userService.detail(id);
-		return ApiResult.ok(UserDetailResponse.of(user));
+		return ApiResult.ok(UserDetailResponse.from(user));
 	}
 
 	// 유저 정보 수정
@@ -71,7 +71,7 @@ public class AdminUserController {
 	@ResponseStatus(HttpStatus.OK)
 	public ApiResult<UserUpdateResponse> update(@PathVariable Long id, @RequestBody @Valid UserUpdateRequest request) {
 		var user = userService.update(id, request.name(), request.email(), request.mobile());
-		return ApiResult.ok(UserUpdateResponse.of(user));
+		return ApiResult.ok(UserUpdateResponse.from(user));
 	}
 
 	// 유저 비활성화
@@ -81,7 +81,7 @@ public class AdminUserController {
 	@ResponseStatus(HttpStatus.OK)
 	public ApiResult<UserStatusResponse> updateUserStatusInactive(@PathVariable Long id) {
 		var user = userService.deactivateUser(id);
-		return ApiResult.ok(UserStatusResponse.of(user));
+		return ApiResult.ok(UserStatusResponse.from(user));
 	}
 }
 

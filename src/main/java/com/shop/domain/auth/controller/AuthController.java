@@ -47,7 +47,7 @@ public class AuthController {
 	@ResponseStatus(HttpStatus.CREATED)
 	public ApiResult<UserCreateResponse> signup(@RequestBody @Valid UserCreateRequest request) {
 		var user = userService.create(request);
-		return ApiResult.ok(UserCreateResponse.of(user));
+		return ApiResult.ok(UserCreateResponse.from(user));
 	}
 
 	@Operation(summary = "토큰 재발급", description = "Refresh Token을 이용해 Access Token을 재발급합니다.")

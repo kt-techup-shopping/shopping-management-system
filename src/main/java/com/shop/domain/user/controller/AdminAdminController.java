@@ -43,7 +43,7 @@ public class AdminAdminController {
 	@ResponseStatus(HttpStatus.CREATED)
 	public ApiResult<UserCreateResponse> create(@RequestBody @Valid UserCreateRequest request) {
 		var admin = userService.createAdmin(request);
-		return ApiResult.ok(UserCreateResponse.of(admin));
+		return ApiResult.ok(UserCreateResponse.from(admin));
 	}
 
 	// 관리자 정보 수정
@@ -56,7 +56,7 @@ public class AdminAdminController {
 		@PathVariable Long id
 	) {
 		var user = userService.update(id, request.name(), request.email(), request.mobile());
-		return ApiResult.ok(UserUpdateResponse.of(user));
+		return ApiResult.ok(UserUpdateResponse.from(user));
 	}
 
 	// 관리자 권한 삭제
@@ -69,6 +69,6 @@ public class AdminAdminController {
 	@Operation(summary = "관리자 권한 삭제", description = "관리자 계정의 권한을 일반 사용자로 변경합니다.")
 	public ApiResult<UserStatusResponse> updateUserRoleToUser(@PathVariable Long id) {
 		var user = adminService.updateUserRoleToUser(id);
-		return ApiResult.ok(UserStatusResponse.of(user));
+		return ApiResult.ok(UserStatusResponse.from(user));
 	}
 }

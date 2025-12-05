@@ -8,7 +8,7 @@ public record UserUpdateResponse (
 	String email,
 	String mobile
 ){
-	public static UserUpdateResponse of(User user) {
+	public static UserUpdateResponse from(User user) {
 		return new UserUpdateResponse(
 			user.getId(),
 			user.getName(),

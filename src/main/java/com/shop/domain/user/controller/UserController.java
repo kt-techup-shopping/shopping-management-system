@@ -70,7 +70,7 @@ public class UserController {
 		@RequestBody @Valid UserUpdateRequest request
 	) {
 		var user = userService.update(currentUser.getId(), request.name(), request.email(), request.mobile());
-		return ApiResult.ok(UserUpdateResponse.of(user));
+		return ApiResult.ok(UserUpdateResponse.from(user));
 	}
 
 	@Operation(summary = "회원 탈퇴", description = "현재 로그인한 사용자가 계정을 탈퇴합니다.")

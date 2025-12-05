@@ -84,10 +84,12 @@ public class UserService {
 		return userRepository.findByIdOrThrow(id, ErrorCode.NOT_FOUND_USER);
 	}
 
-	public void update(Long id, String name, String email, String mobile) {
+	public User update(Long id, String name, String email, String mobile) {
 		var user = userRepository.findByIdOrThrow(id, ErrorCode.NOT_FOUND_USER);
 
 		user.update(name, email, mobile);
+
+		return user;
 	}
 
 	public void delete(Long id) {

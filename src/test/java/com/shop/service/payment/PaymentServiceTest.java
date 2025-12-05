@@ -15,6 +15,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.shop.domain.order.model.Order;
+import com.shop.domain.order.model.OrderStatus;
 import com.shop.domain.order.repository.OrderRepository;
 import com.shop.domain.payment.model.Payment;
 import com.shop.domain.payment.model.PaymentStatus;
@@ -144,5 +145,66 @@ class PaymentServiceTest {
 		assertThat(result)
 			.isNotNull()
 			.isEmpty();
+	}
+
+	@Test
+	void 결제_완료_성공() {
+		Long paymentId = 1L;
+
+		Payment payment = Mockito.mock(Payment.class);
+		Order order = Mockito.mock(Order.class);
+
+		given(paymentRepository.findByIdOrThrow(paymentId, ErrorCode.NOT_FOUND_PAYMENT)).willReturn(payment);
+		given(payment.getOrder()).willReturn(order);
+		given(payment.isPending()).willReturn(true);
+		given(order.isPending()).willReturn(true);
+
+		paymentService.completePayment(paymentId);
+
+		verify(payment).complete();
+		verify(order).completePayment();
+	}
+
+	@Test
+	void 결제_대기가_아닌_경우_실패() {
+		Long paymentId = 1L;
+
+		Payment payment = Mockito.mock(Payment.class);
+		Order order = Mockito.mock(Order.class);
+
+		given(paymentRepository.findByIdOrThrow(paymentId, ErrorCode.NOT_FOUND_PAYMENT)).willReturn(payment);
+		given(payment.getOrder()).willReturn(order);
+
+		given(payment.isPending()).willReturn(false);
+
+		assertThatThrownBy(() -> paymentService.completePayment(paymentId))
+			.isInstanceOf(CustomException.class)
+			.extracting("errorCode")
+			.isEqualTo(ErrorCode.INVALID_PAYMENT_STATUS);
+
+		verify(payment, never()).complete();
+		verify(order, never()).completePayment();
+	}
+
+	@Test
+	void 주문이_결제_대기가_아닌_경우_실패() {
+		Long paymentId = 1L;
+
+		Payment payment = Mockito.mock(Payment.class);
+		Order order = Mockito.mock(Order.class);
+
+		given(paymentRepository.findByIdOrThrow(paymentId, ErrorCode.NOT_FOUND_PAYMENT)).willReturn(payment);
+		given(payment.getOrder()).willReturn(order);
+
+		given(payment.isPending()).willReturn(true);
+		given(order.isPending()).willReturn(false);
+
+		assertThatThrownBy(() -> paymentService.completePayment(paymentId))
+			.isInstanceOf(CustomException.class)
+			.extracting("errorCode")
+			.isEqualTo(ErrorCode.INVALID_ORDER_STATUS);
+		
+		verify(payment, never()).complete();
+		verify(order, never()).completePayment();
 	}
 }

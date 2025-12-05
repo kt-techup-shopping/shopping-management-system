@@ -3,11 +3,14 @@ package com.shop.service.payment;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -17,6 +20,7 @@ import com.shop.domain.payment.model.Payment;
 import com.shop.domain.payment.model.PaymentStatus;
 import com.shop.domain.payment.model.PaymentType;
 import com.shop.domain.payment.repository.PaymentRepository;
+import com.shop.domain.payment.response.PaymentResponse;
 import com.shop.domain.payment.service.PaymentService;
 import com.shop.global.common.CustomException;
 import com.shop.global.common.ErrorCode;
@@ -95,5 +99,50 @@ class PaymentServiceTest {
 
 		verify(paymentRepository, Mockito.times(1)).save(Mockito.any(Payment.class));
 		verify(order, Mockito.times(1)).addPayment(Mockito.any(Payment.class));
+	}
+
+	@Test
+	void 결제_목록_조회_성공() {
+		Long orderId = 1L;
+		Order order = Mockito.mock(Order.class);
+
+		Payment payment1 = Mockito.mock(Payment.class);
+		Payment payment2 = Mockito.mock(Payment.class);
+		List<Payment> payments = List.of(payment1, payment2);
+
+		given(orderRepository.findByIdOrThrow(orderId, ErrorCode.NOT_FOUND_ORDER)).willReturn(order);
+		given(order.getPayments()).willReturn(payments);
+
+		PaymentResponse response1 = Mockito.mock(PaymentResponse.class);
+		PaymentResponse response2 = Mockito.mock(PaymentResponse.class);
+
+		try (MockedStatic<PaymentResponse> mockedStatic = Mockito.mockStatic(PaymentResponse.class)) {
+			mockedStatic.when(() -> PaymentResponse.of(payment1)).thenReturn(response1);
+			mockedStatic.when(() -> PaymentResponse.of(payment2)).thenReturn(response2);
+
+			var result = paymentService.getPayment(orderId);
+
+			assertThat(result)
+				.hasSize(2)
+				.containsExactly(response1, response2);
+
+			mockedStatic.verify(() -> PaymentResponse.of(payment1));
+			mockedStatic.verify(() -> PaymentResponse.of(payment2));
+		}
+	}
+
+	@Test
+	void 결제_목록이_없는_경우() {
+		Long orderId = 1L;
+		Order order = Mockito.mock(Order.class);
+
+		given(orderRepository.findByIdOrThrow(orderId, ErrorCode.NOT_FOUND_ORDER)).willReturn(order);
+		given(order.getPayments()).willReturn(List.of());
+
+		var result = paymentService.getPayment(orderId);
+
+		assertThat(result)
+			.isNotNull()
+			.isEmpty();
 	}
 }

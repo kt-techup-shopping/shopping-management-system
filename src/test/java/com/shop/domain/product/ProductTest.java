@@ -16,11 +16,23 @@ class ProductTest {
 	// 2. 메서드명 자체를 한글로 작성 (공백은 _ 대체) (v)
 	@Test
 	void 객체_생성_성공() {
+		// given
+		// when
+		// then
+
 		var product = new Product(
 			"테스트 상품명",
 			100_000L,
 			10L
 		);
+		// var product = new Product(
+		// 	"테스트 상품명",
+		// 	100_000L,
+		// 	10L,
+		// 	"테스트 설명",
+		// 	"red"
+		// )
+
 
 		// 객체가 잘 생성되었나
 		// product의 이름필드의 값이 테스트 상품명인가?

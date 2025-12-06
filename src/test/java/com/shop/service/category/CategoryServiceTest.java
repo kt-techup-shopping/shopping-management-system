@@ -38,7 +38,7 @@ class CategoryServiceTest {
 		var category = categoryService.createCategory(name, null);
 
 		// then
-		assertThat(category.name()).isEqualTo("상의");
+		assertThat(category.name()).isEqualTo(name);
 	}
 
 	@Test
@@ -57,9 +57,13 @@ class CategoryServiceTest {
 	@Test
 	void 카테고리_트리_조회_성공() {
 		// given
-		var root = new Category("상의", null);
-		var firstChild = new Category("티셔츠", root);
-		var secondChild = new Category("니트", root);
+		String rootName = "상의";
+		String firstChildName = "티셔츠";
+		String secondChildName = "니트";
+
+		var root = new Category(rootName, null);
+		var firstChild = new Category(firstChildName, root);
+		var secondChild = new Category(secondChildName, root);
 
 		root.getChildren().add(firstChild);
 		root.getChildren().add(secondChild);
@@ -72,10 +76,13 @@ class CategoryServiceTest {
 
 		// then
 		assertThat(response.categories()).hasSize(1);
-		assertThat(response.categories().getFirst().name()).isEqualTo("상의");
+		assertThat(response.categories().getFirst().name()).isEqualTo(rootName);
 
-		var child = response.categories().getFirst().children().getFirst();
-		assertThat(child.name()).isEqualTo("티셔츠");
+		var firstChildDto = response.categories().getFirst().children().getFirst();
+		assertThat(firstChildDto.name()).isEqualTo(firstChildName);
+
+		var secondChildDto = response.categories().getFirst().children().get(1);
+		assertThat(secondChildDto.name()).isEqualTo(secondChildName);
 	}
 
 	@Test

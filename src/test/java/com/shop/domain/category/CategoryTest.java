@@ -12,13 +12,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.shop.domain.category.model.Category;
 import com.shop.domain.category.repository.CategoryRepository;
-import com.shop.domain.category.response.CategoryDetailResponse;
 import com.shop.domain.category.service.CategoryService;
 import com.shop.global.common.CustomException;
 import com.shop.global.common.ErrorCode;
 
 @ExtendWith(MockitoExtension.class)
-class CategoryServiceTest {
+class CategoryTest {
 
 	@Mock
 	CategoryRepository categoryRepository;
@@ -37,7 +36,7 @@ class CategoryServiceTest {
 		var response = categoryService.createCategory(name, null);
 
 		// then
-		assertThat(response.name()).isEqualTo("상의");
+		assertThat(response.name()).isEqualTo(name);
 	}
 
 	@Test

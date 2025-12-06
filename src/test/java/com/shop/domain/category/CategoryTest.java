@@ -2,64 +2,53 @@ package com.shop.domain.category;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.*;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.shop.domain.category.model.Category;
+import com.shop.domain.category.repository.CategoryRepository;
+import com.shop.domain.category.response.CategoryDetailResponse;
+import com.shop.domain.category.service.CategoryService;
 import com.shop.global.common.CustomException;
+import com.shop.global.common.ErrorCode;
 
-public class CategoryTest {
+@ExtendWith(MockitoExtension.class)
+class CategoryServiceTest {
 
-	@Test
-	void 부모_카테고리_생성_성공() {
-		var category = new Category(
-			"상의",
-			null
-		);
+	@Mock
+	CategoryRepository categoryRepository;
 
-		assertThat(category.getName()).isEqualTo("상의");
-		assertThat(category.getParent()).isEqualTo(null);
-	}
+	@InjectMocks
+	CategoryService categoryService;
 
 	@Test
-	void 자식_카테고리_생성_성공() {
-		var parentCategory = new Category(
-			"상의",
-			null
-		);
+	void 카테고리_생성_성공() {
+		// given
+		var name = "상의";
+		given(categoryRepository.save(any(Category.class)))
+			.willReturn(new Category(name, null));
 
-		var category = new Category(
-			"티셔츠",
-			parentCategory
-		);
-		assertThat(category.getName()).isEqualTo("티셔츠");
-		assertThat(category.getParent()).isEqualTo(parentCategory);
+		// when
+		var response = categoryService.createCategory(name, null);
+
+		// then
+		assertThat(response.name()).isEqualTo("상의");
 	}
 
-	@ParameterizedTest
-	@NullAndEmptySource
-	void 부모_카테고리_생성_실패__카테고리명_null_이거나_공백(String name) {
-		assertThrowsExactly(CustomException.class, () -> new Category(
-			name,
-			null
-		));
+	@Test
+	void 카테고리_생성_실패__존재하지_않는_부모ID() {
+		// given
+		var invalidParentId = 999L;
+		given(categoryRepository.findByIdOrThrow(invalidParentId, ErrorCode.NOT_FOUND_CATEGORY))
+			.willThrow(new CustomException(ErrorCode.NOT_FOUND_CATEGORY));
+
+		// when & then
+		assertThrowsExactly(CustomException.class,
+			() -> categoryService.createCategory("상의", invalidParentId));
 	}
-
-
-	@ParameterizedTest
-	@NullAndEmptySource
-	void 자식_카테고리_생성_실패__카테고리명_null_이거나_공백(String name) {
-		var parentCategory = new Category(
-			"상의",
-			null
-		);
-
-		assertThrowsExactly(CustomException.class, () -> new Category(
-			name,
-			parentCategory
-		));
-	}
-
 }

@@ -135,4 +135,21 @@ class ReviewServiceTest {
 		assertThat(response.userUuid()).isEqualTo(baseUser.getUuid().toString());
 		assertThat(response.productId()).isEqualTo(product.getId());
 	}
+
+	@Test
+	@DisplayName("성공 - 리뷰 삭제")
+	void deleteReview_Success(){
+		// given
+		Review review = new Review("제목", "내용", orderProduct, baseUser);
+		ReflectionTestUtils.setField(review, "id", 1L);
+
+		given(reviewRepository.findById(review.getId())).willReturn(Optional.of(review));
+		given(userRepository.findByIdOrThrow(eq(baseUser.getId()), any())).willReturn(baseUser);
+
+		// when
+		reviewService.deleteReview(review.getId(), baseUser.getId());
+
+		// then
+		assertThat(review.getIsDeleted()).isTrue();
+	}
 }

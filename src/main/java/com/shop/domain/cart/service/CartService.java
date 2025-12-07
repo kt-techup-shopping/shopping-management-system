@@ -107,11 +107,6 @@ public class CartService {
 		cartItemRepository.deleteAllByCartUserId(userId);
 	}
 
-	@Transactional // TODO.. 모든 장바구니에서 해당 상품을 없애는 관리자 기능이지만 미구현
-	public void removeProductFromAllCarts(Long productId) {
-		cartItemRepository.deleteByProductId(productId);
-	}
-
 	// 장바구니를 생성하는 메서드
 	private Cart getOrCreateCart(Long userId) {
 		return cartRepository.findByUserId(userId)

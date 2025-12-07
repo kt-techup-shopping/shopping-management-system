@@ -90,6 +90,7 @@ public class Product extends BaseEntity {
 		Preconditions.validate(Strings.isNotBlank(color), ErrorCode.INVALID_PARAMETER);
 		Preconditions.validate(price >= 0, ErrorCode.INVALID_PARAMETER);
 		Preconditions.validate(quantity >= 0, ErrorCode.INVALID_STOCK_QUANTITY);
+		Preconditions.validate(!(quantity == 0 && status != ProductStatus.SOLD_OUT), ErrorCode.INVALID_PARAMETER);
 
 		this.name = name;
 		this.price = price;
@@ -157,7 +158,7 @@ public class Product extends BaseEntity {
 	}
 
 	public void updateStock(Long quantity) {
-		Preconditions.validate(quantity >= 0, ErrorCode.INVALID_STOCK_QUANTITY);
+		Preconditions.validate(quantity > 0, ErrorCode.INVALID_STOCK_QUANTITY);
 		this.stock = quantity;
 	}
 }

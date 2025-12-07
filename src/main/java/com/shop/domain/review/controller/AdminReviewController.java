@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import com.shop.domain.review.request.AdminReviewCreateRequest;
 import com.shop.domain.review.request.AdminReviewUpdateRequest;
 import com.shop.domain.review.response.AdminNoReviewResponse;
+import com.shop.domain.review.response.AdminReviewCreateAndUpdateResponse;
 import com.shop.domain.review.response.AdminReviewDetailResponse;
 import com.shop.domain.review.service.AdminReviewService;
 import com.shop.global.common.ApiResult;
@@ -41,17 +42,16 @@ public class AdminReviewController {
 	})
 	@PostMapping("/{reviewId}")
 	@ResponseStatus(HttpStatus.CREATED)
-	public ApiResult<Void> createAdminReview(
+	public ApiResult<AdminReviewCreateAndUpdateResponse> createAdminReview(
 		@AuthenticationPrincipal DefaultCurrentUser defaultCurrentUser,
 		@RequestBody @Valid AdminReviewCreateRequest adminReviewCreateRequest,
 		@PathVariable Long reviewId
 	) {
-		adminReviewService.createAdminReview(
+		return ApiResult.ok(adminReviewService.createAdminReview(
 			adminReviewCreateRequest,
 			reviewId,
 			defaultCurrentUser.getId()
-		);
-		return ApiResult.ok();
+		));
 	}
 
 	// 작성자 외 다른 어드민도 되게 하는게 맞는지 확인.(그렇다면 ID업데이트 해줘야하는지)
@@ -63,17 +63,16 @@ public class AdminReviewController {
 		ErrorCode.DOES_NOT_MATCH_USER_REVIEW
 	})
 	@PutMapping("/{reviewId}/update")
-	public ApiResult<Void> updateAdminReview(
+	public ApiResult<AdminReviewCreateAndUpdateResponse> updateAdminReview(
 		@AuthenticationPrincipal DefaultCurrentUser defaultCurrentUser,
 		@RequestBody @Valid AdminReviewUpdateRequest adminReviewUpdateRequest,
 		@PathVariable Long reviewId
 	) {
-		adminReviewService.updateAdminReview(
+		return ApiResult.ok(adminReviewService.updateAdminReview(
 			adminReviewUpdateRequest,
 			reviewId,
 			defaultCurrentUser.getId()
-		);
-		return ApiResult.ok();
+		));
 	}
 
 	// 삭제는 어떤 어드민이든 할 수 있지만, 수정은 본인만 가능

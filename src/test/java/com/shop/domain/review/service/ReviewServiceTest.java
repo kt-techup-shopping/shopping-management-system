@@ -304,4 +304,42 @@ class ReviewServiceTest {
 		assertThat(review.getLikeCount()).isEqualTo(0); // 좋아요 수 유지
 		assertThat(review.getDislikeCount()).isEqualTo(0); // 싫어요 수 감소
 	}
+
+	@Test
+	@DisplayName("성공 - 단일 리뷰 조회")
+	void getReview_Success() {
+		// given
+		Long reviewId = 1L;
+		Long loginUserId = baseUser.getId();
+
+		ReviewDetailQueryResponse dto = new ReviewDetailQueryResponse(
+			reviewId,
+			"제목",
+			"내용",
+			orderProduct.getId(),
+			baseUser.getUuid(),
+			5,    // likeCount
+			2,    // dislikeCount
+			ReviewLikeType.LIKE,  // 로그인 유저의 좋아요 상태
+			null // admin 리뷰 여부
+		);
+
+		given(reviewRepository.findReviewById(reviewId, loginUserId))
+			.willReturn(dto);
+
+		// when
+		ReviewResponse response = reviewService.getReview(reviewId, loginUserId);
+
+		// then
+		assertThat(response).isNotNull();
+		assertThat(response.reviewId()).isEqualTo(dto.reviewId());
+		assertThat(response.title()).isEqualTo(dto.title());
+		assertThat(response.content()).isEqualTo(dto.content());
+		assertThat(response.orderProductId()).isEqualTo(dto.orderProductId());
+		assertThat(response.userUuid()).isEqualTo(dto.userUuid());
+		assertThat(response.likeCount()).isEqualTo(dto.likeCount());
+		assertThat(response.dislikeCount()).isEqualTo(dto.dislikeCount());
+		assertThat(response.reviewLikeType()).isEqualTo(dto.reviewLikeType());
+		assertThat(response.adminReview()).isEqualTo(dto.adminReview());
+	}
 }

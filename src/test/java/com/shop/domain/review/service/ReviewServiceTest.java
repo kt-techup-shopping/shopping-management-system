@@ -397,4 +397,61 @@ class ReviewServiceTest {
 		assertThat(response.reviewLikeType()).isEqualTo(ReviewLikeType.LIKE);
 		assertThat(response.adminReview()).isNull();
 	}
+
+	@Test
+	@DisplayName("성공 - 특정 사용자 리뷰 조회(페이지네이션)")
+	void getUserReviewsByUuid_Success() {
+		// given
+		String userUuid = baseUser.getUuid().toString();
+		Long loginUserId = baseUser.getId();
+		PageRequest pageable = PageRequest.of(0, 10);
+
+		// 조회 대상 사용자
+		given(userRepository.findByUuid(UUID.fromString(userUuid)))
+			.willReturn(Optional.of(baseUser));
+
+		// Mock된 DAO 결과
+		ReviewPageQueryResponse daoResponse = new ReviewPageQueryResponse(
+			1L,                  // reviewId
+			"제목",              // title
+			"내용",              // content
+			orderProduct.getId(),// orderProductId
+			baseUser.getUuid(), // userUuid
+			3,                   // likeCount
+			1,                   // dislikeCount
+			ReviewLikeType.LIKE, // reviewLikeType
+			null                // adminReview
+		);
+
+		given(reviewRepository.findReviewsByUser(
+			eq(baseUser.getId()),
+			eq(loginUserId),
+			eq((int) pageable.getOffset()),
+			eq(pageable.getPageSize())
+		)).willReturn(List.of(daoResponse));
+
+		given(reviewRepository.countReviewsByUser(baseUser.getId()))
+			.willReturn(1L);
+
+		// when
+		Page<ReviewPageResponse> result =
+			reviewService.getUserReviewsByUuid(userUuid, loginUserId, pageable);
+
+		// then
+		assertThat(result).isNotNull();
+		assertThat(result.getTotalElements()).isEqualTo(1);
+		assertThat(result.getContent().size()).isEqualTo(1);
+
+		ReviewPageResponse response = result.getContent().get(0);
+
+		assertThat(response.reviewId()).isEqualTo(daoResponse.reviewId());
+		assertThat(response.title()).isEqualTo("제목");
+		assertThat(response.content()).isEqualTo("내용");
+		assertThat(response.orderProductId()).isEqualTo(orderProduct.getId());
+		assertThat(response.userUuid()).isEqualTo(baseUser.getUuid());
+		assertThat(response.likeCount()).isEqualTo(3);
+		assertThat(response.dislikeCount()).isEqualTo(1);
+		assertThat(response.reviewLikeType()).isEqualTo(ReviewLikeType.LIKE);
+		assertThat(response.adminReview()).isNull();
+	}
 }

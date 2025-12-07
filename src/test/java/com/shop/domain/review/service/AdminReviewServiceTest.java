@@ -239,4 +239,22 @@ class AdminReviewServiceTest {
 		assertThat(r.userUuid()).isEqualTo(review.getUser().getUuid());
 	}
 
+	@Test
+	@DisplayName("성공 - 사용자 리뷰 삭제")
+	void deleteReview_success() {
+		// given
+		when(reviewRepository.findById(review.getId()))
+			.thenReturn(Optional.of(review));
+		when(userRepository.findByIdOrThrow(adminUser.getId(), ErrorCode.NOT_FOUND_USER))
+			.thenReturn(adminUser);
+
+		// when
+		assertDoesNotThrow(() ->
+			adminReviewService.deleteReview(review.getId(), adminUser.getId()));
+
+		// then
+		assertTrue(review.getIsDeleted());
+	}
+
+
 }

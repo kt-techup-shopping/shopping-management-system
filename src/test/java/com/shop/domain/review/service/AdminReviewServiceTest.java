@@ -33,6 +33,8 @@ import com.shop.domain.review.repository.AdminReviewRepository;
 import com.shop.domain.review.repository.ReviewRepository;
 import com.shop.domain.review.request.AdminReviewCreateRequest;
 import com.shop.domain.review.request.AdminReviewUpdateRequest;
+import com.shop.domain.review.response.AdminNoReviewQueryResponse;
+import com.shop.domain.review.response.AdminNoReviewResponse;
 import com.shop.domain.review.response.AdminReviewCreateAndUpdateResponse;
 import com.shop.domain.review.response.AdminReviewDetailQueryResponse;
 import com.shop.domain.review.response.AdminReviewDetailResponse;
@@ -203,6 +205,38 @@ class AdminReviewServiceTest {
 		assertThat(r.userUuid()).isEqualTo(review.getUser().getUuid());
 		assertThat(r.adminReview().title()).isEqualTo("관리자 제목");
 		assertThat(r.adminReview().content()).isEqualTo("관리자 내용");
+	}
+
+	@Test
+	@DisplayName("성공 - 어드민 리뷰가 없는 리뷰 전체 조회")
+	void getReviewsWithoutAdmin_success() {
+		// given
+		PageRequest pageable = PageRequest.of(0, 10);
+
+		AdminNoReviewQueryResponse queryResponse =
+			new AdminNoReviewQueryResponse(
+				review.getId(),
+				review.getTitle(),
+				review.getContent(),
+				review.getUser().getUuid()
+			);
+
+		when(adminReviewRepository.findReviewsWithoutAdmin(pageable))
+			.thenReturn(List.of(queryResponse));
+		when(adminReviewRepository.countReviewsWithoutAdmin()).thenReturn(1L);
+
+		// when
+		Page<AdminNoReviewResponse> result =
+			adminReviewService.getReviewsWithoutAdmin(pageable);
+
+		// then
+		assertThat(result.getTotalElements()).isEqualTo(1);
+		AdminNoReviewResponse r = result.getContent().get(0);
+
+		assertThat(r.reviewId()).isEqualTo(review.getId());
+		assertThat(r.reviewTitle()).isEqualTo(review.getTitle());
+		assertThat(r.reviewContent()).isEqualTo(review.getContent());
+		assertThat(r.userUuid()).isEqualTo(review.getUser().getUuid());
 	}
 
 }

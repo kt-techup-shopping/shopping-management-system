@@ -1,13 +1,26 @@
 package com.shop.domain.review.service;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.given;
+
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import com.shop.domain.category.model.Category;
@@ -17,9 +30,20 @@ import com.shop.domain.order.repository.OrderRepository;
 import com.shop.domain.orderproduct.model.OrderProduct;
 import com.shop.domain.orderproduct.repository.OrderProductRepository;
 import com.shop.domain.product.model.Product;
+import com.shop.domain.review.model.Review;
+import com.shop.domain.review.model.ReviewLike;
+import com.shop.domain.review.model.ReviewLikeType;
 import com.shop.domain.review.repository.ReviewLikeRepository;
 import com.shop.domain.review.repository.ReviewRepository;
 
+import com.shop.domain.review.request.ReviewCreateRequest;
+import com.shop.domain.review.request.ReviewLikeRequest;
+import com.shop.domain.review.request.ReviewUpdateRequest;
+import com.shop.domain.review.response.ReviewCreateAndUpdateResponse;
+import com.shop.domain.review.response.ReviewDetailQueryResponse;
+import com.shop.domain.review.response.ReviewPageQueryResponse;
+import com.shop.domain.review.response.ReviewPageResponse;
+import com.shop.domain.review.response.ReviewResponse;
 import com.shop.domain.user.model.Gender;
 import com.shop.domain.user.model.Role;
 import com.shop.domain.user.model.Status;
@@ -69,5 +93,24 @@ class ReviewServiceTest {
 		ReflectionTestUtils.setField(order, "id", 1L);
 		ReflectionTestUtils.setField(orderProduct, "id", 1L);
 
+	}@Test
+	@DisplayName("성공 - 리뷰 생성")
+	void createReview_Success() {
+		// given
+		ReviewCreateRequest request = new ReviewCreateRequest("제목", "내용");
+		given(orderProductRepository.findById(orderProduct.getId())).willReturn(Optional.of(orderProduct));
+		given(userRepository.findByIdOrThrow(eq(baseUser.getId()), any())).willReturn(baseUser);
+		given(reviewRepository.existsByUserIdAndOrderProductIdAndIsDeletedFalse(baseUser.getId(), orderProduct.getId())).willReturn(false);
+
+		// when
+		ReviewCreateAndUpdateResponse response = reviewService.createReview(request, orderProduct.getId(),
+			baseUser.getId());
+
+		// then
+		assertThat(response).isNotNull();
+		assertThat(response.title()).isEqualTo(request.title());
+		assertThat(response.content()).isEqualTo(request.content());
+		assertThat(response.userUuid()).isEqualTo(baseUser.getUuid().toString());
+		assertThat(response.productId()).isEqualTo(product.getId());
 	}
 }

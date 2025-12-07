@@ -20,42 +20,6 @@ public class ProductService {
 	private final ProductRepository productRepository;
 	private final CategoryService categoryService;
 
-	public void soldOut(Long id) {
-		var product = productRepository.findByIdOrThrow(id);
-
-		product.soldOut();
-	}
-
-	public void inActivate(Long id) {
-		var product = productRepository.findByIdOrThrow(id);
-
-		product.inActivate();
-	}
-
-	public void activate(Long id) {
-		var product = productRepository.findByIdOrThrow(id);
-
-		product.activate();
-	}
-
-	public void delete(Long id) {
-		var product = productRepository.findByIdOrThrow(id);
-
-		product.delete();
-	}
-
-	public void decreaseStock(Long id, Long quantity) {
-		var product = productRepository.findByIdOrThrow(id);
-
-		product.decreaseStock(quantity);
-	}
-
-	public void increaseStock(Long id, Long quantity) {
-		var product = productRepository.findByIdOrThrow(id);
-
-		product.increaseStock(quantity);
-	}
-
 	// 상품 목록 조회
 	public Page<ProductSearchResponse> getSearchList(String keyword, Long categoryId, Boolean activeOnly, String sort,
 		PageRequest pageable) {

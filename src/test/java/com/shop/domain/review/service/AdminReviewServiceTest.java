@@ -29,6 +29,7 @@ import com.shop.domain.review.model.Review;
 import com.shop.domain.review.repository.AdminReviewRepository;
 import com.shop.domain.review.repository.ReviewRepository;
 import com.shop.domain.review.request.AdminReviewCreateRequest;
+import com.shop.domain.review.request.AdminReviewUpdateRequest;
 import com.shop.domain.review.response.AdminReviewCreateAndUpdateResponse;
 import com.shop.domain.user.model.User;
 import com.shop.domain.user.repository.UserRepository;
@@ -83,25 +84,50 @@ class AdminReviewServiceTest {
 		ReflectionTestUtils.setField(orderProduct, "id", 1L);
 		ReflectionTestUtils.setField(review, "id", 1L);
 	}
+
 	@Test
-	@DisplayName("어드민 리뷰 생성 성공")
+	@DisplayName("성공 - 어드민 리뷰 생성")
 	void createAdminReview_success() {
 		// given
-		Long reviewId = 1L;
-		Long userId = 10L;
-
 		AdminReviewCreateRequest request = new AdminReviewCreateRequest("관리자 제목", "관리자 내용");
 
-		when(reviewRepository.findById(reviewId)).thenReturn(Optional.of(review));
-		when(adminReviewRepository.existsByReviewIdAndIsDeletedFalse(reviewId)).thenReturn(false);
-		when(userRepository.findByIdOrThrow(userId, ErrorCode.NOT_FOUND_USER)).thenReturn(adminUser);
+		when(reviewRepository.findById(review.getId())).thenReturn(Optional.of(review));
+		when(adminReviewRepository.existsByReviewIdAndIsDeletedFalse(review.getId())).thenReturn(false);
+		when(userRepository.findByIdOrThrow(adminUser.getId(), ErrorCode.NOT_FOUND_USER)).thenReturn(adminUser);
 
 		AdminReview adminReview = new AdminReview("관리자 제목", "관리자 내용", review, adminUser);
 		when(adminReviewRepository.save(any(AdminReview.class))).thenReturn(adminReview);
 
 		// when
 		AdminReviewCreateAndUpdateResponse response =
-			adminReviewService.createAdminReview(request, reviewId, userId);
+			adminReviewService.createAdminReview(request, review.getId(), adminUser.getId());
+
+		// then
+		assertThat(response.reviewId()).isEqualTo(review.getId());
+		assertThat(response.title()).isEqualTo(review.getTitle());
+		assertThat(response.content()).isEqualTo(review.getContent());
+		assertThat(response.productId()).isEqualTo(review.getOrderProduct().getProduct().getId());
+		assertThat(response.userUuid()).isEqualTo(review.getUser().getUuid());
+		assertThat(response.likeCount()).isEqualTo(review.getLikeCount());
+		assertThat(response.dislikeCount()).isEqualTo(review.getDislikeCount());
+		assertThat(response.adminReviewTitle()).isEqualTo(request.title());
+		assertThat(response.adminReviewContent()).isEqualTo(request.content());
+	}
+
+	@Test
+	@DisplayName("성공 - 어드민 리뷰 수정")
+	void updateAdminReview_success() {
+		// given
+		AdminReviewUpdateRequest request = new AdminReviewUpdateRequest("수정된 관리자 제목", "수정된 관리자 내용");
+		AdminReview adminReview = new AdminReview("관리자 제목", "관리자 내용", review, adminUser);
+
+		when(reviewRepository.findById(review.getId())).thenReturn(Optional.of(review));
+		when(adminReviewRepository.findByReviewIdAndIsDeletedFalse(review.getId())).thenReturn(Optional.of(adminReview));
+		when(userRepository.findByIdOrThrow(adminUser.getId(), ErrorCode.NOT_FOUND_USER)).thenReturn(adminUser);
+
+		// when
+		AdminReviewCreateAndUpdateResponse response =
+			adminReviewService.updateAdminReview(request, review.getId(), adminUser.getId());
 
 		// then
 		assertThat(response.reviewId()).isEqualTo(review.getId());

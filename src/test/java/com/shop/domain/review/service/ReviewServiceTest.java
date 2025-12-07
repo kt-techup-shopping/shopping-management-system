@@ -113,4 +113,26 @@ class ReviewServiceTest {
 		assertThat(response.userUuid()).isEqualTo(baseUser.getUuid().toString());
 		assertThat(response.productId()).isEqualTo(product.getId());
 	}
+
+	@Test
+	@DisplayName("성공 - 리뷰 수정")
+	void updateReview_Success(){
+		// given
+		ReviewUpdateRequest request = new ReviewUpdateRequest("수정된 제목", "수정된 내용");
+		Review review = new Review("제목", "내용", orderProduct, baseUser);
+		ReflectionTestUtils.setField(review, "id", 1L);
+
+		given(reviewRepository.findById(review.getId())).willReturn(Optional.of(review));
+		given(userRepository.findByIdOrThrow(eq(baseUser.getId()), any())).willReturn(baseUser);
+
+		// when
+		ReviewCreateAndUpdateResponse response = reviewService.updateReview(request, review.getId(), baseUser.getId());
+
+		// then
+		assertThat(response).isNotNull();
+		assertThat(response.title()).isEqualTo(request.title());
+		assertThat(response.content()).isEqualTo(request.content());
+		assertThat(response.userUuid()).isEqualTo(baseUser.getUuid().toString());
+		assertThat(response.productId()).isEqualTo(product.getId());
+	}
 }

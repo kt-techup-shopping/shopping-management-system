@@ -342,4 +342,59 @@ class ReviewServiceTest {
 		assertThat(response.reviewLikeType()).isEqualTo(dto.reviewLikeType());
 		assertThat(response.adminReview()).isEqualTo(dto.adminReview());
 	}
+
+	@Test
+	@DisplayName("성공 - 특정 상품 리뷰 조회(정렬 + 페이지네이션)")
+	void getReviewPage_WithProductId_Success() {
+		// given
+		Long loginUserId = baseUser.getId();
+		Long productId = 10L;
+		String sort = "latest"; // 최신순
+		PageRequest pageable = PageRequest.of(0, 10);
+
+		// Mock DAO 결과
+		ReviewPageQueryResponse daoResponse = new ReviewPageQueryResponse(
+			1L,
+			"리뷰 제목",
+			"리뷰 내용",
+			orderProduct.getId(),
+			baseUser.getUuid(),
+			5,                      // likeCount
+			1,                      // dislikeCount
+			ReviewLikeType.LIKE,    // reviewLikeType
+			null                   // adminReview
+		);
+
+		given(reviewRepository.findReviews(
+			eq(loginUserId),
+			eq(productId),
+			eq(pageable.getPageNumber()),
+			eq(pageable.getPageSize()),
+			eq(sort)
+		)).willReturn(List.of(daoResponse));
+
+		given(reviewRepository.countReviewsByProduct(productId))
+			.willReturn(1L);
+
+		// when
+		Page<ReviewPageResponse> result =
+			reviewService.getReviewPage(loginUserId, productId, sort, pageable);
+
+		// then
+		assertThat(result).isNotNull();
+		assertThat(result.getTotalElements()).isEqualTo(1);
+		assertThat(result.getContent().size()).isEqualTo(1);
+
+		ReviewPageResponse response = result.getContent().get(0);
+
+		assertThat(response.reviewId()).isEqualTo(daoResponse.reviewId());
+		assertThat(response.title()).isEqualTo("리뷰 제목");
+		assertThat(response.content()).isEqualTo("리뷰 내용");
+		assertThat(response.orderProductId()).isEqualTo(orderProduct.getId());
+		assertThat(response.userUuid()).isEqualTo(baseUser.getUuid());
+		assertThat(response.likeCount()).isEqualTo(5);
+		assertThat(response.dislikeCount()).isEqualTo(1);
+		assertThat(response.reviewLikeType()).isEqualTo(ReviewLikeType.LIKE);
+		assertThat(response.adminReview()).isNull();
+	}
 }

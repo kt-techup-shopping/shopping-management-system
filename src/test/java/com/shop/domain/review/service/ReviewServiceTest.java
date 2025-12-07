@@ -200,4 +200,30 @@ class ReviewServiceTest {
 		assertThat(review.getLikeCount()).isEqualTo(0); // 좋아요 수 유지
 		assertThat(review.getDislikeCount()).isEqualTo(1); // 싫어요 수 증가
 	}
+
+	@Test
+	@DisplayName("성공 - 리뷰 좋아요 : 좋아요 -> 싫어요")
+	void updateReviewLike_ToDislikeFromLike_Success(){
+		// given
+		ReviewLikeRequest request = new ReviewLikeRequest(ReviewLikeType.DISLIKE);
+		Review review = new Review("제목", "내용", orderProduct, baseUser);
+		ReflectionTestUtils.setField(review, "id", 1L);
+		ReflectionTestUtils.setField(review, "likeCount", 1);
+		ReviewLike reviewLike = new ReviewLike(review, baseUser, ReviewLikeType.LIKE);
+
+		given(reviewRepository.findById(review.getId())).willReturn(Optional.of(review));
+		given(userRepository.findByIdOrThrow(eq(baseUser.getId()), any())).willReturn(baseUser);
+		given(reviewLikeRepository.findByReviewAndUserAndIsDeletedFalse(review, baseUser)).willReturn(Optional.of(reviewLike));
+
+		// when
+		ReviewCreateAndUpdateResponse response = reviewService.updateReviewLike(request, review.getId(),
+			baseUser.getId());
+
+		// then
+		assertThat(response).isNotNull();
+		assertThat(response.likeCount()).isEqualTo(review.getLikeCount());
+		assertThat(response.disLikeCount()).isEqualTo(review.getDislikeCount());
+		assertThat(review.getLikeCount()).isEqualTo(0); // 좋아요 수 감소
+		assertThat(review.getDislikeCount()).isEqualTo(1); // 싫어요 수 증가
+	}
 }

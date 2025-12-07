@@ -83,5 +83,35 @@ class AdminReviewServiceTest {
 		ReflectionTestUtils.setField(orderProduct, "id", 1L);
 		ReflectionTestUtils.setField(review, "id", 1L);
 	}
+	@Test
+	@DisplayName("어드민 리뷰 생성 성공")
+	void createAdminReview_success() {
+		// given
+		Long reviewId = 1L;
+		Long userId = 10L;
 
+		AdminReviewCreateRequest request = new AdminReviewCreateRequest("관리자 제목", "관리자 내용");
+
+		when(reviewRepository.findById(reviewId)).thenReturn(Optional.of(review));
+		when(adminReviewRepository.existsByReviewIdAndIsDeletedFalse(reviewId)).thenReturn(false);
+		when(userRepository.findByIdOrThrow(userId, ErrorCode.NOT_FOUND_USER)).thenReturn(adminUser);
+
+		AdminReview adminReview = new AdminReview("관리자 제목", "관리자 내용", review, adminUser);
+		when(adminReviewRepository.save(any(AdminReview.class))).thenReturn(adminReview);
+
+		// when
+		AdminReviewCreateAndUpdateResponse response =
+			adminReviewService.createAdminReview(request, reviewId, userId);
+
+		// then
+		assertThat(response.reviewId()).isEqualTo(review.getId());
+		assertThat(response.title()).isEqualTo(review.getTitle());
+		assertThat(response.content()).isEqualTo(review.getContent());
+		assertThat(response.productId()).isEqualTo(review.getOrderProduct().getProduct().getId());
+		assertThat(response.userUuid()).isEqualTo(review.getUser().getUuid());
+		assertThat(response.likeCount()).isEqualTo(review.getLikeCount());
+		assertThat(response.dislikeCount()).isEqualTo(review.getDislikeCount());
+		assertThat(response.adminReviewTitle()).isEqualTo(request.title());
+		assertThat(response.adminReviewContent()).isEqualTo(request.content());
+	}
 }

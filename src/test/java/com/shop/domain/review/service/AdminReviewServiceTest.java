@@ -140,4 +140,25 @@ class AdminReviewServiceTest {
 		assertThat(response.adminReviewTitle()).isEqualTo(request.title());
 		assertThat(response.adminReviewContent()).isEqualTo(request.content());
 	}
+
+	@Test
+	@DisplayName("성공 - 어드민 리뷰 삭제")
+	void deleteAdminReview_success() {
+		// given
+		AdminReview adminReview = new AdminReview("관리자 제목", "관리자 내용", review, adminUser);
+		ReflectionTestUtils.setField(adminReview, "id", 10L);
+
+		when(reviewRepository.findById(review.getId()))
+			.thenReturn(Optional.of(review));
+		when(adminReviewRepository.findByReviewIdAndIsDeletedFalse(review.getId()))
+			.thenReturn(Optional.of(adminReview));
+
+		// when
+		assertDoesNotThrow(() ->
+			adminReviewService.deleteAdminReview(review.getId(), adminUser.getId()));
+
+		// then
+		assertTrue(adminReview.getIsDeleted());
+	}
+
 }

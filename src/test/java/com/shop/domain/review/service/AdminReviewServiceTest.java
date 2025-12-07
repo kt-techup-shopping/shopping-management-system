@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -17,6 +18,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import com.shop.domain.category.model.Category;
@@ -31,6 +34,9 @@ import com.shop.domain.review.repository.ReviewRepository;
 import com.shop.domain.review.request.AdminReviewCreateRequest;
 import com.shop.domain.review.request.AdminReviewUpdateRequest;
 import com.shop.domain.review.response.AdminReviewCreateAndUpdateResponse;
+import com.shop.domain.review.response.AdminReviewDetailQueryResponse;
+import com.shop.domain.review.response.AdminReviewDetailResponse;
+import com.shop.domain.review.response.AdminReviewQueryResponse;
 import com.shop.domain.user.model.User;
 import com.shop.domain.user.repository.UserRepository;
 import com.shop.domain.user.model.Gender;
@@ -159,6 +165,44 @@ class AdminReviewServiceTest {
 
 		// then
 		assertTrue(adminReview.getIsDeleted());
+	}
+
+	@Test
+	@DisplayName("성공 - 어드민 리뷰가 있는 리뷰 전체 조회")
+	void getAllReviewsWithAdmin_success() {
+		// given
+		PageRequest pageable = PageRequest.of(0, 10);
+
+		AdminReviewDetailQueryResponse queryResponse =
+			new AdminReviewDetailQueryResponse(
+				review.getId(),
+				review.getTitle(),
+				review.getContent(),
+				review.getUser().getUuid(),
+				new AdminReviewQueryResponse(
+					"관리자 제목",
+					"관리자 내용"
+				)
+			);
+
+		when(adminReviewRepository.findAllReviewsWithAdmin(pageable))
+			.thenReturn(List.of(queryResponse));
+		when(adminReviewRepository.countAllReviews()).thenReturn(1L);
+
+		// when
+		Page<AdminReviewDetailResponse> result =
+			adminReviewService.getAllReviewsWithAdmin(pageable);
+
+		// then
+		assertThat(result.getTotalElements()).isEqualTo(1);
+		AdminReviewDetailResponse r = result.getContent().get(0);
+
+		assertThat(r.reviewId()).isEqualTo(review.getId());
+		assertThat(r.reviewTitle()).isEqualTo(review.getTitle());
+		assertThat(r.reviewContent()).isEqualTo(review.getContent());
+		assertThat(r.userUuid()).isEqualTo(review.getUser().getUuid());
+		assertThat(r.adminReview().title()).isEqualTo("관리자 제목");
+		assertThat(r.adminReview().content()).isEqualTo("관리자 내용");
 	}
 
 }

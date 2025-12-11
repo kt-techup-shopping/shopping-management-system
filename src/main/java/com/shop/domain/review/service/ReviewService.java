@@ -19,6 +19,7 @@ import com.shop.domain.review.repository.ReviewRepository;
 import com.shop.domain.review.request.ReviewCreateRequest;
 import com.shop.domain.review.request.ReviewLikeRequest;
 import com.shop.domain.review.request.ReviewUpdateRequest;
+import com.shop.domain.review.response.ReviewCreateAndUpdateResponse;
 import com.shop.domain.review.response.ReviewDetailQueryResponse;
 import com.shop.domain.review.response.ReviewPageQueryResponse;
 import com.shop.domain.review.response.ReviewPageResponse;
@@ -49,7 +50,7 @@ public class ReviewService {
 	 * 삭제 후 재작성 가능
 	 */
 	@Transactional
-	public void createReview(ReviewCreateRequest reviewCreateRequest, Long orderProductId, Long userId) {
+	public ReviewCreateAndUpdateResponse createReview(ReviewCreateRequest reviewCreateRequest, Long orderProductId, Long userId) {
 		var orderProduct = orderProductRepository
 			.findById(orderProductId)
 			.orElseThrow(() -> new CustomException(ErrorCode.NOT_PURCHASED_PRODUCT));
@@ -69,6 +70,8 @@ public class ReviewService {
 		);
 
 		reviewRepository.save(review);
+
+		return ReviewCreateAndUpdateResponse.from(review);
 	}
 
 	/**
@@ -94,7 +97,7 @@ public class ReviewService {
 	 * 리뷰가 삭제되지 않은 경우에만 가능
 	 */
 	@Transactional
-	public void updateReview(ReviewUpdateRequest reviewUpdateRequest, Long reviewId, Long userId) {
+	public ReviewCreateAndUpdateResponse updateReview(ReviewUpdateRequest reviewUpdateRequest, Long reviewId, Long userId) {
 		var review = reviewRepository.findById(reviewId)
 			.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_REVIEW));
 
@@ -109,6 +112,8 @@ public class ReviewService {
 			reviewUpdateRequest.title(),
 			reviewUpdateRequest.content()
 		);
+
+		return ReviewCreateAndUpdateResponse.from(review);
 	}
 
 	/**
@@ -118,7 +123,7 @@ public class ReviewService {
 	 * 좋아요 <-> 싫어요 상태 전환
 	 */
 	@Transactional
-	public void updateReviewLike(ReviewLikeRequest reviewLikeRequest, Long reviewId, Long userId) {
+	public ReviewCreateAndUpdateResponse updateReviewLike(ReviewLikeRequest reviewLikeRequest, Long reviewId, Long userId) {
 		Review review = reviewRepository.findById(reviewId)
 			.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_REVIEW));
 
@@ -134,7 +139,7 @@ public class ReviewService {
 		if (existing == null) {
 			// 첫 클릭
 			saveNewLike(review, user, newType);
-			return;
+			return ReviewCreateAndUpdateResponse.from(review);
 		}
 
 		ReviewLikeType currentType = existing.getReviewLikeType();
@@ -142,12 +147,13 @@ public class ReviewService {
 		if (currentType == newType) {
 			// 같은 상태 클릭 → 취소
 			cancelLike(existing, review, newType);
-			return;
+			return ReviewCreateAndUpdateResponse.from(review);
 		}
 
 		// 다른 상태 클릭 → 기존 취소 + 새 상태 적용
 		cancelLike(existing, review, currentType);
 		saveNewLike(review, user, newType);
+		return ReviewCreateAndUpdateResponse.from(review);
 	}
 
 	/**

@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.shop.domain.review.request.ReviewCreateRequest;
 import com.shop.domain.review.request.ReviewLikeRequest;
 import com.shop.domain.review.request.ReviewUpdateRequest;
+import com.shop.domain.review.response.ReviewCreateAndUpdateResponse;
 import com.shop.domain.review.response.ReviewPageResponse;
 import com.shop.domain.review.response.ReviewResponse;
 import com.shop.domain.review.service.ReviewService;
-import com.shop.domain.user.model.User;
 import com.shop.global.common.ApiResult;
 import com.shop.global.common.ErrorCode;
 import com.shop.global.common.Paging;
@@ -52,13 +52,12 @@ public class ReviewController {
 	})
 	@PostMapping("/{orderProductId}")
 	@ResponseStatus(HttpStatus.CREATED)
-	public ApiResult<Void> createReview(
+	public ApiResult<ReviewCreateAndUpdateResponse> createReview(
 		@AuthenticationPrincipal DefaultCurrentUser defaultCurrentUser,
 		@RequestBody @Valid ReviewCreateRequest reviewCreateRequest,
 		@PathVariable Long orderProductId
 	) {
-		reviewService.createReview(reviewCreateRequest, orderProductId, defaultCurrentUser.getId());
-		return ApiResult.ok();
+		return ApiResult.ok(reviewService.createReview(reviewCreateRequest, orderProductId, defaultCurrentUser.getId()));
 	}
 
 	@Operation(summary = "리뷰 삭제", description = "사용자가 작성한 리뷰를 삭제합니다.")
@@ -83,13 +82,12 @@ public class ReviewController {
 		ErrorCode.DOES_NOT_MATCH_USER_REVIEW,
 	})
 	@PutMapping("/{reviewId}/update")
-	public ApiResult<Void> updateReview(
+	public ApiResult<ReviewCreateAndUpdateResponse> updateReview(
 		@AuthenticationPrincipal DefaultCurrentUser defaultCurrentUser,
 		@RequestBody @Valid ReviewUpdateRequest reviewUpdateRequest,
 		@PathVariable Long reviewId
 	) {
-		reviewService.updateReview(reviewUpdateRequest, reviewId, defaultCurrentUser.getId());
-		return ApiResult.ok();
+		return ApiResult.ok(reviewService.updateReview(reviewUpdateRequest, reviewId, defaultCurrentUser.getId()));
 	}
 
 	@Operation(summary = "리뷰 좋아요/좋아요 취소", description = "단일 API로 좋아요 상태를 토글할 수 있습니다.")
@@ -98,13 +96,12 @@ public class ReviewController {
 		ErrorCode.NOT_FOUND_USER,
 	})
 	@PutMapping("/{reviewId}/like")
-	public ApiResult<Void> updateReviewLike(
+	public ApiResult<ReviewCreateAndUpdateResponse> updateReviewLike(
 		@AuthenticationPrincipal DefaultCurrentUser defaultCurrentUser,
 		@RequestBody @Valid ReviewLikeRequest reviewLikeRequest,
 		@PathVariable Long reviewId
 	) {
-		reviewService.updateReviewLike(reviewLikeRequest, reviewId, defaultCurrentUser.getId());
-		return ApiResult.ok();
+		return ApiResult.ok(reviewService.updateReviewLike(reviewLikeRequest, reviewId, defaultCurrentUser.getId()));
 	}
 
 	@Operation(summary = "상품 리뷰 조회", description = "특정 상품에 대한 리뷰 목록을 조회합니다. 정렬(좋아요순, 최신순, 오래된순)과 페이지네이션 지원")

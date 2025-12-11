@@ -14,6 +14,7 @@ import com.shop.domain.review.repository.ReviewRepository;
 import com.shop.domain.review.request.AdminReviewCreateRequest;
 import com.shop.domain.review.request.AdminReviewUpdateRequest;
 import com.shop.domain.review.response.AdminNoReviewQueryResponse;
+import com.shop.domain.review.response.AdminReviewCreateAndUpdateResponse;
 import com.shop.domain.review.response.AdminReviewDetailQueryResponse;
 import com.shop.domain.review.response.AdminReviewDetailResponse;
 import com.shop.domain.review.response.AdminNoReviewResponse;
@@ -36,7 +37,7 @@ public class AdminReviewService {
 	 * 어드민 리뷰를 작성하는 API
 	 */
 	@Transactional
-	public void createAdminReview(AdminReviewCreateRequest adminReviewCreateRequest, Long reviewId, Long userId) {
+	public AdminReviewCreateAndUpdateResponse createAdminReview(AdminReviewCreateRequest adminReviewCreateRequest, Long reviewId, Long userId) {
 		var review = reviewRepository.findById(reviewId)
 			.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_REVIEW));
 
@@ -54,27 +55,51 @@ public class AdminReviewService {
 			review, user);
 
 		adminReviewRepository.save(adminReview);
+
+		return new AdminReviewCreateAndUpdateResponse(
+			review.getId(),
+			review.getTitle(),
+			review.getContent(),
+			review.getOrderProduct().getProduct().getId(),
+			review.getUser().getUuid(),
+			review.getLikeCount(),
+			review.getDislikeCount(),
+			adminReview.getTitle(),
+			adminReview.getContent()
+		);
 	}
 
 	/**
 	 * 어드민 리뷰를 수정하는 API
 	 */
 	@Transactional
-	public void updateAdminReview(AdminReviewUpdateRequest adminReviewUpdateRequest, Long reviewId, Long userId) {
+	public AdminReviewCreateAndUpdateResponse updateAdminReview(AdminReviewUpdateRequest adminReviewUpdateRequest, Long reviewId, Long userId) {
 		var review = reviewRepository.findById(reviewId)
 			.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_REVIEW));
 
 		// 삭제 여부 검사
 		Preconditions.validate(!review.getIsDeleted(), ErrorCode.NOT_FOUND_REVIEW);
 
-		var adminAdminReview = adminReviewRepository.findByReviewIdAndIsDeletedFalse(reviewId)
+		var adminReview = adminReviewRepository.findByReviewIdAndIsDeletedFalse(reviewId)
 			.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ADMIN_REVIEW));
 
 		var user = userRepository.findByIdOrThrow(userId, ErrorCode.NOT_FOUND_USER);
 
-		Preconditions.validate(user.equals(adminAdminReview.getUser()), ErrorCode.DOES_NOT_MATCH_USER_REVIEW);
+		Preconditions.validate(user.equals(adminReview.getUser()), ErrorCode.DOES_NOT_MATCH_USER_REVIEW);
 
-		adminAdminReview.update(adminReviewUpdateRequest.title(), adminReviewUpdateRequest.content());
+		adminReview.update(adminReviewUpdateRequest.title(), adminReviewUpdateRequest.content());
+
+		return new AdminReviewCreateAndUpdateResponse(
+			review.getId(),
+			review.getTitle(),
+			review.getContent(),
+			review.getOrderProduct().getProduct().getId(),
+			review.getUser().getUuid(),
+			review.getLikeCount(),
+			review.getDislikeCount(),
+			adminReview.getTitle(),
+			adminReview.getContent()
+		);
 	}
 
 	/**

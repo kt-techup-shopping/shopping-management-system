@@ -175,7 +175,7 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
 				new QReviewDetailQueryResponse(
 					review.id,
 					review.title,
-					review.content, // 전체 content
+					review.content,
 					review.orderProduct.id,
 					user.uuid,
 					review.likeCount,
@@ -187,7 +187,6 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
 			.from(review)
 			.join(review.user, user)
 			.leftJoin(reviewLike)
-			.leftJoin(adminReview)
 			.on(
 				reviewLike.review.eq(review)
 					.and(loginUserId != null
@@ -195,6 +194,7 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
 						: Expressions.FALSE)
 					.and(reviewLike.isDeleted.isFalse())
 			)
+			.leftJoin(adminReview)
 			.on(
 				adminReview.review.eq(review)
 					.and(adminReview.isDeleted.isFalse())

@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.shop.domain.user.request.UserCreateRequest;
 import com.shop.domain.user.request.UserUpdateRequest;
+import com.shop.domain.user.response.UserCreateResponse;
+import com.shop.domain.user.response.UserStatusResponse;
+import com.shop.domain.user.response.UserUpdateResponse;
 import com.shop.domain.user.service.AdminService;
 import com.shop.domain.user.service.UserService;
 import com.shop.global.common.ApiResult;
@@ -22,7 +25,6 @@ import com.shop.global.docs.ApiErrorCodeExamples;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 
 @Tag(name = "관리자(관리자용)", description = "관리자 계정 관리 API")
@@ -39,9 +41,9 @@ public class AdminAdminController {
 	@ApiErrorCodeExample(ErrorCode.EXIST_USER)
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public ApiResult<Void> create(@RequestBody @Valid UserCreateRequest request) {
-		userService.createAdmin(request);
-		return ApiResult.ok();
+	public ApiResult<UserCreateResponse> create(@RequestBody @Valid UserCreateRequest request) {
+		var admin = userService.createAdmin(request);
+		return ApiResult.ok(UserCreateResponse.from(admin));
 	}
 
 	// 관리자 정보 수정
@@ -49,12 +51,12 @@ public class AdminAdminController {
 	@ApiErrorCodeExample(ErrorCode.NOT_FOUND_USER)
 	@PutMapping("/{id}")
 	@ResponseStatus(HttpStatus.OK)
-	public ApiResult<Void> updateAdminInfo(
+	public ApiResult<UserUpdateResponse> updateAdminInfo(
 		@RequestBody @Valid UserUpdateRequest request,
 		@PathVariable Long id
 	) {
-		userService.update(id, request.name(), request.email(), request.mobile());
-		return ApiResult.ok();
+		var user = userService.update(id, request.name(), request.email(), request.mobile());
+		return ApiResult.ok(UserUpdateResponse.from(user));
 	}
 
 	// 관리자 권한 삭제
@@ -65,8 +67,8 @@ public class AdminAdminController {
 	})
 	@ResponseStatus(HttpStatus.OK)
 	@Operation(summary = "관리자 권한 삭제", description = "관리자 계정의 권한을 일반 사용자로 변경합니다.")
-	public ApiResult<Void> updateUserRoleToUser(@PathVariable Long id) {
-		adminService.updateUserRoleToUser(id);
-		return ApiResult.ok();
+	public ApiResult<UserStatusResponse> updateUserRoleToUser(@PathVariable Long id) {
+		var user = adminService.updateUserRoleToUser(id);
+		return ApiResult.ok(UserStatusResponse.from(user));
 	}
 }

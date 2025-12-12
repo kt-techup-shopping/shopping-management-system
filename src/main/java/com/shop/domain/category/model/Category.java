@@ -3,8 +3,12 @@ package com.shop.domain.category.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.util.Strings;
+
 import com.shop.domain.product.model.Product;
 import com.shop.global.common.BaseEntity;
+import com.shop.global.common.ErrorCode;
+import com.shop.global.common.Preconditions;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -32,6 +36,8 @@ public class Category extends BaseEntity {
 	// private List<Product> products = new ArrayList<>();
 
 	public Category(String name, Category parent) {
+		Preconditions.validate(Strings.isNotBlank(name), ErrorCode.INVALID_PARAMETER);
+
 		this.name = name;
 		this.parent = parent;
 	}

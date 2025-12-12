@@ -84,8 +84,8 @@ public class AdminProductService {
 	}
 
 	// 관리자 상품 정보 수정
-	@Lock(key = Lock.Key.PRODUCT, index = 0, waitTime = 1000, leaseTime = 500, timeUnit = TimeUnit.MILLISECONDS)
-	public AdminProductInfoResponse updateDetail(Long id, String name, Long price, String description, String color, Long deltaStock,
+	@Lock(key = Lock.Key.PRODUCT, index = 0, waitTime = 1500, leaseTime = 1000, timeUnit = TimeUnit.MILLISECONDS)
+	public AdminProductInfoResponse updateDetail(Long id, String name, Long price, String description, String color, Long quantity,
 		String status, Long categoryId) {
 		var product = productRepository.findByIdOrThrow(id);
 		var category = categoryRepository.findByIdOrThrow(categoryId, ErrorCode.NOT_FOUND_CATEGORY);
@@ -95,7 +95,7 @@ public class AdminProductService {
 			price,
 			description,
 			color,
-			deltaStock,
+			quantity,
 			ProductStatus.from(status),
 			category
 		);

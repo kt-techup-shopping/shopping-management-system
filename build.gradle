@@ -69,7 +69,7 @@ plugins {
 }
 
 allprojects {
-	group = 'com.kt'
+	group = 'com.shop'
 	version = '0.0.1-SNAPSHOT'
 
 	sourceCompatibility = JavaVersion.VERSION_21

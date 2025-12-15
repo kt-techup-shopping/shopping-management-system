@@ -5,7 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.shop.global.common.ErrorCode;
+import com.shop.ErrorCode;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

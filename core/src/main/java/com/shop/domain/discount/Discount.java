@@ -1,7 +1,7 @@
 package com.shop.domain.discount;
 
-import com.shop.domain.product.model.Product;
-import com.shop.global.common.BaseEntity;
+import com.shop.BaseEntity;
+import com.shop.domain.product.Product;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

@@ -10,11 +10,13 @@ import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.HandlerMethod;
+
 import com.shop.global.common.ErrorCode;
 import com.shop.global.docs.ApiErrorCodeExample;
 import com.shop.global.docs.ApiErrorCodeExamples;
-import com.shop.global.docs.SwaggerErrorResponse;
 import com.shop.global.docs.ExampleHolder;
+import com.shop.global.docs.SwaggerErrorResponse;
+
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;

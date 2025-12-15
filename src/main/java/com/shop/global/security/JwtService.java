@@ -1,7 +1,6 @@
 package com.shop.global.security;
 
 import java.util.Date;
-import java.util.List;
 
 import org.springframework.stereotype.Component;
 

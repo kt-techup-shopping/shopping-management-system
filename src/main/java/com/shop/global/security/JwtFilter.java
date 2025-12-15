@@ -1,7 +1,6 @@
 package com.shop.global.security;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.http.HttpHeaders;
@@ -9,7 +8,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.shop.domain.user.model.Role;
 import com.shop.domain.user.model.Status;
 import com.shop.domain.user.repository.UserRepository;
 

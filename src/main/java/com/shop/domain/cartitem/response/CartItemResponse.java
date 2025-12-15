@@ -1,6 +1,7 @@
 package com.shop.domain.cartitem.response;
 
 import com.shop.domain.cartitem.model.CartItem;
+import com.shop.domain.category.model.Category;
 
 public record CartItemResponse(
 	Long cartItemId,
@@ -11,6 +12,9 @@ public record CartItemResponse(
 	Long quantity,
 	Long totalPrice,
 	Long totalDiscountPrice,
+	String description,
+	String color,
+	Category categories,
 	boolean isAvailable,
 	boolean isSoldOut
 ) {
@@ -36,6 +40,9 @@ public record CartItemResponse(
 			cartItem.getQuantity(),
 			cartItem.getTotalPrice(),
 			cartItem.getTotalDiscountPrice(),
+			cartItem.getProduct().getDescription(),
+			cartItem.getProduct().getColor(),
+			cartItem.getProduct().getCategory(),
 			cartItem.isAvailable(),
 			cartItem.isSoldOut()
 		);

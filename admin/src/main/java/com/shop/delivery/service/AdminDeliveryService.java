@@ -7,6 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.shop.ErrorCode;
 import com.shop.Lock;
+import com.shop.delivery.request.DeliveryReadyRequest;
+import com.shop.delivery.response.DeliveryResponse;
 import com.shop.domain.delivery.Delivery;
 import com.shop.repository.delivery.DeliveryRepository;
 import com.shop.repository.order.OrderRepository;

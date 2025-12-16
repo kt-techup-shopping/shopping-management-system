@@ -19,6 +19,7 @@ import com.shop.domain.product.Product;
 import com.shop.domain.user.User;
 import com.shop.repository.cart.CartRepository;
 import com.shop.repository.cartItem.CartItemRepository;
+import com.shop.repository.cartItem.response.CartItemQueryResponse;
 import com.shop.repository.product.ProductRepository;
 import com.shop.repository.user.UserRepository;
 
@@ -45,7 +46,10 @@ public class CartService {
 
 	// 장바구니를 검색하는 API
 	public Page<CartItemResponse> searchCartItems(Long userId, String keyword, Pageable pageable) {
-		return cartItemRepository.search(userId, keyword, pageable);
+		Page<CartItemQueryResponse> queryResponses = cartItemRepository.search(userId, keyword, pageable);
+		return queryResponses.map(queryResponse ->
+			CartItemResponse.of(queryResponse.cartItem())
+		);
 	}
 
 	// 장바구니에 상품을 담는 API

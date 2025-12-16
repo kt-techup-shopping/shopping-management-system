@@ -14,7 +14,14 @@ import com.shop.Preconditions;
 import com.shop.domain.review.AdminReview;
 import com.shop.repository.review.AdminReviewRepository;
 import com.shop.repository.review.ReviewRepository;
+import com.shop.repository.review.response.AdminNoReviewQueryResponse;
+import com.shop.repository.review.response.AdminReviewDetailQueryResponse;
 import com.shop.repository.user.UserRepository;
+import com.shop.review.request.AdminReviewCreateRequest;
+import com.shop.review.request.AdminReviewUpdateRequest;
+import com.shop.review.response.AdminNoReviewResponse;
+import com.shop.review.response.AdminReviewCreateAndUpdateResponse;
+import com.shop.review.response.AdminReviewDetailResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,7 +37,8 @@ public class AdminReviewService {
 	 * 어드민 리뷰를 작성하는 API
 	 */
 	@Transactional
-	public AdminReviewCreateAndUpdateResponse createAdminReview(AdminReviewCreateRequest adminReviewCreateRequest, Long reviewId, Long userId) {
+	public AdminReviewCreateAndUpdateResponse createAdminReview(AdminReviewCreateRequest adminReviewCreateRequest,
+		Long reviewId, Long userId) {
 		var review = reviewRepository.findById(reviewId)
 			.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_REVIEW));
 
@@ -66,7 +74,8 @@ public class AdminReviewService {
 	 * 어드민 리뷰를 수정하는 API
 	 */
 	@Transactional
-	public AdminReviewCreateAndUpdateResponse updateAdminReview(AdminReviewUpdateRequest adminReviewUpdateRequest, Long reviewId, Long userId) {
+	public AdminReviewCreateAndUpdateResponse updateAdminReview(AdminReviewUpdateRequest adminReviewUpdateRequest,
+		Long reviewId, Long userId) {
 		var review = reviewRepository.findById(reviewId)
 			.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_REVIEW));
 

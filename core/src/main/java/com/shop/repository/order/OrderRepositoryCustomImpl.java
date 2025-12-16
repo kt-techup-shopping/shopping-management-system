@@ -14,11 +14,18 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.shop.domain.order.OrderStatus;
+import com.shop.domain.order.QOrder;
+import com.shop.domain.orderproduct.QOrderProduct;
+import com.shop.domain.payment.QPayment;
+import com.shop.domain.product.QProduct;
 import com.shop.repository.order.response.AdminOrderDetailQueryResponse;
 import com.shop.repository.order.response.AdminOrderDetailUserQueryResponse;
 import com.shop.repository.order.response.OrderDetailQueryResponse;
 import com.shop.repository.order.response.OrderDetailUserQueryResponse;
-import com.shop.repository.order.response.OrderResponse;
+import com.shop.repository.order.response.QAdminOrderDetailQueryResponse;
+import com.shop.repository.order.response.QAdminOrderDetailUserQueryResponse;
+import com.shop.repository.order.response.QOrderDetailQueryResponse;
+import com.shop.repository.order.response.QOrderDetailUserQueryResponse;
 
 import lombok.RequiredArgsConstructor;
 

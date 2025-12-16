@@ -4,7 +4,6 @@ import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +12,7 @@ import com.shop.Preconditions;
 import com.shop.domain.user.Gender;
 import com.shop.domain.user.Role;
 import com.shop.domain.user.User;
+import com.shop.encoder.PasswordEncoder;
 import com.shop.repository.user.UserRepository;
 import com.shop.user.request.UserCreateRequest;
 import com.shop.user.response.UserSearchResponse;

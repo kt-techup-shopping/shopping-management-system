@@ -1,12 +1,21 @@
 package com.shop.repository.review;
 
 
+import static com.shop.domain.review.QAdminReview.*;
+import static com.shop.domain.review.QReview.*;
+import static com.shop.domain.user.QUser.*;
+
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.shop.repository.review.response.AdminNoReviewQueryResponse;
+import com.shop.repository.review.response.AdminReviewDetailQueryResponse;
+import com.shop.repository.review.response.QAdminNoReviewQueryResponse;
+import com.shop.repository.review.response.QAdminReviewDetailQueryResponse;
+import com.shop.repository.review.response.QAdminReviewQueryResponse;
 
 import lombok.RequiredArgsConstructor;
 

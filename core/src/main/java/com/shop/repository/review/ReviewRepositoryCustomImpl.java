@@ -1,12 +1,26 @@
 package com.shop.repository.review;
 
 
+import static com.shop.domain.orderproduct.QOrderProduct.*;
+import static com.shop.domain.product.QProduct.*;
+import static com.shop.domain.review.QAdminReview.*;
+
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.StringTemplate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.shop.domain.review.QReview;
+import com.shop.domain.review.QReviewLike;
 import com.shop.domain.review.ReviewLikeType;
+import com.shop.domain.user.QUser;
+import com.shop.repository.review.response.QAdminReviewQueryResponse;
+import com.shop.repository.review.response.QReviewDetailQueryResponse;
+import com.shop.repository.review.response.QReviewPageQueryResponse;
+import com.shop.repository.review.response.ReviewDetailQueryResponse;
+import com.shop.repository.review.response.ReviewPageQueryResponse;
 
 import lombok.RequiredArgsConstructor;
 

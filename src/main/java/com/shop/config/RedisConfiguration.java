@@ -1,4 +1,4 @@
-package com.shop.redis;
+package com.shop.config;
 
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
@@ -24,34 +24,6 @@ public class RedisConfiguration {
 	// redis는 만료시간을 설정할 수 있음
 	// 5초정도 줄까?
 	// 100개의 요청을처리하는데 100*5 = 500초가 걸릴수도?
-
-	// TODO 배포 시 반영
-	// @Bean
-	// @DevProfile
-	// @AppProfile
-	// public RedissonClient redissonClient() {
-	//	영
-	// 	var host = redisProperties.getCluster().getNodes().getFirst();
-	// 	var uri = String.format("rediss://%s", host);
-	//
-	// 	config
-	// 		.useClusterServers()
-	// 		.addNodeAddress(uri);
-	//
-	// 	return Redisson.create(config);
-	// }
-
-	// @Bean
-	// @LocalProfile
-	// public RedissonClient localRedissonClient() {
-	// 	var config = new Config();
-	// 	var host = redisProperties.getCluster().getNodes().getFirst();
-	// 	var uri = String.format("redis://%s", host);
-	//
-	// 	config
-	// 		.useSingleServer().setAddress(uri);
-	// 	return Redisson.create(config);
-	// }
 
 	@Bean
 	public RedissonClient redissonClient() {

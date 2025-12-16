@@ -9,8 +9,11 @@ import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.shop.domain.cart.QCart;
 import com.shop.domain.cartItem.CartItem;
+import com.shop.domain.cartItem.QCartItem;
 import com.shop.domain.product.ProductStatus;
+import com.shop.domain.product.QProduct;
 import com.shop.repository.cartItem.response.CartItemQueryResponse;
 
 import lombok.RequiredArgsConstructor;

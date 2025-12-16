@@ -10,7 +10,10 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.shop.domain.user.Gender;
+import com.shop.domain.user.QUser;
 import com.shop.domain.user.Role;
+import com.shop.domain.user.Status;
+import com.shop.repository.user.response.QUserSearchQueryResponse;
 import com.shop.repository.user.response.UserSearchQueryResponse;
 
 import lombok.RequiredArgsConstructor;

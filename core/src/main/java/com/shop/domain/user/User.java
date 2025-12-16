@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.shop.domain.order.model.Order;
-import com.shop.domain.review.model.AdminReview;
-import com.shop.domain.review.model.Review;
-import com.shop.domain.review.model.ReviewLike;
-import com.shop.global.common.BaseEntity;
+import com.shop.BaseEntity;
+import com.shop.domain.order.Order;
+import com.shop.domain.review.AdminReview;
+import com.shop.domain.review.Review;
+import com.shop.domain.review.ReviewLike;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

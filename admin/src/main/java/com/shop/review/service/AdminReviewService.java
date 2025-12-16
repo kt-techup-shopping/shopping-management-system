@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.shop.CustomException;
 import com.shop.ErrorCode;
 import com.shop.Preconditions;
+import com.shop.domain.review.AdminReview;
 import com.shop.repository.review.AdminReviewRepository;
 import com.shop.repository.review.ReviewRepository;
 import com.shop.repository.user.UserRepository;

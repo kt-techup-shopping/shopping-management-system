@@ -3,9 +3,9 @@ package com.shop.domain.review;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.shop.domain.orderproduct.model.OrderProduct;
-import com.shop.domain.user.model.User;
-import com.shop.global.common.BaseEntity;
+import com.shop.BaseEntity;
+import com.shop.domain.orderproduct.OrderProduct;
+import com.shop.domain.user.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

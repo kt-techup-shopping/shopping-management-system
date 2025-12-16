@@ -4,8 +4,8 @@ import java.util.Arrays;
 
 import org.apache.logging.log4j.util.Strings;
 
-import com.shop.global.common.CustomException;
-import com.shop.global.common.ErrorCode;
+import com.shop.CustomException;
+import com.shop.ErrorCode;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

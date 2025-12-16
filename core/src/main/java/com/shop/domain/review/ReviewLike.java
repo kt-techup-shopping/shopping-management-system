@@ -1,9 +1,7 @@
 package com.shop.domain.review;
 
-import com.shop.domain.review.model.Review;
-import com.shop.domain.review.model.ReviewLikeType;
-import com.shop.domain.user.model.User;
-import com.shop.global.common.BaseEntity;
+import com.shop.BaseEntity;
+import com.shop.domain.user.User;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

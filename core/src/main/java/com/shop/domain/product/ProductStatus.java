@@ -2,8 +2,8 @@ package com.shop.domain.product;
 
 import java.util.Arrays;
 
-import com.shop.global.common.CustomException;
-import com.shop.global.common.ErrorCode;
+import com.shop.CustomException;
+import com.shop.ErrorCode;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -2,6 +2,8 @@ package com.shop.repository.review;
 
 import java.util.List;
 
+import com.shop.repository.review.response.ReviewDetailQueryResponse;
+import com.shop.repository.review.response.ReviewPageQueryResponse;
 
 public interface ReviewRepositoryCustom {
 	// 전체 리뷰 페이지 조회

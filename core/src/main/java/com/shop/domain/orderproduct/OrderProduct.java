@@ -3,10 +3,10 @@ package com.shop.domain.orderproduct;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.shop.domain.order.model.Order;
-import com.shop.domain.product.model.Product;
-import com.shop.domain.review.model.Review;
-import com.shop.global.common.BaseEntity;
+import com.shop.BaseEntity;
+import com.shop.domain.order.Order;
+import com.shop.domain.product.Product;
+import com.shop.domain.review.Review;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;

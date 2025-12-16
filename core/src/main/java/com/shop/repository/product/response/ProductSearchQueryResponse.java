@@ -1,10 +1,10 @@
-package com.shop.product.response;
+package com.shop.repository.product.response;
 
 import com.querydsl.core.annotations.QueryProjection;
 import com.shop.domain.discount.DiscountType;
 import com.shop.domain.product.ProductStatus;
 
-public record ProductSearchResponse (
+public record ProductSearchQueryResponse(
 	Long id,
 	String name,
 	Long price,
@@ -13,4 +13,7 @@ public record ProductSearchResponse (
 	DiscountType discountType,
 	Long discountedPrice
 	){
+	@QueryProjection
+	public ProductSearchQueryResponse {
+	}
 }

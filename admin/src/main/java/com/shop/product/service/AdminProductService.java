@@ -17,6 +17,7 @@ import com.shop.domain.product.ProductSort;
 import com.shop.domain.product.ProductStatus;
 import com.shop.repository.category.CategoryRepository;
 import com.shop.repository.product.ProductRepository;
+import com.shop.repository.product.response.AdminProductStockQueryResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -154,7 +155,7 @@ public class AdminProductService {
 	}
 
 	// 관리자 상품 재고 목록 조회
-	public Page<AdminProductStockResponse> getStockList(String keyword, PageRequest paging) {
+	public Page<AdminProductStockQueryResponse> getStockList(String keyword, PageRequest paging) {
 		return productRepository.getStockList(keyword, paging);
 	}
 

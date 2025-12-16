@@ -23,7 +23,16 @@ public class ProductService {
 	// 상품 목록 조회
 	public Page<ProductSearchResponse> getSearchList(String keyword, Long categoryId, Boolean activeOnly, String sort,
 		PageRequest pageable) {
-		return productRepository.getSearchList(keyword, categoryId, activeOnly, ProductSort.from(sort), pageable);
+		var searchResult = productRepository.getSearchList(keyword, categoryId, activeOnly, ProductSort.from(sort), pageable);
+		return searchResult.map(it -> new ProductSearchResponse(
+			it.id(),
+			it.name(),
+			it.price(),
+			it.status(),
+			it.discountValue(),
+			it.discountType(),
+			it.discountedPrice()
+		));
 	}
 
 	// 상품 상세 조회

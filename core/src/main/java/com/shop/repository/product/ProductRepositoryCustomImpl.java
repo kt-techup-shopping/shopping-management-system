@@ -18,26 +18,26 @@ import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.shop.domain.category.model.Category;
-import com.shop.domain.category.repository.CategoryRepository;
-import com.shop.domain.discount.model.DiscountType;
-import com.shop.domain.discount.model.QDiscount;
-import com.shop.domain.order.model.OrderStatus;
-import com.shop.domain.order.model.QOrder;
-import com.shop.domain.orderproduct.model.QOrderProduct;
-import com.shop.domain.product.model.ProductStatus;
-import com.shop.domain.product.model.QProduct;
-import com.shop.domain.product.request.ProductSort;
-import com.shop.domain.product.response.AdminProductDetailQueryResponse;
-import com.shop.domain.product.response.AdminProductSearchResponse;
-import com.shop.domain.product.response.AdminProductStockResponse;
-import com.shop.domain.product.response.ProductDetailQueryResponse;
-import com.shop.domain.product.response.ProductSearchResponse;
-import com.shop.domain.product.response.QAdminProductDetailQueryResponse;
-import com.shop.domain.product.response.QAdminProductSearchResponse;
-import com.shop.domain.product.response.QAdminProductStockResponse;
-import com.shop.domain.product.response.QProductDetailQueryResponse;
-import com.shop.domain.product.response.QProductSearchResponse;
+import com.shop.domain.category.Category;
+import com.shop.domain.discount.DiscountType;
+import com.shop.domain.discount.QDiscount;
+import com.shop.domain.order.OrderStatus;
+import com.shop.domain.order.QOrder;
+import com.shop.domain.orderproduct.QOrderProduct;
+import com.shop.domain.product.ProductSort;
+import com.shop.domain.product.ProductStatus;
+import com.shop.domain.product.QProduct;
+import com.shop.repository.category.CategoryRepository;
+import com.shop.repository.product.response.AdminProductDetailQueryResponse;
+import com.shop.repository.product.response.AdminProductSearchQueryResponse;
+import com.shop.repository.product.response.AdminProductStockQueryResponse;
+import com.shop.repository.product.response.ProductDetailQueryResponse;
+import com.shop.repository.product.response.ProductSearchQueryResponse;
+import com.shop.repository.product.response.QAdminProductDetailQueryResponse;
+import com.shop.repository.product.response.QAdminProductSearchQueryResponse;
+import com.shop.repository.product.response.QAdminProductStockQueryResponse;
+import com.shop.repository.product.response.QProductDetailQueryResponse;
+import com.shop.repository.product.response.QProductSearchQueryResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -54,7 +54,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 
 	// 사용자 상품 목록 조회 (검색/카테고리/판매중/정렬 조건 적용)
 	@Override
-	public Page<ProductSearchResponse> getSearchList(
+	public Page<ProductSearchQueryResponse> getSearchList(
 		String keyword,
 		Long categoryId,
 		Boolean activeOnly,
@@ -67,7 +67,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 			activeOnly,
 			sort,
 			pageable,
-			new QProductSearchResponse(
+			new QProductSearchQueryResponse(
 				product.id,
 				product.name,
 				product.price,
@@ -102,7 +102,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 
 	// 관리자 상품 목록 조회 (검색/카테고리/판매중/정렬 조건 적용, 재고 포함)
 	@Override
-	public Page<AdminProductSearchResponse> getAdminSearchList(
+	public Page<AdminProductSearchQueryResponse> getAdminSearchList(
 		String keyword,
 		Long categoryId,
 		Boolean activeOnly,
@@ -115,7 +115,7 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 			activeOnly,
 			sort,
 			pageable,
-			new QAdminProductSearchResponse(
+			new QAdminProductSearchQueryResponse(
 				product.id,
 				product.name,
 				product.price,
@@ -152,14 +152,14 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 
 	// 관리자 상품 재고 목록 조회 (검색 조건 적용)
 	@Override
-	public Page<AdminProductStockResponse> getStockList(String keyword, PageRequest pageable) {
+	public Page<AdminProductStockQueryResponse> getStockList(String keyword, PageRequest pageable) {
 		var reservedStock = reservedStockExpression();
 		BooleanBuilder builder = new BooleanBuilder();
 		builder.and(stockKeywordFilter(keyword)); 					// 숫자면 상품 ID, 아니면 상품명 검색
 		builder.and(filterDeleted(false)); 							// 삭제된 상품 포함
 
 		var content = jpaQueryFactory
-			.select(new QAdminProductStockResponse(
+			.select(new QAdminProductStockQueryResponse(
 				product.id,
 				product.name,
 				product.stock.subtract(reservedStock), 				// 사용 가능한 재고 = 전체 재고 - 예약된 재고

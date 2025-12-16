@@ -3,8 +3,8 @@ package com.shop.order.response;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.shop.domain.order.model.OrderStatus;
-import com.shop.domain.payment.model.PaymentType;
+import com.shop.domain.order.OrderStatus;
+import com.shop.domain.payment.PaymentType;
 
 public record OrderDetailUserResponse(
 	Long orderId,

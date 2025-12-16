@@ -1,10 +1,10 @@
-package com.shop.domain.order.response;
+package com.shop.repository.order.response;
 
 import java.time.LocalDateTime;
 
-import com.shop.domain.order.model.OrderStatus;
-import com.shop.domain.payment.model.PaymentType;
 import com.querydsl.core.annotations.QueryProjection;
+import com.shop.domain.order.OrderStatus;
+import com.shop.domain.payment.PaymentType;
 
 public record AdminOrderDetailUserQueryResponse(
 	Long orderId,

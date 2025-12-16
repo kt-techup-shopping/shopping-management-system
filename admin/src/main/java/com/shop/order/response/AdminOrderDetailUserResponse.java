@@ -1,10 +1,10 @@
-package com.shop.domain.order.response;
+package com.shop.order.response;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.shop.domain.order.model.OrderStatus;
-import com.shop.domain.payment.model.PaymentType;
+import com.shop.domain.order.OrderStatus;
+import com.shop.domain.payment.PaymentType;
 
 public record AdminOrderDetailUserResponse(
 	Long orderId,
@@ -15,11 +15,9 @@ public record AdminOrderDetailUserResponse(
 	String receiverName,
 	String receiverAddress,
 	String receiverMobile,
-
 	OrderStatus orderStatus,
 	LocalDateTime deliveredAt,
 	LocalDateTime orderedAt,
-
 	List<OrderProductInfo> products,
 	PaymentInfo paymentInfo
 ) {

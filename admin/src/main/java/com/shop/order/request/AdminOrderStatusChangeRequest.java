@@ -1,6 +1,6 @@
-package com.shop.domain.order.request;
+package com.shop.order.request;
 
-import com.shop.domain.order.model.OrderStatus;
+import com.shop.domain.order.OrderStatus;
 
 import jakarta.validation.constraints.NotNull;
 

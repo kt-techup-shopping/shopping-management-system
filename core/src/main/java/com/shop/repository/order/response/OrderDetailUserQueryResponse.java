@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 import com.querydsl.core.annotations.QueryProjection;
 import com.shop.domain.order.OrderStatus;
-import com.shop.domain.payment.model.PaymentType;
+import com.shop.domain.payment.PaymentType;
 
 public record OrderDetailUserQueryResponse(
 	Long orderId,

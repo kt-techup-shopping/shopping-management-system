@@ -21,6 +21,14 @@ import com.shop.ErrorCode;
 import com.shop.Paging;
 import com.shop.docs.ApiErrorCodeExample;
 import com.shop.docs.ApiErrorCodeExamples;
+import com.shop.product.request.AdminProductSoldOutRequest;
+import com.shop.product.request.AdminProductCreateRequest;
+import com.shop.product.request.AdminProductUpdateRequest;
+import com.shop.product.response.AdminProductDetailResponse;
+import com.shop.product.response.AdminProductInfoResponse;
+import com.shop.product.response.AdminProductSearchResponse;
+import com.shop.product.response.AdminProductStatusResponse;
+import com.shop.product.response.AdminProductStockResponse;
 import com.shop.product.service.AdminProductService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,7 +49,7 @@ public class AdminProductController {
 	@ApiErrorCodeExample(ErrorCode.NOT_FOUND_CATEGORY)
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public ApiResult<AdminProductInfoResponse> create(@RequestBody @Valid ProductCreateRequest request) {
+	public ApiResult<AdminProductInfoResponse> create(@RequestBody @Valid AdminProductCreateRequest request) {
 		var product = adminProductService.create(
 			request.name(),
 			request.price(),
@@ -93,7 +101,7 @@ public class AdminProductController {
 	@ResponseStatus(HttpStatus.OK)
 	public ApiResult<AdminProductInfoResponse> updateDetail(
 		@PathVariable Long id,
-		@RequestBody @Valid ProductUpdateRequest request
+		@RequestBody @Valid AdminProductUpdateRequest request
 	) {
 		var product = adminProductService.updateDetail(
 			id,
@@ -136,7 +144,8 @@ public class AdminProductController {
 	@ApiErrorCodeExample(ErrorCode.NOT_FOUND_PRODUCT)
 	@PutMapping("/sold-out")
 	@ResponseStatus(HttpStatus.OK)
-	public ApiResult<List<AdminProductStatusResponse>> updateSoldOutList(@RequestBody ProductSoldOutRequest request) {
+	public ApiResult<List<AdminProductStatusResponse>> updateSoldOutList(
+		@RequestBody AdminProductSoldOutRequest request) {
 		return ApiResult.ok(adminProductService.updateSoldOutList(request.productIds()));
 	}
 

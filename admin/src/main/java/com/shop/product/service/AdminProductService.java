@@ -15,9 +15,13 @@ import com.shop.category.service.AdminCategoryService;
 import com.shop.domain.product.Product;
 import com.shop.domain.product.ProductSort;
 import com.shop.domain.product.ProductStatus;
+import com.shop.product.response.AdminProductDetailResponse;
+import com.shop.product.response.AdminProductInfoResponse;
+import com.shop.product.response.AdminProductSearchResponse;
+import com.shop.product.response.AdminProductStatusResponse;
+import com.shop.product.response.AdminProductStockResponse;
 import com.shop.repository.category.CategoryRepository;
 import com.shop.repository.product.ProductRepository;
-import com.shop.repository.product.response.AdminProductStockQueryResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -54,7 +58,18 @@ public class AdminProductService {
 	// 관리자 상품 목록 조회
 	public Page<AdminProductSearchResponse> getAdminSearchList(String keyword, Long categoryId, Boolean activeOnly,
 		String sort, PageRequest pageable) {
-		return productRepository.getAdminSearchList(keyword, categoryId, activeOnly, ProductSort.from(sort), pageable);
+		var searchResult =  productRepository.getAdminSearchList(keyword, categoryId, activeOnly, ProductSort.from(sort), pageable);
+		return searchResult.map(product -> new AdminProductSearchResponse(
+			product.id(),
+			product.name(),
+			product.price(),
+			product.stock(),
+			product.status(),
+			product.discountValue(),
+			product.discountType(),
+			product.discountedPrice()
+		));
+
 	}
 
 	// 관리자 상품 상세 조회
@@ -81,7 +96,8 @@ public class AdminProductService {
 
 	// 관리자 상품 정보 수정
 	@Lock(key = Lock.Key.PRODUCT, index = 0, waitTime = 1500, leaseTime = 1000, timeUnit = TimeUnit.MILLISECONDS)
-	public AdminProductInfoResponse updateDetail(Long id, String name, Long price, String description, String color, Long quantity,
+	public AdminProductInfoResponse updateDetail(Long id, String name, Long price, String description, String color,
+		Long quantity,
 		String status, Long categoryId) {
 		var product = productRepository.findByIdOrThrow(id);
 		var category = categoryRepository.findByIdOrThrow(categoryId, ErrorCode.NOT_FOUND_CATEGORY);
@@ -155,8 +171,15 @@ public class AdminProductService {
 	}
 
 	// 관리자 상품 재고 목록 조회
-	public Page<AdminProductStockQueryResponse> getStockList(String keyword, PageRequest paging) {
-		return productRepository.getStockList(keyword, paging);
+	public Page<AdminProductStockResponse> getStockList(String keyword, PageRequest paging) {
+		 return productRepository.getStockList(keyword, paging)
+			 .map(product -> new AdminProductStockResponse(
+				 product.id(),
+				 product.name(),
+				 product.availableStock(),
+				 product.reservedStock(),
+				 product.totalStock()
+			 ));
 	}
 
 	// 관리자 상품 재고 수정

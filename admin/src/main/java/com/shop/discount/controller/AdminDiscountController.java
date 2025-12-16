@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.shop.ApiResult;
 import com.shop.ErrorCode;
+import com.shop.discount.request.AdminDiscountCreateRequest;
 import com.shop.discount.service.DiscountService;
 import com.shop.docs.ApiErrorCodeExample;
 

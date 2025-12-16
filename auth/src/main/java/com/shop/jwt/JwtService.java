@@ -1,0 +1,77 @@
+package com.shop.jwt;
+
+import java.util.Date;
+
+import org.springframework.stereotype.Component;
+
+import com.shop.domain.user.Role;
+
+import io.jsonwebtoken.Jwts;
+import lombok.RequiredArgsConstructor;
+
+@Component
+@RequiredArgsConstructor
+public class JwtService {
+	private final JwtProperties jwtProperties;
+
+	public String issue(Long id, Role role, Date expiration) {
+
+		return Jwts
+			.builder()
+			.issuer("shopping-api")
+			.subject(id.toString())
+			.claim("role", role.name())
+			// TODO: membership 구현되면 추가
+			// .claim("tier", "GOLD")
+			.issuedAt(new Date())
+			.expiration(expiration)
+			.signWith(jwtProperties.getSecret())
+			.compact();
+	}
+
+	public Date getAccessExpiration() {
+		return jwtProperties.getAccessTokenExpiration();
+	}
+
+	public Date getRefreshExpiration() {
+		return jwtProperties.getRefreshTokenExpiration();
+	}
+
+	public boolean validate(String token) {
+		try {
+			Jwts
+				.parser()
+				.verifyWith(jwtProperties.getSecret())
+				.build()
+				.parseSignedClaims(token);
+
+			return true;
+		} catch (io.jsonwebtoken.JwtException | IllegalArgumentException e) {
+			return false;
+		}
+	}
+
+	public Long parseId(String token) {
+		var id = Jwts
+			.parser()
+			.verifyWith(jwtProperties.getSecret())
+			.build()
+			.parseSignedClaims(token)
+			.getPayload()
+			.getSubject();
+
+		return Long.valueOf(id);
+	}
+
+	public Role parseRole(String token) {
+		String role = Jwts
+			.parser()
+			.verifyWith(jwtProperties.getSecret())
+			.build()
+			.parseSignedClaims(token)
+			.getPayload()
+			.get("role", String.class);
+
+		return Role.valueOf(role);
+	}
+}

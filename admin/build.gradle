@@ -1,0 +1,24 @@
+dependencies {
+    implementation(project(":common"))
+    implementation(project(":core"))
+    implementation(project(":integration"))
+    implementation(project(":auth"))
+
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    tasks.named("bootJar") {
+        enabled = true
+        archiveFileName = "shopping-admin.jar"
+    }
+
+    tasks.register("zip", Zip.class) {
+        dependsOn("bootJar")
+        group("build")
+        archiveFileName = "shopping-admin.zip"
+
+        from("build/libs/shopping-admin.jar") { into("") }
+        from("../.ebextensions") { into(".ebextensions") }
+        from("../procfiles/Procfile") { into("") }
+    }
+}

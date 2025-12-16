@@ -51,6 +51,25 @@ public class CartService {
 			CartItemResponse.of(queryResponse.cartItem())
 		);
 	}
+	/*
+	public Page<CartItemResponse> searchCartItems(Long userId, String keyword, Pageable pageable) {
+		Page<CartItemQueryResponse> queryResponses = cartItemRepository.search(userId, keyword, pageable);
+		return queryResponses.map(it -> new CartItemResponse(
+				it.cartItemId(),
+				it.productId(),
+				it.productName(),
+				it.description(),
+				it.color(),
+				it.categories().getName(),
+				it.productPrice(),
+				it.discountPrice(),
+				it.quantity(),
+				it.totalPrice(),
+				it.totalDiscountPrice(),
+				it.isAvailable()
+			)
+		);
+	} */
 
 	// 장바구니에 상품을 담는 API
 	@Transactional

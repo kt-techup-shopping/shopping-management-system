@@ -8,14 +8,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.shop.domain.user.model.Gender;
-import com.shop.domain.user.model.Role;
-import com.shop.domain.user.model.User;
-import com.shop.domain.user.repository.UserRepository;
-import com.shop.domain.user.request.UserCreateRequest;
-import com.shop.domain.user.response.UserSearchResponse;
-import com.shop.global.common.ErrorCode;
-import com.shop.global.common.Preconditions;
+import com.shop.ErrorCode;
+import com.shop.Preconditions;
+import com.shop.domain.user.Gender;
+import com.shop.domain.user.Role;
+import com.shop.domain.user.User;
+import com.shop.repository.user.UserRepository;
+import com.shop.user.request.UserCreateRequest;
+import com.shop.user.response.UserSearchResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -81,7 +81,9 @@ public class UserService {
 
 	public Page<UserSearchResponse> searchUsers(String keyword, Gender gender, Boolean activeOnly, String sort,
 		PageRequest pageable) {
-		return userRepository.search(keyword, gender, activeOnly, Role.USER, sort, pageable);
+		var search =  userRepository.search(keyword, gender, activeOnly, Role.USER, sort, pageable);
+
+		return search.map(UserSearchResponse::from);
 	}
 
 	public User detail(Long id) {

@@ -18,6 +18,11 @@ import com.shop.ErrorCode;
 import com.shop.Paging;
 import com.shop.docs.ApiErrorCodeExample;
 import com.shop.domain.user.Gender;
+import com.shop.user.request.UserUpdateRequest;
+import com.shop.user.response.UserDetailResponse;
+import com.shop.user.response.UserSearchResponse;
+import com.shop.user.response.UserStatusResponse;
+import com.shop.user.response.UserUpdateResponse;
 import com.shop.user.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;

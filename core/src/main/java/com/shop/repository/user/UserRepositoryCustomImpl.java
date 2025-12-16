@@ -9,12 +9,9 @@ import org.springframework.stereotype.Repository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.shop.domain.user.model.Gender;
-import com.shop.domain.user.model.QUser;
-import com.shop.domain.user.model.Role;
-import com.shop.domain.user.model.Status;
-import com.shop.domain.user.response.QUserSearchResponse;
-import com.shop.domain.user.response.UserSearchResponse;
+import com.shop.domain.user.Gender;
+import com.shop.domain.user.Role;
+import com.shop.repository.user.response.UserSearchQueryResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,7 +23,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 	private final QUser user = QUser.user;
 
 	@Override
-	public Page<UserSearchResponse> search(
+	public Page<UserSearchQueryResponse> search(
 		String keyword,
 		Gender gender,
 		Boolean activeOnly,
@@ -41,7 +38,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 		booleanBuilder.and(filterRole(role));
 
 		var content = jpaQueryFactory
-			.select(new QUserSearchResponse(
+			.select(new QUserSearchQueryResponse(
 				user.id,
 				user.loginId,
 				user.name,

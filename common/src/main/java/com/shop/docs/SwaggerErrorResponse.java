@@ -1,6 +1,6 @@
 package com.shop.docs;
 
-import com.shop.global.common.ErrorCode;
+import com.shop.ErrorCode;
 
 public class SwaggerErrorResponse {
 	private final String code;

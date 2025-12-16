@@ -13,6 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.shop.ApiResult;
 import com.shop.ErrorCode;
 import com.shop.docs.ApiErrorCodeExample;
+import com.shop.docs.ApiErrorCodeExamples;
+import com.shop.user.request.UserCreateRequest;
+import com.shop.user.request.UserUpdateRequest;
+import com.shop.user.response.UserCreateResponse;
+import com.shop.user.response.UserStatusResponse;
+import com.shop.user.response.UserUpdateResponse;
 import com.shop.user.service.AdminService;
 import com.shop.user.service.UserService;
 

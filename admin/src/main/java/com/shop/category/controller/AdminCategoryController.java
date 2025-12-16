@@ -9,7 +9,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.shop.ApiResult;
 import com.shop.ErrorCode;
-import com.shop.category.service.CategoryService;
+import com.shop.category.request.AdminCategoryCreateRequest;
+import com.shop.category.response.AdminCategoryDetailResponse;
+import com.shop.category.response.AdminCategoryListResponse;
+import com.shop.category.service.AdminCategoryService;
 import com.shop.docs.ApiErrorCodeExample;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,19 +27,20 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/admin/categories")
 public class AdminCategoryController {
 
-	private final CategoryService categoryService;
+	private final AdminCategoryService adminCategoryService;
 
 	@Operation(summary = "카테고리 만들기", description = "관리자가 카테고리를 등록하는 API")
 	@ApiErrorCodeExample(ErrorCode.NOT_FOUND_CATEGORY)
 	@PostMapping
-	public ApiResult<CategoryDetailResponse> createCategory(@RequestBody @Valid AdminCategoryCreateRequest request) {
-		var category = categoryService.createCategory(request.name(), request.parentCategoryId());
+	public ApiResult<AdminCategoryDetailResponse> createCategory(
+		@RequestBody @Valid AdminCategoryCreateRequest request) {
+		var category = adminCategoryService.createCategory(request.name(), request.parentCategoryId());
 		return ApiResult.ok(category);
 	}
 
 	@Operation(summary = "카테고리 조회", description = "관리자 카테고리 목록 조회")
 	@GetMapping
 	public ApiResult<AdminCategoryListResponse> getCategories() {
-		return ApiResult.ok(categoryService.getCategories());
+		return ApiResult.ok(adminCategoryService.getCategories());
 	}
 }

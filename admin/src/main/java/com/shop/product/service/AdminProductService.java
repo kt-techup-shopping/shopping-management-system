@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.shop.ErrorCode;
 import com.shop.Lock;
 import com.shop.Preconditions;
-import com.shop.category.service.CategoryService;
+import com.shop.category.service.AdminCategoryService;
 import com.shop.domain.product.Product;
 import com.shop.domain.product.ProductSort;
 import com.shop.domain.product.ProductStatus;
@@ -27,7 +27,7 @@ public class AdminProductService {
 
 	private final ProductRepository productRepository;
 	private final CategoryRepository categoryRepository;
-	private final CategoryService categoryService;
+	private final AdminCategoryService adminCategoryService;
 
 	// 관리자 상품 등록
 	@Transactional
@@ -62,7 +62,7 @@ public class AdminProductService {
 		var isExisted = productRepository.existsById(id);
 		Preconditions.validate(isExisted, ErrorCode.NOT_FOUND_PRODUCT);
 		var product = productRepository.findAdminDetailById(id);
-		var categoryList = categoryService.getCategoryHierarchy(product.category());
+		var categoryList = adminCategoryService.getCategoryHierarchy(product.category());
 
 		return new AdminProductDetailResponse(
 			product.id(),

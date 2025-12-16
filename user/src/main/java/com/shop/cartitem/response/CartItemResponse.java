@@ -1,6 +1,6 @@
-package com.shop.cartitem.response;
+package com.shop.domain.cartitem.response;
 
-import com.shop.domain.cartItem.CartItem;
+import com.shop.domain.cartitem.model.CartItem;
 
 public record CartItemResponse(
 	Long cartItemId,
@@ -14,8 +14,20 @@ public record CartItemResponse(
 	Long quantity,
 	Long totalPrice,
 	Long totalDiscountPrice,
-	boolean isAvailable
+	boolean isAvailable,
+	boolean isSoldOut
 ) {
+
+	// status를 메서드로 제공 (파생 정보)
+	public String status() {
+		if (!isAvailable) {
+			return "판매중지";
+		}
+		if (isSoldOut) {
+			return "품절";
+		}
+		return "정상";
+	}
 
 	public static CartItemResponse of(CartItem cartItem) {
 		return new CartItemResponse(
@@ -30,7 +42,8 @@ public record CartItemResponse(
 			cartItem.getQuantity(),
 			cartItem.getTotalPrice(),
 			cartItem.getTotalDiscountPrice(),
-			cartItem.isAvailable()
+			cartItem.isAvailable(),
+			cartItem.isSoldOut()
 		);
 	}
 }

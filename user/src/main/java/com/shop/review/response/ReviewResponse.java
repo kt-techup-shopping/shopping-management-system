@@ -2,7 +2,8 @@ package com.shop.review.response;
 
 import java.util.UUID;
 
-import com.shop.domain.review.model.ReviewLikeType;
+import com.shop.domain.review.ReviewLikeType;
+import com.shop.repository.review.response.AdminReviewQueryResponse;
 
 public record ReviewResponse(
 	Long reviewId,

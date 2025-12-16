@@ -1,6 +1,6 @@
-package com.shop.domain.cartitem.response;
+package com.shop.cartitem.response;
 
-import com.shop.domain.cartitem.model.CartItem;
+import com.shop.domain.cartItem.CartItem;
 
 public record CartItemResponse(
 	Long cartItemId,

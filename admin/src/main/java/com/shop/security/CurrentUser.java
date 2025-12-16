@@ -1,6 +1,6 @@
 package com.shop.security;
 
-import com.shop.domain.user.model.Role;
+import com.shop.domain.user.Role;
 
 public interface CurrentUser {
 	Long getId();

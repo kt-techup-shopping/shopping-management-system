@@ -4,7 +4,7 @@ import java.util.Date;
 
 import org.springframework.stereotype.Component;
 
-import com.shop.domain.user.model.Role;
+import com.shop.domain.user.Role;
 
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;

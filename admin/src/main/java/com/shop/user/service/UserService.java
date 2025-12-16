@@ -81,7 +81,9 @@ public class UserService {
 
 	public Page<UserSearchResponse> searchUsers(String keyword, Gender gender, Boolean activeOnly, String sort,
 		PageRequest pageable) {
-		return userRepository.search(keyword, gender, activeOnly, Role.USER, sort, pageable);
+		var search =  userRepository.search(keyword, gender, activeOnly, Role.USER, sort, pageable);
+
+		return search.map(UserSearchResponse::from);
 	}
 
 	public User detail(Long id) {

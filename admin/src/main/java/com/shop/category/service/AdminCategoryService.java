@@ -1,7 +1,5 @@
 package com.shop.category.service;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,6 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.shop.ErrorCode;
+import com.shop.category.response.AdminCategoryDetailResponse;
+import com.shop.category.response.AdminCategoryListResponse;
+import com.shop.category.response.AdminCategoryResponse;
 import com.shop.domain.category.Category;
 import com.shop.repository.category.CategoryRepository;
 
@@ -16,27 +17,20 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class CategoryService {
+public class AdminCategoryService {
 
 	private final CategoryRepository categoryRepository;
 
 	// 상위 카테고리 리스트 포함하여 반환
-	public List<CategoryDetailResponse> getCategoryHierarchy(Category category) {
-		List<Category> list = new ArrayList<>();
-		while (category != null) {
-			list.add(category);
-			category = category.getParent();
-		}
-
-		Collections.reverse(list);
-		return list.stream()
-			.map(c -> new CategoryDetailResponse(c.getId(), c.getName()))
+	public List<AdminCategoryDetailResponse> getCategoryHierarchy(Category category) {
+		return category.getHierarchy().stream()
+			.map(c -> new AdminCategoryDetailResponse(c.getId(), c.getName()))
 			.toList();
 	}
 
 	// 관리자 카테고리 등록
 	@Transactional
-	public CategoryDetailResponse createCategory(String name, Long parentCategoryId) {
+	public AdminCategoryDetailResponse createCategory(String name, Long parentCategoryId) {
 		var parentCategory = Optional.ofNullable(parentCategoryId)
 			.map(id -> categoryRepository.findByIdOrThrow(id, ErrorCode.NOT_FOUND_CATEGORY))
 			.orElse(null);
@@ -47,7 +41,7 @@ public class CategoryService {
 				parentCategory
 			)
 		);
-		return new CategoryDetailResponse(
+		return new AdminCategoryDetailResponse(
 			category.getId(),
 			category.getName()
 		);

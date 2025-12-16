@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import jakarta.validation.constraints.NotEmpty;
 
-public record ProductSoldOutRequest(
+public record AdminProductSoldOutRequest(
 	@NotNull
 	@NotEmpty
 	List<Long> productIds

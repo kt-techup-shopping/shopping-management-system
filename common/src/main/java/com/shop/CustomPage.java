@@ -2,8 +2,6 @@ package com.shop;
 
 import java.util.List;
 
-import com.shop.domain.user.model.User;
-
 // 프론트엔드에서 페이징을 구현할 때 필요한 정보
 // 데이터들
 // 한화면에 몇개 보여줄것인가? => limit
@@ -13,7 +11,7 @@ import com.shop.domain.user.model.User;
 // 10개씩 보여주는데 데이터는 21개 => 3페이지
 // 총 몇개의 데이터가 있나? (무조건) => count
 public record CustomPage(
-	List<User> users,
+	List<?> data,
 	int size,
 	int page,
 	int pages,

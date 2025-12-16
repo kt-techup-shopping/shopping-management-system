@@ -1,6 +1,7 @@
 package com.shop.domain.category;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.logging.log4j.util.Strings;
@@ -39,5 +40,18 @@ public class Category extends BaseEntity {
 
 		this.name = name;
 		this.parent = parent;
+	}
+
+	public List<Category> getHierarchy() {
+		List<Category> list = new ArrayList<>();
+		Category current = this;
+
+		while (current != null) {
+			list.add(current);
+			current = current.getParent();
+		}
+
+		Collections.reverse(list);
+		return list;
 	}
 }

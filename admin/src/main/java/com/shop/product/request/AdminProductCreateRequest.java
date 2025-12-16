@@ -3,7 +3,7 @@ package com.shop.product.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public record ProductCreateRequest(
+public record AdminProductCreateRequest(
 	@NotBlank
 	String name,
 	@NotNull

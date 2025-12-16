@@ -1,16 +1,16 @@
 package com.shop.service;
 
 import org.springframework.data.util.Pair;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.shop.domain.user.model.Status;
-import com.shop.domain.user.repository.UserRepository;
-import com.shop.global.common.CustomException;
-import com.shop.global.common.ErrorCode;
-import com.shop.global.common.Preconditions;
-import com.shop.global.security.JwtService;
+import com.shop.CustomException;
+import com.shop.ErrorCode;
+import com.shop.Preconditions;
+import com.shop.domain.user.Status;
+import com.shop.encoder.PasswordEncoder;
+import com.shop.jwt.JwtService;
+import com.shop.repository.user.UserRepository;
 
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;

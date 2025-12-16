@@ -60,4 +60,12 @@ public class AdminService {
 
 		user.changePassword(passwordEncoder.encode(newPassword));
 	}
+
+	public User update(Long id, String name, String email, String mobile) {
+		var user = userRepository.findByIdOrThrow(id, ErrorCode.NOT_FOUND_USER);
+
+		user.update(name, email, mobile);
+
+		return user;
+	}
 }

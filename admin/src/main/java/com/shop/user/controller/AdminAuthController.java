@@ -28,7 +28,6 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "사용자(관리자)", description = "관리자용 인증 API")
 @RestController
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN')")
 @RequestMapping("/admin/auth")
 public class AdminAuthController {
 	private final AdminService adminService;
@@ -43,6 +42,7 @@ public class AdminAuthController {
 		return ApiResult.ok(UserCreateResponse.from(user));
 	}
 
+	@PreAuthorize("hasRole('ADMIN')")
 	@Operation(summary = "로그아웃", description = "현재 로그인된 관리자를 로그아웃합니다.")
 	@PostMapping("/logout")
 	@ResponseStatus(HttpStatus.OK)
@@ -51,6 +51,7 @@ public class AdminAuthController {
 		return ApiResult.ok();
 	}
 
+	@PreAuthorize("hasRole('ADMIN')")
 	@Operation(summary = "비밀번호 변경", description = "현재 비밀번호를 확인하고 새 비밀번호로 변경합니다.")
 	@ApiErrorCodeExamples({
 		ErrorCode.NOT_FOUND_USER,

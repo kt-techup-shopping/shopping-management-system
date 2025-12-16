@@ -1,4 +1,4 @@
-package com.shop.domain.review.response;
+package com.shop.repository.review.response;
 
 import java.util.UUID;
 

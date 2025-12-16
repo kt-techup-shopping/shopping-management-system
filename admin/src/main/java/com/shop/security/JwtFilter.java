@@ -8,8 +8,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.shop.domain.user.model.Status;
-import com.shop.domain.user.repository.UserRepository;
+import com.shop.domain.user.Status;
+import com.shop.jwt.JwtService;
+import com.shop.repository.user.UserRepository;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

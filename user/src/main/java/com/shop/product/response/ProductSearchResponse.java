@@ -1,6 +1,5 @@
 package com.shop.product.response;
 
-import com.querydsl.core.annotations.QueryProjection;
 import com.shop.domain.discount.DiscountType;
 import com.shop.domain.product.ProductStatus;
 

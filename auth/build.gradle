@@ -1,19 +1,11 @@
-plugins {
-    id 'java'
-}
-
-group = 'com.kt'
-version = '0.0.1-SNAPSHOT'
-
-repositories {
-    mavenCentral()
-}
-
 dependencies {
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-}
+    implementation(project(":core"))
+    implementation(project(":common"))
 
-test {
-    useJUnitPlatform()
+    implementation 'io.jsonwebtoken:jjwt-api:0.13.0'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.13.0'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.13.0'
+
+    compileOnly('org.springframework.boot:spring-boot-starter-web')
+    compileOnly('org.springframework.boot:spring-boot-starter-validation')
 }

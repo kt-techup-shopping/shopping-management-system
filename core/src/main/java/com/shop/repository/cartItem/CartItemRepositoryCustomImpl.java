@@ -10,6 +10,8 @@ import org.springframework.stereotype.Repository;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.shop.domain.cartItem.CartItem;
+import com.shop.domain.product.ProductStatus;
+import com.shop.repository.cartItem.response.CartItemQueryResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,7 +26,7 @@ public class CartItemRepositoryCustomImpl implements CartItemRepositoryCustom {
 	private final QCart cart = QCart.cart;
 
 	@Override
-	public Page<CartItemResponse> search(Long userId, String keyword, Pageable pageable) {
+	public Page<CartItemQueryResponse> search(Long userId, String keyword, Pageable pageable) {
 		List<CartItem> items = jpaQueryFactory
 			.selectFrom(cartItem)
 			.join(cartItem.product, product).fetchJoin()
@@ -49,8 +51,8 @@ public class CartItemRepositoryCustomImpl implements CartItemRepositoryCustom {
 			)
 			.fetchOne();
 
-		List<CartItemResponse> content = items.stream()
-			.map(CartItemResponse::of)
+		List<CartItemQueryResponse> content = items.stream()
+			.map(CartItemQueryResponse::of)
 			.toList();
 
 		return new PageImpl<>(content, pageable, total != null ? total : 0);

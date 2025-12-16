@@ -1,4 +1,4 @@
-package com.shop.domain.order.response;
+package com.shop.order.response;
 
 import java.time.LocalDateTime;
 import java.util.List;

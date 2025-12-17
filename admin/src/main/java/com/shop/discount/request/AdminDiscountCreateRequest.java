@@ -1,9 +1,7 @@
 package com.shop.discount.request;
 
-
+import org.jetbrains.annotations.NotNull;
 import com.shop.domain.discount.DiscountType;
-
-import jakarta.validation.constraints.NotNull;
 
 public record AdminDiscountCreateRequest(
 	@NotNull

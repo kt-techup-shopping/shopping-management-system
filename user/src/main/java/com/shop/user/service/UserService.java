@@ -45,25 +45,6 @@ public class UserService {
 		return newUser;
 	}
 
-	public User createAdmin(UserCreateRequest request) {
-		Preconditions.validate(!userRepository.existsByLoginId(request.loginId()), ErrorCode.EXIST_USER);
-
-		var newAdmin = User.admin(
-			request.loginId(),
-			UUID.randomUUID(),
-			passwordEncoder.encode(request.password()),
-			request.name(),
-			request.email(),
-			request.mobile(),
-			request.gender(),
-			request.birthday()
-		);
-
-		userRepository.save(newAdmin);
-
-		return newAdmin;
-	}
-
 	public void isDuplicateLoginId(String loginId) {
 		var result = userRepository.existsByLoginId(loginId);
 		Preconditions.validate(!result, ErrorCode.EXIST_LOGINID);
@@ -102,13 +83,5 @@ public class UserService {
 		var user = userRepository.findByIdOrThrow(id, ErrorCode.NOT_FOUND_USER);
 
 		user.delete();
-	}
-
-	public User deactivateUser(Long id) {
-		var user = userRepository.findByIdOrThrow(id, ErrorCode.NOT_FOUND_USER);
-
-		user.deactivate();
-
-		return user;
 	}
 }

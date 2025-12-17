@@ -20,6 +20,9 @@ dependencies {
 
         from("build/libs/shopping-user.jar") { into("") }
         from("../.ebextensions") { into(".ebextensions") }
-        from("../procfiles/Procfile") { into("") }
+        from("../procfiles/UserProcfile") {
+            into("")
+            rename { "Procfile" }
+        }
     }
 }

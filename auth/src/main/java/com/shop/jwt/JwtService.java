@@ -1,6 +1,7 @@
 package com.shop.jwt;
 
 import java.util.Date;
+import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
@@ -23,6 +24,7 @@ public class JwtService {
 			.claim("role", role.name())
 			// TODO: membership 구현되면 추가
 			// .claim("tier", "GOLD")
+			.id(UUID.randomUUID().toString())
 			.issuedAt(new Date())
 			.expiration(expiration)
 			.signWith(jwtProperties.getSecret())
@@ -73,5 +75,25 @@ public class JwtService {
 			.get("role", String.class);
 
 		return Role.valueOf(role);
+	}
+
+	public String parseJti(String token) {
+		return Jwts
+			.parser()
+			.verifyWith(jwtProperties.getSecret())
+			.build()
+			.parseSignedClaims(token)
+			.getPayload()
+			.getId();
+	}
+
+	public Date parseExpiration(String token) {
+		return Jwts
+			.parser()
+			.verifyWith(jwtProperties.getSecret())
+			.build()
+			.parseSignedClaims(token)
+			.getPayload()
+			.getExpiration();
 	}
 }

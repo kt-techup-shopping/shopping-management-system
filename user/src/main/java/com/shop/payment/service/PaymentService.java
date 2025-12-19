@@ -9,6 +9,7 @@ import com.shop.ErrorCode;
 import com.shop.Preconditions;
 import com.shop.domain.payment.Payment;
 import com.shop.domain.payment.PaymentType;
+import com.shop.payment.response.PaymentInfoResponse;
 import com.shop.payment.response.PaymentResponse;
 import com.shop.repository.order.OrderRepository;
 import com.shop.repository.payment.PaymentRepository;
@@ -53,6 +54,22 @@ public class PaymentService {
 			.stream()
 			.map(PaymentResponse::of)
 			.toList();
+	}
+
+	public PaymentInfoResponse getPaymentInfo(Long paymentId) {
+		final String ORD_PREFIX = "ORD";
+
+		var payment = paymentRepository.findByIdOrThrow(paymentId, ErrorCode.NOT_FOUND_PAYMENT);
+		var order = payment.getOrder();
+
+		var orderId = String.format(
+			"%s_%06d_%06d",
+			ORD_PREFIX,
+			order.getId(),
+			paymentId
+		);
+
+		return PaymentInfoResponse.of(orderId, payment.getFinalAmount(), "주문 결제");
 	}
 
 	public void completePayment(Long paymentId) {

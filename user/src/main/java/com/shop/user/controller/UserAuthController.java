@@ -3,6 +3,7 @@ package com.shop.user.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -44,8 +45,11 @@ public class UserAuthController {
 	@Operation(summary = "로그아웃", description = "현재 로그인된 사용자를 로그아웃합니다.")
 	@PostMapping("/logout")
 	@ResponseStatus(HttpStatus.OK)
-	public ApiResult<Void> logout(@AuthenticationPrincipal CurrentUser currentUser) {
-		authService.logout(currentUser.getId());
+	public ApiResult<Void> logout(
+		@AuthenticationPrincipal CurrentUser currentUser,
+		@RequestAttribute("accessToken") String accessToken
+	) {
+		authService.logout(currentUser.getId(), accessToken);
 		return ApiResult.ok();
 	}
 

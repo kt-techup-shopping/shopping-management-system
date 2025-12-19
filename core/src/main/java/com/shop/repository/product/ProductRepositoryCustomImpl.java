@@ -287,10 +287,10 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 	// 정렬 기준 -> OrderSpecifier 변환 (QueryDSL 정렬 메타데이터 객체)
 	private OrderSpecifier<?> resolveSort(ProductSort sort) {
 		return switch (sort) {
-			case ProductSort.PRICE_ASC -> product.price.asc();
-			case ProductSort.PRICE_DESC -> product.price.desc();
-			case ProductSort.LATEST -> product.createdAt.desc();
-			case ProductSort.DEFAULT -> product.id.asc();
+			case PRICE_ASC -> product.price.asc();
+			case PRICE_DESC -> product.price.desc();
+			case LATEST -> product.createdAt.desc();
+			case DEFAULT -> product.id.asc();
 		};
 	}
 

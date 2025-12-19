@@ -1,8 +1,8 @@
-pluginManagement {
-    plugins {
-        id 'org.jetbrains.kotlin.jvm' version '2.2.20'
-    }
-}
+//pluginManagement {
+//    plugins {
+//        id 'org.jetbrains.kotlin.jvm' version '2.2.20'
+//    }
+//}
 rootProject.name = 'shopping-management-system'
 include 'admin'
 include 'user'

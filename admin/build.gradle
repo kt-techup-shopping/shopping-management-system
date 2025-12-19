@@ -19,6 +19,9 @@ dependencies {
 
         from("build/libs/shopping-admin.jar") { into("") }
         from("../.ebextensions") { into(".ebextensions") }
-        from("../procfiles/Procfile") { into("") }
+        from("../procfiles/AdminProcfile") {
+            into("")
+            rename { "Procfile" }
+        }
     }
 }

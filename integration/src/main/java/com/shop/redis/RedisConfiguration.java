@@ -7,6 +7,10 @@ import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.shop.profile.AppProfile;
+import com.shop.profile.DevProfile;
+import com.shop.profile.LocalProfile;
+
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -26,40 +30,40 @@ public class RedisConfiguration {
 	// 100개의 요청을처리하는데 100*5 = 500초가 걸릴수도?
 
 	// TODO 배포 시 반영
-	// @Bean
-	// @DevProfile
-	// @AppProfile
-	// public RedissonClient redissonClient() {
-	//	영
-	// 	var host = redisProperties.getCluster().getNodes().getFirst();
-	// 	var uri = String.format("rediss://%s", host);
-	//
-	// 	config
-	// 		.useClusterServers()
-	// 		.addNodeAddress(uri);
-	//
-	// 	return Redisson.create(config);
-	// }
-
-	// @Bean
-	// @LocalProfile
-	// public RedissonClient localRedissonClient() {
-	// 	var config = new Config();
-	// 	var host = redisProperties.getCluster().getNodes().getFirst();
-	// 	var uri = String.format("redis://%s", host);
-	//
-	// 	config
-	// 		.useSingleServer().setAddress(uri);
-	// 	return Redisson.create(config);
-	// }
-
 	@Bean
+	@DevProfile
+	@AppProfile
 	public RedissonClient redissonClient() {
 		var config = new Config();
-		var uri = String.format("redis://%s:%s", redisProperties.getHost(), redisProperties.getPort());
+		var host = redisProperties.getCluster().getNodes().getFirst();
+		var uri = String.format("rediss://%s", host);
 
-		config.useSingleServer().setAddress(uri);
+		config
+			.useClusterServers()
+			.addNodeAddress(uri);
 
 		return Redisson.create(config);
 	}
+
+	@Bean
+	@LocalProfile
+	public RedissonClient localRedissonClient() {
+		var config = new Config();
+		var host = redisProperties.getCluster().getNodes().getFirst();
+		var uri = String.format("redis://%s", host);
+
+		config
+			.useSingleServer().setAddress(uri);
+		return Redisson.create(config);
+	}
+
+	// @Bean
+	// public RedissonClient redissonClient() {
+	// 	var config = new Config();
+	// 	var uri = String.format("redis://%s:%s", redisProperties.getHost(), redisProperties.getPort());
+	//
+	// 	config.useSingleServer().setAddress(uri);
+	//
+	// 	return Redisson.create(config);
+	// }
 }

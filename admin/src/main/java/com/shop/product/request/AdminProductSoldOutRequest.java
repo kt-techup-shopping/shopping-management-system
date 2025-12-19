@@ -2,9 +2,8 @@ package com.shop.product.request;
 
 import java.util.List;
 
-import org.jetbrains.annotations.NotNull;
-
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 public record AdminProductSoldOutRequest(
 	@NotNull

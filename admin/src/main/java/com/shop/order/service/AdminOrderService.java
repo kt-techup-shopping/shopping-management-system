@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.shop.CustomException;
 import com.shop.ErrorCode;
 import com.shop.Paging;
+import com.shop.Preconditions;
 import com.shop.domain.order.OrderStatus;
 import com.shop.order.request.AdminOrderStatusChangeRequest;
 import com.shop.order.response.AdminOrderDetailResponse;
@@ -40,6 +41,7 @@ public class AdminOrderService {
 			.sorted((e1, e2) -> e2.getKey().compareTo(e1.getKey()))
 			.map(entry -> {
 				var first = entry.getValue().getFirst();
+				Preconditions.validate(first != null, ErrorCode.INVALID_ORDER_STATUS);
 				var products = entry.getValue().stream()
 					.map(qr -> new AdminOrderDetailResponse.OrderProductInfo(
 						qr.productName(),

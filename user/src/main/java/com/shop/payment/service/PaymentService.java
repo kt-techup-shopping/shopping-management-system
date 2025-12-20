@@ -14,7 +14,6 @@ import com.shop.payment.response.PaymentResponse;
 import com.shop.repository.order.OrderRepository;
 import com.shop.repository.payment.PaymentRepository;
 import com.shop.toss.TossPaymentsClient;
-// import com.shop.toss.TossPaymentsClient;
 
 import lombok.RequiredArgsConstructor;
 
@@ -114,13 +113,17 @@ public class PaymentService {
 
 		var toss = tossPaymentsClient.confirm(paymentKey, orderId, amount);
 
+		// 토스 응답 확인
 		Preconditions.validate("DONE".equals(toss.status()), ErrorCode.INVALID_PAYMENT_STATUS);
 		Preconditions.validate(amount.equals(toss.totalAmount()), ErrorCode.INVALID_PAYMENT_AMOUNT);
 		Preconditions.validate(orderId.equals(toss.orderId()), ErrorCode.INVALID_ORDER_ID);
 
-		// TODO: 내부 완료 처리
 		System.out.println("결제 완료");
 		System.out.println(toss.paymentKey());
 		System.out.println(toss.orderId());
+
+		// TODO: 내부 완료 처리
+		// payment.complete();
+		// order.completePayment();
 	}
 }

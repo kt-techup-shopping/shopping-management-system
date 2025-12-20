@@ -9,6 +9,7 @@ import com.shop.ErrorCode;
 import com.shop.Preconditions;
 import com.shop.domain.payment.Payment;
 import com.shop.domain.payment.PaymentType;
+import com.shop.order.response.OrderCreatePaymentResponse;
 import com.shop.payment.response.PaymentInfoResponse;
 import com.shop.payment.response.PaymentResponse;
 import com.shop.payment.vo.OrderId;
@@ -26,7 +27,7 @@ public class PaymentService {
 	private final PaymentRepository paymentRepository;
 	private final TossPaymentsClient tossPaymentsClient;
 
-	public void createPayment(Long orderId, PaymentType type) {
+	public OrderCreatePaymentResponse createPayment(Long orderId, PaymentType type) {
 		var order = orderRepository.findByIdOrThrow(orderId, ErrorCode.NOT_FOUND_ORDER);
 		Preconditions.validate(!order.isCompleted(), ErrorCode.ALREADY_PAID_ORDER);
 		Preconditions.validate(order.canRequestPayment(), ErrorCode.ALREADY_PENDING_ORDER);
@@ -47,6 +48,8 @@ public class PaymentService {
 		order.addPayment(payment);
 
 		paymentRepository.save(payment);
+
+		return OrderCreatePaymentResponse.from(payment);
 	}
 
 	public List<PaymentResponse> getPayment(Long orderId) {

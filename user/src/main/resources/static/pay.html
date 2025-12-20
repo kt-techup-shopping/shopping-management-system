@@ -163,7 +163,7 @@
       const origin = location.origin;
       return {
         successUrl: `${origin}/api/v1/payment-success.html?paymentId=${paymentId}`,
-        failUrl: `${origin}/api/v1/payments/toss/fail?paymentId=${paymentId}`
+        failUrl: `${origin}/api/v1/payment-fail.html?paymentId=${paymentId}`
       };
     }
 

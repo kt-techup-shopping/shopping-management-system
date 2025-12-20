@@ -66,8 +66,9 @@ public class PaymentService {
 		var payment = paymentRepository.findByIdOrThrow(paymentId, ErrorCode.NOT_FOUND_PAYMENT);
 		var order = payment.getOrder();
 		var orderId = OrderId.generate(order.getId(), paymentId);
+		var orderName = order.generateOrderName();
 
-		return PaymentInfoResponse.of(orderId, payment.getFinalAmount(), "주문 결제");
+		return PaymentInfoResponse.of(orderId, payment.getFinalAmount(), orderName);
 	}
 
 	public void completePayment(Long paymentId) {
@@ -116,11 +117,8 @@ public class PaymentService {
 		Preconditions.validate(amount.equals(toss.totalAmount()), ErrorCode.INVALID_PAYMENT_AMOUNT);
 		Preconditions.validate(orderId.equals(toss.orderId()), ErrorCode.INVALID_ORDER_ID);
 
-		System.out.println("결제 완료");
-		System.out.println(toss.paymentKey());
-		System.out.println(toss.orderId());
-
-		// TODO: 내부 완료 처리
+		// 내부 완료 처리
+		// TODO: 개선 필요할지도?
 		payment.complete();
 		order.completePayment();
 	}

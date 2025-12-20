@@ -18,6 +18,7 @@ import com.shop.ApiResult;
 import com.shop.ErrorCode;
 import com.shop.docs.ApiErrorCodeExamples;
 import com.shop.payment.request.PaymentConfirmRequest;
+import com.shop.payment.response.PaymentConfirmResponse;
 import com.shop.payment.response.PaymentInfoResponse;
 import com.shop.payment.service.PaymentService;
 
@@ -64,18 +65,18 @@ public class PaymentController {
 	})
 	@PostMapping("/{paymentId}/confirm")
 	@ResponseStatus(HttpStatus.OK)
-	public ApiResult<Void> tossConfirm(
+	public ApiResult<PaymentConfirmResponse> tossConfirm(
 		@PathVariable Long paymentId,
 		@RequestBody PaymentConfirmRequest request
 	) {
-		paymentService.confirm(
+		var response = paymentService.confirm(
 			paymentId,
 			request.orderId(),
 			request.paymentKey(),
 			request.amount()
 		);
 
-		return ApiResult.ok();
+		return ApiResult.ok(response);
 	}
 
 	// 결제 완료 처리

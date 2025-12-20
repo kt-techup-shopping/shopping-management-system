@@ -10,6 +10,7 @@ import com.shop.Preconditions;
 import com.shop.domain.payment.Payment;
 import com.shop.domain.payment.PaymentType;
 import com.shop.order.response.OrderCreatePaymentResponse;
+import com.shop.payment.response.PaymentConfirmResponse;
 import com.shop.payment.response.PaymentInfoResponse;
 import com.shop.payment.response.PaymentResponse;
 import com.shop.payment.vo.OrderId;
@@ -93,7 +94,7 @@ public class PaymentService {
 		order.resetToPending();
 	}
 
-	public void confirm(Long paymentId, String orderId, String paymentKey, Long amount) {
+	public PaymentConfirmResponse confirm(Long paymentId, String orderId, String paymentKey, Long amount) {
 		var payment = paymentRepository.findByIdOrThrow(paymentId, ErrorCode.NOT_FOUND_PAYMENT);
 		var order = payment.getOrder();
 
@@ -119,5 +120,9 @@ public class PaymentService {
 		// TODO: 개선 필요할지도?
 		payment.complete();
 		order.completePayment();
+
+		var orderName = order.generateOrderName();
+
+		return PaymentConfirmResponse.of(toss, orderName);
 	}
 }

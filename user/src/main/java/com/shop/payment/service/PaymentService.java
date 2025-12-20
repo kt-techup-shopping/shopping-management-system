@@ -11,6 +11,7 @@ import com.shop.domain.payment.Payment;
 import com.shop.domain.payment.PaymentType;
 import com.shop.payment.response.PaymentInfoResponse;
 import com.shop.payment.response.PaymentResponse;
+import com.shop.payment.vo.OrderId;
 import com.shop.repository.order.OrderRepository;
 import com.shop.repository.payment.PaymentRepository;
 import com.shop.toss.TossPaymentsClient;
@@ -59,17 +60,9 @@ public class PaymentService {
 	}
 
 	public PaymentInfoResponse getPaymentInfo(Long paymentId) {
-		final String ORD_PREFIX = "ORD";
-
 		var payment = paymentRepository.findByIdOrThrow(paymentId, ErrorCode.NOT_FOUND_PAYMENT);
 		var order = payment.getOrder();
-
-		var orderId = String.format(
-			"%s_%06d_%06d",
-			ORD_PREFIX,
-			order.getId(),
-			paymentId
-		);
+		var orderId = OrderId.generate(order.getId(), paymentId);
 
 		return PaymentInfoResponse.of(orderId, payment.getFinalAmount(), "주문 결제");
 	}
@@ -104,7 +97,9 @@ public class PaymentService {
 		Preconditions.validate(payment.isPending(), ErrorCode.INVALID_PAYMENT_STATUS);
 
 		// orderId 검증
-		// Preconditions.validate(order.getId());
+		var parsed = OrderId.parse(orderId);
+		Preconditions.validate(parsed.orderId().equals(order.getId()), ErrorCode.INVALID_ORDER_ID);
+		Preconditions.validate(parsed.paymentId().equals(paymentId), ErrorCode.INVALID_ORDER_ID);
 
 		// 결제 금액 검증
 		Preconditions.validate(payment
@@ -123,7 +118,7 @@ public class PaymentService {
 		System.out.println(toss.orderId());
 
 		// TODO: 내부 완료 처리
-		// payment.complete();
-		// order.completePayment();
+		payment.complete();
+		order.completePayment();
 	}
 }

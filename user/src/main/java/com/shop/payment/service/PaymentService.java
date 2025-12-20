@@ -114,11 +114,13 @@ public class PaymentService {
 
 		var toss = tossPaymentsClient.confirm(paymentKey, orderId, amount);
 
-		// Preconditions.validate("DONE".equals(toss.status()), ErrorCode.INVALID_PAYMENT_STATUS);
-		// Preconditions.validate(amount.equals(toss.totalAmount()), ErrorCode.INVALID_PAYMENT_AMOUNT);
-		// Preconditions.validate(orderId.equals(toss.orderId()), ErrorCode.INVALID_ORDER_ID);
+		Preconditions.validate("DONE".equals(toss.status()), ErrorCode.INVALID_PAYMENT_STATUS);
+		Preconditions.validate(amount.equals(toss.totalAmount()), ErrorCode.INVALID_PAYMENT_AMOUNT);
+		Preconditions.validate(orderId.equals(toss.orderId()), ErrorCode.INVALID_ORDER_ID);
 
-		// 내부 완료 처리
-		System.out.println(toss);
+		// TODO: 내부 완료 처리
+		System.out.println("결제 완료");
+		System.out.println(toss.paymentKey());
+		System.out.println(toss.orderId());
 	}
 }

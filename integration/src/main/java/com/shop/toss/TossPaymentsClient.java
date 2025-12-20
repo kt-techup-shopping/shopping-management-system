@@ -12,6 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.shop.toss.response.TossPaymentsConfirmResponse;
+
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -19,8 +22,9 @@ import lombok.RequiredArgsConstructor;
 public class TossPaymentsClient {
 	private final RestTemplate restTemplate = new RestTemplate();
 	private final TossPaymentsProperties tossPaymentsProperties;
+	private final ObjectMapper objectMapper;
 
-	public ResponseEntity<String> confirm(String paymentKey, String orderId, Long amount) {
+	public TossPaymentsConfirmResponse confirm(String paymentKey, String orderId, Long amount) {
 		String basicAuth = Base64
 			.getEncoder()
 			.encodeToString((tossPaymentsProperties.getSecretKey() + ":").getBytes(StandardCharsets.UTF_8));
@@ -37,12 +41,22 @@ public class TossPaymentsClient {
 
 		HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
 
-		return restTemplate.exchange(
+		ResponseEntity<String> response = restTemplate.exchange(
 			tossPaymentsProperties.getBaseUrl() + "/v1/payments/confirm",
 			HttpMethod.POST,
 			entity,
 			String.class
 		);
+
+		try {
+			return objectMapper.readValue(
+				response.getBody(),
+				TossPaymentsConfirmResponse.class
+			);
+		} catch (Exception e) {
+			// TODO: 에러 처리 개선
+			throw new RuntimeException("토스 결제 응답 파싱 실패", e);
+		}
 	}
 
 }

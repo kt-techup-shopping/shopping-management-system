@@ -47,18 +47,6 @@ public class PaymentController {
 		@RequestParam String paymentKey,
 		@RequestParam Long amount
 	) {
-		System.out.println(paymentId);
-		System.out.println(orderId);
-		System.out.println(paymentKey);
-		System.out.println(amount);
-
-		// paymentService.confirmAndComplete(
-		// 	paymentId,
-		// 	orderId,
-		// 	paymentKey,
-		// 	amount
-		// );
-
 		// 정적 성공 페이지로 이동
 		return "redirect:/payment-success.html"
 			+ "?paymentId=" + paymentId
@@ -72,14 +60,12 @@ public class PaymentController {
 		@PathVariable Long paymentId,
 		@RequestBody PaymentConfirmRequest request
 	) {
-		// TODO: 토스한테 confirm요청 보내기
 		paymentService.confirm(
 			paymentId,
 			request.orderId(),
 			request.paymentKey(),
 			request.amount()
 		);
-
 	}
 
 	// 결제 완료 처리

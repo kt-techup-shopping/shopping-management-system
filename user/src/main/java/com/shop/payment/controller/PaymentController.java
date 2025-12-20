@@ -40,6 +40,7 @@ public class PaymentController {
 		return ApiResult.ok(paymentInfo);
 	}
 
+	// 결제 성공 페이지로 라디아렉트용
 	@GetMapping("/toss/success")
 	public String tossSuccess(
 		@RequestParam Long paymentId,
@@ -55,8 +56,15 @@ public class PaymentController {
 			+ "&amount=" + amount;
 	};
 
+	@Operation(summary = "결제 확인", description = "결제 ID를 통해 결제를 확정합니다.")
+	@ApiErrorCodeExamples({
+		ErrorCode.INVALID_PAYMENT_STATUS,
+		ErrorCode.INVALID_ORDER_ID,
+		ErrorCode.INVALID_PAYMENT_AMOUNT,
+	})
 	@PostMapping("/{paymentId}/confirm")
-	public void tossConfirm(
+	@ResponseStatus(HttpStatus.OK)
+	public ApiResult<Void> tossConfirm(
 		@PathVariable Long paymentId,
 		@RequestBody PaymentConfirmRequest request
 	) {
@@ -66,6 +74,8 @@ public class PaymentController {
 			request.paymentKey(),
 			request.amount()
 		);
+
+		return ApiResult.ok();
 	}
 
 	// 결제 완료 처리

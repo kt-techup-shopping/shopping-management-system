@@ -50,6 +50,7 @@ public enum ErrorCode {
 	ALREADY_PENDING_ORDER(HttpStatus.BAD_REQUEST, "이미 결제 대기중인 주문입니다."),
 	ALREADY_PAID_ORDER(HttpStatus.BAD_REQUEST, "이미 주문에 대한 결제가 완료되었습니다."),
 	INVALID_ORDER_ID(HttpStatus.BAD_REQUEST, "주문 정보가 일치하지 않습니다"),
+	ORDER_PAYMENT_MISMATCH(HttpStatus.BAD_REQUEST, "주문과 결제 정보가 일치하지 않습니다."),
 
 	// Payment
 	NOT_FOUND_PAYMENT(HttpStatus.BAD_REQUEST, "해당 결제 내역이 존재하지 않습니다."),

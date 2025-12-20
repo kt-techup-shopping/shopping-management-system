@@ -102,20 +102,18 @@ public class PaymentService {
 
 		// orderId 검증
 		var parsed = OrderId.parse(orderId);
-		Preconditions.validate(parsed.orderId().equals(order.getId()), ErrorCode.INVALID_ORDER_ID);
-		Preconditions.validate(parsed.paymentId().equals(paymentId), ErrorCode.INVALID_ORDER_ID);
+		Preconditions.validate(parsed.orderId().equals(order.getId()), ErrorCode.ORDER_PAYMENT_MISMATCH);
+		Preconditions.validate(parsed.paymentId().equals(paymentId), ErrorCode.ORDER_PAYMENT_MISMATCH);
 
 		// 결제 금액 검증
-		Preconditions.validate(payment
-			.getFinalAmount()
-			.equals(amount), ErrorCode.INVALID_PAYMENT_AMOUNT);
+		Preconditions.validate(payment.getFinalAmount().equals(amount), ErrorCode.INVALID_PAYMENT_AMOUNT);
 
 		var toss = tossPaymentsClient.confirm(paymentKey, orderId, amount);
 
 		// 토스 응답 확인
 		Preconditions.validate("DONE".equals(toss.status()), ErrorCode.INVALID_PAYMENT_STATUS);
 		Preconditions.validate(amount.equals(toss.totalAmount()), ErrorCode.INVALID_PAYMENT_AMOUNT);
-		Preconditions.validate(orderId.equals(toss.orderId()), ErrorCode.INVALID_ORDER_ID);
+		Preconditions.validate(orderId.equals(toss.orderId()), ErrorCode.ORDER_PAYMENT_MISMATCH);
 
 		// 내부 완료 처리
 		// TODO: 개선 필요할지도?

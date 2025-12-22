@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.shop.ApiResult;
 import com.shop.ErrorCode;
+import com.shop.docs.ApiErrorCodeExample;
 import com.shop.docs.ApiErrorCodeExamples;
 import com.shop.payment.request.PaymentConfirmRequest;
 import com.shop.payment.response.PaymentConfirmResponse;
@@ -34,6 +35,8 @@ public class PaymentController {
 	private final PaymentService paymentService;
 
 	// 결제 정보 요청
+	@Operation(summary = "결제 정보 조회", description = "결제 ID를 통해 결제 정보를 조회합니다.")
+	@ApiErrorCodeExample(ErrorCode.NOT_FOUND_PAYMENT)
 	@GetMapping("/{paymentId}")
 	@ResponseStatus(HttpStatus.OK)
 	public ApiResult<PaymentInfoResponse> getPaymentPageInfo(@PathVariable Long paymentId) {

@@ -48,3 +48,15 @@ slack:
 logstash:
   host: ${logstashhost:localhost}
   port: ${logstashport:9601}
+
+management:
+  metrics:
+    tags:
+      application: ${spring.application.name}
+      namespace: ${spring.profiles.active}
+  server:
+    port: 9092
+  endpoints:
+    web:
+      exposure:
+        include: "health, prometheus"

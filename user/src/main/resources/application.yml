@@ -1,3 +1,4 @@
+
 spring:
   application:
     name: shopping-user-api
@@ -47,3 +48,16 @@ slack:
 logstash:
   host: ${logstashhost:localhost}
   port: ${logstashport:9601}
+
+management:
+  metrics:
+    tags:
+      application: ${spring.application.name}
+      namespace: ${spring.profiles.active}
+
+  server:
+    port: 9093
+  endpoints:
+    web:
+      exposure:
+        include: "health, prometheus"

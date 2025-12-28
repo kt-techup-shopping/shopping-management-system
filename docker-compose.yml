@@ -15,6 +15,21 @@ services:
       - "6379:6379"
     platform: linux/arm64
 
+  local-prometheus:
+    image: prom/prometheus:latest
+    container_name: my-prometheus-container
+    ports:
+      - "9091:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+  local-grafana:
+    image: grafana/grafana:latest
+    container_name: my-grafana-container
+    ports:
+      - "3001:3000"
+    depends_on:
+      - local-prometheus
+
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:9.2.2
     container_name: elasticsearch

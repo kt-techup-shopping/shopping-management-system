@@ -41,15 +41,6 @@ public class UserController {
 		return ApiResult.ok();
 	}
 
-	@Operation(summary = "사용자 삭제 (관리자용)", description = "관리자가 특정 사용자를 삭제합니다.")
-	@ApiErrorCodeExample(ErrorCode.NOT_FOUND_USER)
-	@DeleteMapping("/{id}")
-	@ResponseStatus(HttpStatus.OK)
-	public ApiResult<Void> delete(@PathVariable Long id) {
-		userService.delete(id);
-		return ApiResult.ok();
-	}
-
 	@Operation(summary = "내 정보 조회", description = "현재 로그인한 사용자의 정보를 조회합니다.")
 	@ApiErrorCodeExample(ErrorCode.NOT_FOUND_USER)
 	@GetMapping("/my-info")

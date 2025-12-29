@@ -16,7 +16,7 @@ public class KafkaConsumerComponent {
 
 	private final SimpMessagingTemplate messagingTemplate;
 
-	@KafkaListener(topics = "chat-topic1", groupId = "chat-group")
+	@KafkaListener(topics = "chat-topic1", groupId = "#{ 'chat-group-' + T(java.net.InetAddress).getLocalHost().getHostName() }")
 	public void consume(ChatMessage message) {
 		log.info("Kafka로부터 메시지 수신: {}", message);
 

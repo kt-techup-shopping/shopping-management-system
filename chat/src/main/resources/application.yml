@@ -41,10 +41,9 @@ spring:
       properties:
         spring.json.trusted.packages: "*"
     consumer:
-      group-id: my-group
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer      # 문자열 형태로 메시지 키 값 역직렬화
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer    # 문자열 형태로 메시지 값 역직렬화
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer    # 문자열 형태로 메시지 값 역직렬화
       properties:
         spring.json.trusted.packages: "*"
 

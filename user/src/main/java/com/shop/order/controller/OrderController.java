@@ -20,6 +20,8 @@ import com.shop.docs.ApiErrorCodeExamples;
 import com.shop.order.request.OrderCreateRequest;
 import com.shop.order.request.OrderDeleteRequest;
 import com.shop.order.request.OrderUpdateRequest;
+import com.shop.order.response.OrderCreatePaymentResponse;
+import com.shop.order.response.OrderCreateResponse;
 import com.shop.order.response.OrderDetailResponse;
 import com.shop.order.response.OrderDetailUserResponse;
 import com.shop.order.service.OrderService;
@@ -48,16 +50,17 @@ public class OrderController {
 		ErrorCode.NOT_FOUND_USER,
 	})
 	@PostMapping
-	public ApiResult<Void> createOrder(
+	public ApiResult<OrderCreateResponse> createOrder(
 		@AuthenticationPrincipal DefaultCurrentUser defaultCurrentUser,
-		@RequestBody @Valid OrderCreateRequest orderCreateRequest) {
-		orderService.createOrder(
+		@RequestBody @Valid OrderCreateRequest orderCreateRequest
+	) {
+		var orderId = orderService.createOrder(
 			defaultCurrentUser.getId(),
 			// lock을 위해 리스트로
 			orderCreateRequest.productQuantity().keySet().stream().toList(),
 			orderCreateRequest
 		);
-		return ApiResult.ok();
+		return ApiResult.ok(orderId);
 	}
 
 	@Operation(summary = "내 주문 조회", description = "사용자가 자신의 모든 주문 내역을 조회합니다.")
@@ -129,12 +132,12 @@ public class OrderController {
 	})
 	@PostMapping("/{orderId}/payments")
 	@ResponseStatus(HttpStatus.CREATED)
-	public ApiResult<Void> createPayment(
+	public ApiResult<OrderCreatePaymentResponse> createPayment(
 		@PathVariable Long orderId,
 		@RequestBody PaymentCreateRequest request
 	) {
-		paymentService.createPayment(orderId, request.type());
-		return ApiResult.ok();
+		var paymentId = paymentService.createPayment(orderId, request.type());
+		return ApiResult.ok(paymentId);
 	}
 
 	@Operation(summary = "결제 조회", description = "오더 ID를 통해 결제를 조회합니다.")

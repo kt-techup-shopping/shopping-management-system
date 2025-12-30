@@ -11,6 +11,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.shop.domain.user.Status;
 import com.shop.jwt.JwtService;
 import com.shop.repository.user.UserRepository;
+import com.shop.service.AccessTokenBlacklistService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -25,6 +26,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
 	private final JwtService jwtService;
 	private final UserRepository userRepository;
+	private final AccessTokenBlacklistService accessTokenBlacklistService;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -48,6 +50,14 @@ public class JwtFilter extends OncePerRequestFilter {
 
 		if (!jwtService.validate(token)) {
 			filterChain.doFilter(request, response);
+			return;
+		}
+
+		request.setAttribute("accessToken", token);
+
+		String jti = jwtService.parseJti(token);
+		if (accessTokenBlacklistService.isExist(jti)) {
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			return;
 		}
 

@@ -16,6 +16,7 @@ import com.shop.domain.orderproduct.OrderProduct;
 import com.shop.order.request.OrderCreateRequest;
 import com.shop.order.request.OrderDeleteRequest;
 import com.shop.order.request.OrderUpdateRequest;
+import com.shop.order.response.OrderCreateResponse;
 import com.shop.order.response.OrderDetailResponse;
 import com.shop.order.response.OrderDetailUserResponse;
 import com.shop.repository.order.OrderRepository;
@@ -36,7 +37,7 @@ public class OrderService {
 	private final OrderProductRepository orderProductRepository;
 
 	@Lock(key = Lock.Key.STOCK, index = 1, isList = true)
-	public void createOrder(
+	public OrderCreateResponse createOrder(
 		Long userId,
 		List<Long> productIds,
 		OrderCreateRequest orderCreateRequest
@@ -74,6 +75,8 @@ public class OrderService {
 				return orderProduct;
 			})
 			.toList();
+
+		return OrderCreateResponse.from(order);
 	}
 
 	/**

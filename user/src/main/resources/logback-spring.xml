@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+
+    <!-- 콘솔 로그 출력 포맷-->
+    <property name="CONSOLE_LOG_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) %magenta(%-4relative) --- [ %thread{10} ] %cyan(%logger{20}) : %msg%n"/>
+
+    <!-- Logstash 접속 정보 (application.yml에서 주입) -->
+    <springProperty name="LOGSTASH_HOST" source="logstash.host" defaultValue="localhost"/>
+    <springProperty name="LOGSTASH_PORT" source="logstash.port" defaultValue="9601"/>
+
+    <!-- 서비스 식별 정보 -->
+    <springProperty name="APP_NAME" source="spring.application.name" defaultValue="none"/>
+    <springProperty name="ACTIVE_PROFILES" source="spring.profiles.active" defaultValue="default"/>
+
+    <!-- LOGSTASH Appender -->
+    <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>${LOGSTASH_HOST}:${LOGSTASH_PORT}</destination>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>
+                {"app":"${APP_NAME}","env":"${ACTIVE_PROFILES}"}
+            </customFields>
+        </encoder>
+    </appender>
+
+    <!-- CONSOLE Appender -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 운영 환경 (Logstash만, Console 사용 X) -->
+    <springProfile name="dev">
+        <root level="INFO">
+            <appender-ref ref="LOGSTASH"/>
+        </root>
+    </springProfile>
+
+    <!-- 기본 환경 (Logstash + Console) -->
+    <springProfile name="default">
+        <root level="INFO">
+            <appender-ref ref="LOGSTASH"/>
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+</configuration>

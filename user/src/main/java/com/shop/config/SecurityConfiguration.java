@@ -28,11 +28,14 @@ public class SecurityConfiguration {
 
 	private static final String[] GET_PERMIT_ALL = {
 		"/api/health/**", "/swagger-ui/**", "/v3/api-docs/**",
+		"/actuator/**",
 		"/products", "/products/*", "/cart/**",
 		"/reviews", "/reviews/user", "/reviews/single",
+		"/payments/toss/success"
 	};
 	private static final String[] POST_PERMIT_ALL = {
-		"/auth/login", "/auth/signup", "/auth/refresh",
+		"/auth/login", "/auth/refresh",
+		"/users/auth/signup",
 		"/cart/**",
 		"/products", "/products/*",
 	};
@@ -41,7 +44,8 @@ public class SecurityConfiguration {
 	};
 	private static final String[] PATCH_PERMIT_ALL = {"/api/v1/public/**"};
 	private static final String[] DELETE_PERMIT_ALL = {"/api/v1/public/**"};
-	private static final String[] ADMIN_PERMIT_ALL = {"/admin/**"};
+	private static final String[] PAYMENT_TEST_PERMIT_ALL = {"/pay.html", "/login.html", "/payment-success.html",
+		"/payment-fail.html"};
 
 	@Bean
 	public com.shop.encoder.PasswordEncoder passwordEncoder() {
@@ -80,8 +84,9 @@ public class SecurityConfiguration {
 					request.requestMatchers(HttpMethod.PUT, PUT_PERMIT_ALL).permitAll();
 					request.requestMatchers(HttpMethod.DELETE, DELETE_PERMIT_ALL).permitAll();
 
-					// admin 접근 권한 확인
-					request.requestMatchers(ADMIN_PERMIT_ALL).hasRole("ADMIN");
+					// 간편 결제 테스트용
+					request.requestMatchers(PAYMENT_TEST_PERMIT_ALL).permitAll();
+
 					request.anyRequest().authenticated();
 				}
 			)

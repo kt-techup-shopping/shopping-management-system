@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kafka Chatting</title>
+    <meta charset="utf-8">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <style>
+        #chat-box { width: 400px; height: 300px; border: 1px solid #ccc; overflow-y: scroll; margin-bottom: 10px; padding: 10px; }
+        .msg { margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+<h2>실시간 채팅 (Kafka + WebSocket)</h2>
+<div id="login-area">
+    <input type="text" id="loginId" placeholder="아이디">
+    <input type="password" id="password" placeholder="비밀번호">
+    <button onclick="login()">로그인</button>
+</div>
+<div id ="chat-area">
+    방 번호: <input type="text" id="roomId" value="1">
+    사용자명: <input type="text" id="sender" value="user1">
+    <button onclick="connect()">접속</button>
+</div>
+
+<div id="chat-box"></div>
+
+<div>
+    <input type="text" id="message" placeholder="메시지를 입력하세요..." onkeypress="if(event.keyCode==13) sendMessage()">
+    <button onclick="sendMessage()">전송</button>
+</div>
+
+<script src="/api/v1/js/chat.js"></script>
+</body>
+</html>

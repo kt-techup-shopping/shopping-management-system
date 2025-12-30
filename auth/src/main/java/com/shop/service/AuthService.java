@@ -23,6 +23,7 @@ public class AuthService {
 	private final PasswordEncoder passwordEncoder;
 	private final JwtService jwtService;
 	private final RefreshTokenService refreshTokenService;
+	private final AccessTokenBlacklistService accessTokenBlacklistService;
 
 	public Pair<String, String> login(String loginId, String password) {
 		var user = userRepository.findByLoginId(loginId)
@@ -69,7 +70,18 @@ public class AuthService {
 		return Pair.of(newAccessToken, newRefreshToken);
 	}
 
-	public void logout(Long id) {
+	public void logout(Long id, String accessToken) {
 		refreshTokenService.delete(id);
+
+		try {
+			String jti = jwtService.parseJti(accessToken);
+			var exp = jwtService.parseExpiration(accessToken);
+
+			long ttlMs = exp.getTime() - System.currentTimeMillis();
+			if (ttlMs > 0) {
+				accessTokenBlacklistService.save(jti, ttlMs);
+			}
+		} catch (JwtException | IllegalArgumentException e) {
+		}
 	}
 }

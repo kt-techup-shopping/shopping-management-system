@@ -28,11 +28,13 @@ public class SecurityConfiguration {
 
 	private static final String[] GET_PERMIT_ALL = {
 		"/api/health/**", "/swagger-ui/**", "/v3/api-docs/**",
+		"/actuator/**",
 		"/products", "/products/*", "/cart/**",
 		"/reviews", "/reviews/user", "/reviews/single",
 	};
 	private static final String[] POST_PERMIT_ALL = {
-		"/auth/login", "/auth/signup", "/auth/refresh",
+		"/auth/login", "/auth/refresh",
+		"/admin/auth/signup",
 		"/cart/**",
 		"/products", "/products/*",
 	};
@@ -41,7 +43,7 @@ public class SecurityConfiguration {
 	};
 	private static final String[] PATCH_PERMIT_ALL = {"/api/v1/public/**"};
 	private static final String[] DELETE_PERMIT_ALL = {"/api/v1/public/**"};
-	private static final String[] ADMIN_PERMIT_ALL = {"/admin/**"};
+	private static final String[] ADMIN_CHECK_ALL = {"/admin/**"};
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
@@ -81,7 +83,7 @@ public class SecurityConfiguration {
 					request.requestMatchers(HttpMethod.DELETE, DELETE_PERMIT_ALL).permitAll();
 
 					// admin 접근 권한 확인
-					request.requestMatchers(ADMIN_PERMIT_ALL).hasRole("ADMIN");
+					request.requestMatchers(ADMIN_CHECK_ALL).hasRole("ADMIN");
 					request.anyRequest().authenticated();
 				}
 			)

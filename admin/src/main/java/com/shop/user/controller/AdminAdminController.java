@@ -20,7 +20,6 @@ import com.shop.user.response.UserCreateResponse;
 import com.shop.user.response.UserStatusResponse;
 import com.shop.user.response.UserUpdateResponse;
 import com.shop.user.service.AdminService;
-import com.shop.user.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,7 +33,6 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/admin/admins")
 public class AdminAdminController {
 	private final AdminService adminService;
-	private final UserService userService;
 
 	// 관리자가 관리자 생성
 	@Operation(summary = "관리자 생성", description = "관리자가 새로운 관리자 계정을 생성합니다.")
@@ -42,7 +40,7 @@ public class AdminAdminController {
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public ApiResult<UserCreateResponse> create(@RequestBody @Valid UserCreateRequest request) {
-		var admin = userService.createAdmin(request);
+		var admin = adminService.createAdmin(request);
 		return ApiResult.ok(UserCreateResponse.from(admin));
 	}
 
@@ -55,7 +53,7 @@ public class AdminAdminController {
 		@RequestBody @Valid UserUpdateRequest request,
 		@PathVariable Long id
 	) {
-		var user = userService.update(id, request.name(), request.email(), request.mobile());
+		var user = adminService.update(id, request.name(), request.email(), request.mobile());
 		return ApiResult.ok(UserUpdateResponse.from(user));
 	}
 

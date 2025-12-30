@@ -135,4 +135,14 @@ public class Order extends BaseEntity {
 	public void resetToPending() {
 		this.status = OrderStatus.PENDING;
 	}
+
+	public String generateOrderName() {
+		var first = orderProducts
+			.getFirst()
+			.getProduct()
+			.getName();
+		var count = orderProducts.size();
+
+		return count == 1 ? first : first + " 외 " + (count - 1) + "건";
+	}
 }

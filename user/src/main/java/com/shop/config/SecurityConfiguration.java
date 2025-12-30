@@ -30,6 +30,7 @@ public class SecurityConfiguration {
 		"/api/health/**", "/swagger-ui/**", "/v3/api-docs/**",
 		"/products", "/products/*", "/cart/**",
 		"/reviews", "/reviews/user", "/reviews/single",
+		"/payments/toss/success"
 	};
 	private static final String[] POST_PERMIT_ALL = {
 		"/auth/login", "/auth/refresh",
@@ -42,6 +43,8 @@ public class SecurityConfiguration {
 	};
 	private static final String[] PATCH_PERMIT_ALL = {"/api/v1/public/**"};
 	private static final String[] DELETE_PERMIT_ALL = {"/api/v1/public/**"};
+	private static final String[] PAYMENT_TEST_PERMIT_ALL = {"/pay.html", "/login.html", "/payment-success.html",
+		"/payment-fail.html"};
 
 	@Bean
 	public com.shop.encoder.PasswordEncoder passwordEncoder() {
@@ -79,6 +82,9 @@ public class SecurityConfiguration {
 					request.requestMatchers(HttpMethod.PATCH, PATCH_PERMIT_ALL).permitAll();
 					request.requestMatchers(HttpMethod.PUT, PUT_PERMIT_ALL).permitAll();
 					request.requestMatchers(HttpMethod.DELETE, DELETE_PERMIT_ALL).permitAll();
+
+					// 간편 결제 테스트용
+					request.requestMatchers(PAYMENT_TEST_PERMIT_ALL).permitAll();
 
 					request.anyRequest().authenticated();
 				}

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>결제 실패</title>
+
+    <style>
+        * { box-sizing: border-box; }
+        body {
+          margin: 0;
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: #f9fafb;
+          font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+          color: #111827;
+          padding: 24px;
+        }
+        .container {
+          width: 100%;
+          max-width: 520px;
+          background: #fff;
+          border: 1px solid #e5e7eb;
+          border-radius: 12px;
+          padding: 18px;
+        }
+        h2 { margin: 0 0 8px; font-size: 20px; }
+        .muted { color: #6b7280; font-size: 13px; line-height: 1.45; }
+        .pill {
+          display: inline-block;
+          padding: 6px 10px;
+          border-radius: 999px;
+          font-size: 12px;
+          background: #fef2f2;
+          color: #991b1b;
+          margin: 10px 0 14px;
+          font-weight: 700;
+        }
+        .list {
+          margin: 0;
+          padding: 0;
+          list-style: none;
+          border-top: 1px solid #e5e7eb;
+        }
+        .item {
+          display: flex;
+          justify-content: space-between;
+          gap: 12px;
+          padding: 10px 0;
+          border-bottom: 1px solid #e5e7eb;
+          font-size: 14px;
+        }
+        .label { color: #6b7280; }
+        .value { font-weight: 600; text-align: right; }
+        .actions {
+          display: flex;
+          gap: 10px;
+          margin-top: 14px;
+        }
+        button {
+          flex: 1;
+          padding: 12px;
+          border-radius: 10px;
+          border: 0;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: 600;
+          background: #111827;
+          color: #fff;
+        }
+        button.secondary { background: #374151; }
+        details { margin-top: 14px; }
+        pre {
+          margin-top: 10px;
+          padding: 12px;
+          font-size: 12px;
+          background: #f9fafb;
+          border: 1px solid #e5e7eb;
+          border-radius: 10px;
+          max-height: 260px;
+          overflow-y: auto;
+          white-space: pre-wrap;
+          word-break: break-word;
+          line-height: 1.4;
+        }
+        code { background:#f3f4f6; padding:2px 6px; border-radius:6px; }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <h2 id="title">결제 실패</h2>
+    <div class="muted" id="subtitle">
+        결제가 완료되지 않았습니다. 아래 실패 사유를 확인해주세요.
+    </div>
+    <div class="pill" id="badge">FAIL</div>
+
+    <ul class="list">
+        <li class="item"><span class="label">paymentId</span><span class="value" id="paymentId">-</span></li>
+        <li class="item"><span class="label">실패 코드</span><span class="value" id="code">-</span></li>
+        <li class="item"><span class="label">실패 사유</span><span class="value" id="message">-</span></li>
+    </ul>
+
+    <div class="actions">
+        <button id="goHomeBtn" class="secondary" type="button">홈(로그인)</button>
+        <button id="retryBtn" type="button">다시 결제</button>
+    </div>
+
+    <div class="muted" style="margin-top:10px;">
+        필요하면 로그인 후 다시 시도해주세요. 토큰 키: <code>accessToken</code>
+    </div>
+
+    <details open>
+        <summary class="muted">디버그 로그</summary>
+        <pre id="debug">(로그가 여기에 표시됩니다)</pre>
+    </details>
+</div>
+
+<script>
+    // ✅ 네 프로젝트에 맞게 경로 조정
+    const LOGIN_PAGE = "/api/v1/login.html";
+    const PAY_PAGE = "/api/v1/pay.html";
+
+    const $ = (id) => document.getElementById(id);
+
+    const log = (msg, obj) => {
+      const el = $("debug");
+      const line =
+        `[${new Date().toISOString()}] ${msg}` +
+        (obj ? `\n${JSON.stringify(obj, null, 2)}` : "");
+      if (el.textContent === "(로그가 여기에 표시됩니다)") el.textContent = line;
+      else el.textContent += "\n\n" + line;
+      el.scrollTop = el.scrollHeight;
+    };
+
+    function safeText(v) {
+      return (v === null || v === undefined || v === "") ? "-" : String(v);
+    }
+
+    function parseQuery() {
+      const params = new URLSearchParams(location.search);
+      return {
+        paymentId: params.get("paymentId"),
+        code: params.get("code"),
+        message: params.get("message"),
+      };
+    }
+
+    function render() {
+      const q = parseQuery();
+
+      $("paymentId").textContent = safeText(q.paymentId);
+      $("code").textContent = safeText(q.code);
+      $("message").textContent = safeText(q.message);
+
+      log("쿼리 파라미터 로드", q);
+
+      // message/code가 없으면 안내 문구를 조금 바꿔줌
+      if (!q.code && !q.message) {
+        $("subtitle").textContent = "결제가 완료되지 않았습니다. 다시 시도해주세요.";
+        log("실패 사유 정보 없음", {});
+      }
+    }
+
+    $("goHomeBtn").addEventListener("click", () => {
+      log("홈(로그인) 이동", { url: LOGIN_PAGE });
+      location.href = LOGIN_PAGE;
+    });
+
+    $("retryBtn").addEventListener("click", () => {
+      const q = parseQuery();
+
+      // paymentId가 있으면 pay.html로 바로 이동 가능(네 구조: /pay.html?paymentId=...)
+      if (q.paymentId) {
+        const url = `${PAY_PAGE}?paymentId=${encodeURIComponent(q.paymentId)}`;
+        log("다시 결제 이동", { url });
+        location.href = url;
+        return;
+      }
+
+      // paymentId가 없으면 로그인으로 보내서 다시 흐름 시작하게
+      log("paymentId가 없어 로그인으로 이동", { url: LOGIN_PAGE });
+      location.href = LOGIN_PAGE;
+    });
+
+    render();
+</script>
+</body>
+</html>

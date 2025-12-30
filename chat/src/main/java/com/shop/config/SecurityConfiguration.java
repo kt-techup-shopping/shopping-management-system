@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -27,11 +28,11 @@ public class SecurityConfiguration {
 	private final JwtFilter jwtFilter;
 
 	private static final String[] GET_PERMIT_ALL = {
+		"/index.html",
+		"/js/**", "/css/**", "/images/**", "/favicon.ico",
 		"/api/health/**", "/swagger-ui/**", "/v3/api-docs/**",
-		"/actuator/**",
 		"/products", "/products/*", "/cart/**",
 		"/reviews", "/reviews/user", "/reviews/single",
-		"/payments/toss/success"
 	};
 	private static final String[] POST_PERMIT_ALL = {
 		"/auth/login", "/auth/refresh",
@@ -44,12 +45,9 @@ public class SecurityConfiguration {
 	};
 	private static final String[] PATCH_PERMIT_ALL = {"/api/v1/public/**"};
 	private static final String[] DELETE_PERMIT_ALL = {"/api/v1/public/**"};
-	private static final String[] PAYMENT_TEST_PERMIT_ALL = {"/pay.html", "/login.html", "/payment-success.html",
-		"/payment-fail.html"};
 
 	@Bean
-	public com.shop.encoder.PasswordEncoder passwordEncoder() {
-		// 어댑터 패턴 -> 이미 구현 되어있는 것을 래핑하는 패턴
+	public PasswordEncoder passwordEncoder() {
 		return new PasswordEncoder() {
 			private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
@@ -78,14 +76,14 @@ public class SecurityConfiguration {
 			)
 			.authorizeHttpRequests(
 				request -> {
+					request.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll();
 					request.requestMatchers(HttpMethod.GET, GET_PERMIT_ALL).permitAll();
 					request.requestMatchers(HttpMethod.POST, POST_PERMIT_ALL).permitAll();
 					request.requestMatchers(HttpMethod.PATCH, PATCH_PERMIT_ALL).permitAll();
 					request.requestMatchers(HttpMethod.PUT, PUT_PERMIT_ALL).permitAll();
+					// WebSocket (SockJS 포함)
+                	request.requestMatchers("/ws-chat/**").permitAll();
 					request.requestMatchers(HttpMethod.DELETE, DELETE_PERMIT_ALL).permitAll();
-
-					// 간편 결제 테스트용
-					request.requestMatchers(PAYMENT_TEST_PERMIT_ALL).permitAll();
 
 					request.anyRequest().authenticated();
 				}

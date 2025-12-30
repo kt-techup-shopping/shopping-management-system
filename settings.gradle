@@ -11,4 +11,4 @@ include 'integration'
 include 'common'
 include 'auth'
 include 'admin'
-
+include 'chat'

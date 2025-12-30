@@ -9,9 +9,14 @@ import com.shop.ErrorCode;
 import com.shop.Preconditions;
 import com.shop.domain.payment.Payment;
 import com.shop.domain.payment.PaymentType;
+import com.shop.order.response.OrderCreatePaymentResponse;
+import com.shop.payment.response.PaymentConfirmResponse;
+import com.shop.payment.response.PaymentInfoResponse;
 import com.shop.payment.response.PaymentResponse;
+import com.shop.payment.vo.OrderId;
 import com.shop.repository.order.OrderRepository;
 import com.shop.repository.payment.PaymentRepository;
+import com.shop.toss.TossPaymentsClient;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,8 +26,9 @@ import lombok.RequiredArgsConstructor;
 public class PaymentService {
 	private final OrderRepository orderRepository;
 	private final PaymentRepository paymentRepository;
+	private final TossPaymentsClient tossPaymentsClient;
 
-	public void createPayment(Long orderId, PaymentType type) {
+	public OrderCreatePaymentResponse createPayment(Long orderId, PaymentType type) {
 		var order = orderRepository.findByIdOrThrow(orderId, ErrorCode.NOT_FOUND_ORDER);
 		Preconditions.validate(!order.isCompleted(), ErrorCode.ALREADY_PAID_ORDER);
 		Preconditions.validate(order.canRequestPayment(), ErrorCode.ALREADY_PENDING_ORDER);
@@ -43,6 +49,8 @@ public class PaymentService {
 		order.addPayment(payment);
 
 		paymentRepository.save(payment);
+
+		return OrderCreatePaymentResponse.from(payment);
 	}
 
 	public List<PaymentResponse> getPayment(Long orderId) {
@@ -53,6 +61,15 @@ public class PaymentService {
 			.stream()
 			.map(PaymentResponse::of)
 			.toList();
+	}
+
+	public PaymentInfoResponse getPaymentInfo(Long paymentId) {
+		var payment = paymentRepository.findByIdOrThrow(paymentId, ErrorCode.NOT_FOUND_PAYMENT);
+		var order = payment.getOrder();
+		var orderId = OrderId.generate(order.getId(), paymentId);
+		var orderName = order.generateOrderName();
+
+		return PaymentInfoResponse.of(orderId, payment.getFinalAmount(), orderName);
 	}
 
 	public void completePayment(Long paymentId) {
@@ -75,5 +92,37 @@ public class PaymentService {
 
 		payment.cancel();
 		order.resetToPending();
+	}
+
+	public PaymentConfirmResponse confirm(Long paymentId, String orderId, String paymentKey, Long amount) {
+		var payment = paymentRepository.findByIdOrThrow(paymentId, ErrorCode.NOT_FOUND_PAYMENT);
+		var order = payment.getOrder();
+
+		// 결제 상태 검증
+		Preconditions.validate(payment.isPending(), ErrorCode.INVALID_PAYMENT_STATUS);
+
+		// orderId 검증
+		var parsed = OrderId.parse(orderId);
+		Preconditions.validate(parsed.orderId().equals(order.getId()), ErrorCode.ORDER_PAYMENT_MISMATCH);
+		Preconditions.validate(parsed.paymentId().equals(paymentId), ErrorCode.ORDER_PAYMENT_MISMATCH);
+
+		// 결제 금액 검증
+		Preconditions.validate(payment.getFinalAmount().equals(amount), ErrorCode.INVALID_PAYMENT_AMOUNT);
+
+		var toss = tossPaymentsClient.confirm(paymentKey, orderId, amount);
+
+		// 토스 응답 확인
+		Preconditions.validate("DONE".equals(toss.status()), ErrorCode.INVALID_PAYMENT_STATUS);
+		Preconditions.validate(amount.equals(toss.totalAmount()), ErrorCode.INVALID_PAYMENT_AMOUNT);
+		Preconditions.validate(orderId.equals(toss.orderId()), ErrorCode.ORDER_PAYMENT_MISMATCH);
+
+		// 내부 완료 처리
+		// TODO: 개선 필요할지도?
+		payment.complete();
+		order.completePayment();
+
+		var orderName = order.generateOrderName();
+
+		return PaymentConfirmResponse.of(toss, orderName);
 	}
 }

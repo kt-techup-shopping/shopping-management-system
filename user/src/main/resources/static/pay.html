@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>결제하기</title>
+
+    <script src="https://js.tosspayments.com/v2/standard"></script>
+
+    <style>
+        body {
+          font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+          margin: 24px;
+          background: #f9fafb;
+        }
+
+        .card {
+          max-width: 720px;
+          margin: 0 auto;
+          border: 1px solid #e5e7eb;
+          border-radius: 12px;
+          padding: 16px;
+          background: #fff;
+        }
+
+        .muted { color: #6b7280; font-size: 14px; }
+        .gap { height: 10px; }
+        .row { display:flex; justify-content: space-between; gap: 12px; margin: 8px 0; }
+
+        button {
+          width: 100%;
+          padding: 12px 14px;
+          border-radius: 10px;
+          border: 0;
+          cursor: pointer;
+          font-size: 16px;
+        }
+
+        button:disabled { opacity: .5; cursor: not-allowed; }
+        .primary { background: #111827; color: #fff; }
+
+        pre {
+          white-space: pre-wrap;
+          word-break: break-word;
+          background: #f9fafb;
+          border: 1px solid #e5e7eb;
+          border-radius: 10px;
+          padding: 12px;
+          font-size: 12px;
+          max-height: 260px;
+          overflow-y: auto;
+        }
+
+        code { background:#f3f4f6; padding:2px 6px; border-radius:6px; }
+    </style>
+</head>
+
+<body>
+<div class="card">
+    <h2 style="margin:0 0 6px;">결제 페이지</h2>
+    <div class="muted" id="subtitle">결제 정보를 불러오는 중...</div>
+
+    <div class="gap"></div>
+
+    <div id="info" style="display:none;">
+        <div class="row"><span class="muted">주문명</span><span id="orderName"></span></div>
+        <div class="row"><span class="muted">주문 ID</span><span id="orderId"></span></div>
+        <div class="row"><span class="muted">결제 금액</span><span id="amount"></span></div>
+    </div>
+
+    <div class="gap"></div>
+
+    <div class="gap"></div>
+
+    <div id="payment-method"></div>
+    <div class="gap"></div>
+    <div id="agreement"></div>
+    <div class="gap"></div>
+
+    <button class="primary" id="payment-button" disabled>결제하기</button>
+
+    <div class="gap"></div>
+
+    <details open>
+        <summary class="muted">디버그 로그</summary>
+        <pre id="debug">(로그가 여기에 표시됩니다)</pre>
+    </details>
+
+    <div class="gap"></div>
+    <div class="muted">
+        토큰: <code>accessToken</code> / API: <code>/api/v1/payments/{paymentId}</code>
+    </div>
+</div>
+
+<script>
+    const TOSS_CLIENT_KEY = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
+    const CUSTOMER_KEY = "test_customer_key_000001";
+    const LOGIN_PAGE = "/api/v1/login.html";
+
+    const PAYMENT_INFO_API = (paymentId) => `/api/v1/payments/${paymentId}`;
+    const $ = (id) => document.getElementById(id);
+
+    const log = (msg, obj) => {
+      const el = $("debug");
+      const line =
+        `[${new Date().toISOString()}] ${msg}` +
+        (obj ? `\n${JSON.stringify(obj, null, 2)}` : "");
+
+      if (el.textContent === "(로그가 여기에 표시됩니다)") {
+        el.textContent = line;
+      } else {
+        el.textContent += "\n\n" + line;
+      }
+      el.scrollTop = el.scrollHeight;
+    };
+
+    function redirectToLogin(reason) {
+      log("로그인 필요 → 로그인 페이지로 이동", { reason });
+      location.href = LOGIN_PAGE;
+    }
+
+    function getPaymentId() {
+      const v = new URLSearchParams(location.search).get("paymentId");
+      const n = Number(v);
+      return Number.isFinite(n) ? n : null;
+    }
+
+    function getAccessToken() {
+      return localStorage.getItem("accessToken");
+    }
+
+    async function fetchPaymentInfo(paymentId) {
+      const token = getAccessToken();
+      if (!token) redirectToLogin("accessToken 없음");
+
+      const res = await fetch(PAYMENT_INFO_API(paymentId), {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Accept": "application/json"
+        }
+      });
+
+      if (res.status === 401 || res.status === 403) {
+        redirectToLogin(`HTTP ${res.status}`);
+        throw new Error("Unauthorized");
+      }
+
+      const text = await res.text();
+      const data = text ? JSON.parse(text) : null;
+
+      log("결제 정보 응답", { status: res.status, data });
+
+      if (!res.ok) throw new Error("결제 정보 조회 실패");
+
+      return data.data;
+    }
+
+    function formatMoney(v) {
+      return new Intl.NumberFormat("ko-KR").format(v) + "원";
+    }
+
+    function buildSuccessFailUrls(paymentId) {
+      const origin = location.origin;
+      return {
+        successUrl: `${origin}/api/v1/payment-success.html?paymentId=${paymentId}`,
+        failUrl: `${origin}/api/v1/payment-fail.html?paymentId=${paymentId}`
+      };
+    }
+
+    async function main() {
+      const paymentId = getPaymentId();
+      if (!paymentId) {
+        log("paymentId 누락", { href: location.href });
+        $("subtitle").textContent = "paymentId가 필요합니다.";
+        return;
+      }
+
+      const payment = await fetchPaymentInfo(paymentId);
+
+      $("info").style.display = "block";
+      $("orderId").textContent = payment.orderId;
+      $("orderName").textContent = payment.orderName;
+      $("amount").textContent = formatMoney(payment.amount);
+      $("subtitle").textContent = "결제 수단을 선택하세요.";
+
+      const tossPayments = TossPayments(TOSS_CLIENT_KEY);
+      const widgets = tossPayments.widgets({ customerKey: CUSTOMER_KEY });
+
+      await widgets.setAmount({ currency: "KRW", value: payment.amount });
+
+      await Promise.all([
+        widgets.renderPaymentMethods({ selector: "#payment-method", variantKey: "DEFAULT" }),
+        widgets.renderAgreement({ selector: "#agreement", variantKey: "AGREEMENT" })
+      ]);
+
+      $("payment-button").disabled = false;
+
+      $("payment-button").addEventListener("click", async () => {
+        const { successUrl, failUrl } = buildSuccessFailUrls(paymentId);
+        log("결제 요청", { successUrl, failUrl });
+
+        await widgets.requestPayment({
+          orderId: payment.orderId,
+          orderName: payment.orderName,
+          successUrl,
+          failUrl
+        });
+      });
+    }
+
+    main().catch(e => {
+      log("초기화 실패", { message: e.message, stack: e.stack });
+      $("subtitle").textContent = "초기화 실패 (로그 확인)";
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>결제 결과</title>
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f9fafb;
+      font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      color: #111827;
+      padding: 24px;
+    }
+    .container {
+      width: 100%;
+      max-width: 520px;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 18px;
+    }
+    h2 { margin: 0 0 8px; font-size: 20px; }
+    .muted { color: #6b7280; font-size: 13px; line-height: 1.45; }
+    .pill {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      background: #f3f4f6;
+      color: #374151;
+      margin: 10px 0 14px;
+    }
+    .list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      border-top: 1px solid #e5e7eb;
+    }
+    .item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 14px;
+    }
+    .label { color: #6b7280; }
+    .value { font-weight: 600; text-align: right; }
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    button {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      border: 0;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      background: #111827;
+      color: #fff;
+    }
+    button.secondary { background: #374151; }
+    button:disabled { opacity: .6; cursor: not-allowed; }
+    details { margin-top: 14px; }
+    pre {
+      margin-top: 10px;
+      padding: 12px;
+      font-size: 12px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      max-height: 260px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.4;
+    }
+    code { background:#f3f4f6; padding:2px 6px; border-radius:6px; }
+  </style>
+</head>
+
+<body>
+<div class="container">
+  <h2 id="title">결제 처리 중...</h2>
+  <div class="muted" id="subtitle">
+    서버에 결제 승인을 요청하고 있습니다. 잠시만 기다려주세요.
+  </div>
+  <div class="pill" id="badge">PROCESSING</div>
+
+  <ul class="list">
+    <li class="item"><span class="label">paymentId</span><span class="value" id="paymentId">(없음)</span></li>
+    <li class="item"><span class="label">주문명</span><span class="value" id="orderName">-</span></li>
+    <li class="item"><span class="label">주문번호</span><span class="value" id="orderId">-</span></li>
+    <li class="item"><span class="label">결제 금액</span><span class="value" id="amount">-</span></li>
+    <li class="item"><span class="label">결제 수단</span><span class="value" id="method">-</span></li>
+    <li class="item"><span class="label">승인 시각</span><span class="value" id="approvedAt">-</span></li>
+  </ul>
+
+  <div class="actions">
+    <button id="goHomeBtn" class="secondary" type="button">홈/목록</button>
+    <button id="retryBtn" type="button" disabled>다시 시도</button>
+  </div>
+
+  <div class="muted" style="margin-top:10px;">
+    토큰 키: <code>accessToken</code> (localStorage)
+  </div>
+
+  <details open>
+    <summary class="muted">디버그 로그</summary>
+    <pre id="debug">(로그가 여기에 표시됩니다)</pre>
+  </details>
+</div>
+
+<script>
+  // ✅ 필요하면 네 로그인 페이지 경로로 변경
+  const LOGIN_PAGE = "/api/v1/login.html";
+
+  // ✅ 실패 페이지 경로(네 프로젝트에 맞게)
+  const FAIL_PAGE = "/api/v1/payment-fail.html";
+
+  const $ = (id) => document.getElementById(id);
+
+  const log = (msg, obj) => {
+    const el = $("debug");
+    const line =
+      `[${new Date().toISOString()}] ${msg}` +
+      (obj ? `\n${JSON.stringify(obj, null, 2)}` : "");
+    if (el.textContent === "(로그가 여기에 표시됩니다)") el.textContent = line;
+    else el.textContent += "\n\n" + line;
+    el.scrollTop = el.scrollHeight;
+  };
+
+  const setStatusUI = (state, subtitle) => {
+    // state: PROCESSING | SUCCESS | FAIL
+    $("badge").textContent = state;
+    $("subtitle").textContent = subtitle || "";
+    if (state === "SUCCESS") {
+      $("badge").style.background = "#ecfdf5";
+      $("badge").style.color = "#065f46";
+    } else if (state === "FAIL") {
+      $("badge").style.background = "#fef2f2";
+      $("badge").style.color = "#991b1b";
+    } else {
+      $("badge").style.background = "#f3f4f6";
+      $("badge").style.color = "#374151";
+    }
+  };
+
+  function redirectToLogin(reason) {
+    log("로그인 필요 → 로그인 페이지로 이동", { reason });
+    const q = new URLSearchParams();
+    q.set("reason", reason || "UNAUTHORIZED");
+    // 돌아올 수 있게 현재 URL을 붙이고 싶으면:
+    // q.set("next", location.href);
+    location.href = `${LOGIN_PAGE}?${q.toString()}`;
+  }
+
+  function redirectToFail(message, code) {
+    const q = new URLSearchParams();
+    if (message) q.set("message", message);
+    if (code) q.set("code", code);
+    log("실패 페이지로 이동", { message, code, href: `${FAIL_PAGE}?${q.toString()}` });
+    location.href = `${FAIL_PAGE}?${q.toString()}`;
+  }
+
+  function getAccessToken() {
+    return localStorage.getItem("accessToken");
+  }
+
+  function formatMoney(amount) {
+    try { return new Intl.NumberFormat("ko-KR").format(amount) + "원"; }
+    catch { return String(amount); }
+  }
+
+  function safeText(v) {
+    return (v === null || v === undefined || v === "") ? "-" : String(v);
+  }
+
+  function parseQuery() {
+    const urlParams = new URLSearchParams(location.search);
+    return {
+      paymentId: urlParams.get("paymentId"),
+      paymentKey: urlParams.get("paymentKey"),
+      orderId: urlParams.get("orderId"),
+      amount: urlParams.get("amount"),
+    };
+  }
+
+  function requireParams(q) {
+    if (!q.paymentId || !q.paymentKey || !q.orderId || !q.amount) {
+      setStatusUI("FAIL", "필수 파라미터가 누락되었습니다.");
+      $("title").textContent = "결제 실패";
+      $("retryBtn").disabled = false;
+      redirectToFail("필수 파라미터 누락", "MISSING_QUERY_PARAM");
+      return false;
+    }
+    return true;
+  }
+
+  function renderFromConfirmResponse(confirmData) {
+    /**
+     * ✅ 서버 confirm 응답 DTO에 맞춰서 매핑하면 돼.
+     * 여기서는 흔한 케이스들을 방어적으로 처리:
+     * - ApiResult 형태: { data: {...} }
+     * - 직접 DTO: {...}
+     */
+    const data = confirmData?.data ?? confirmData ?? {};
+
+    $("orderName").textContent = safeText(data.orderName);
+    $("orderId").textContent = safeText(data.orderId);
+    $("amount").textContent = data.totalAmount != null ? formatMoney(Number(data.totalAmount)) : "-";
+
+    // 결제 수단/승인시각은 서버가 내려주면 표시
+    $("method").textContent = safeText(data.method);
+    $("approvedAt").textContent = safeText(data.approvedAt);
+
+    // 영수증 URL (있으면 링크)
+    const receiptUrl =
+      data.receiptUrl ??
+      data.receipt?.url ??
+      null;
+  }
+
+  async function confirmPayment() {
+    const q = parseQuery();
+    $("paymentId").textContent = safeText(q.paymentId);
+
+    if (!requireParams(q)) return;
+
+    const token = getAccessToken();
+    if (!token) {
+      $("title").textContent = "로그인이 필요합니다";
+      setStatusUI("FAIL", "토큰이 없습니다. 로그인 페이지로 이동합니다.");
+      $("retryBtn").disabled = false;
+      redirectToLogin("NO_ACCESS_TOKEN");
+      return;
+    }
+
+    $("title").textContent = "결제 처리 중...";
+    setStatusUI("PROCESSING", "서버에 결제 승인을 요청하는 중입니다.");
+
+    const requestBody = {
+      paymentKey: q.paymentKey,
+      orderId: q.orderId,
+      amount: Number(q.amount),
+    };
+
+    const url = `/api/v1/payments/${encodeURIComponent(q.paymentId)}/confirm`;
+
+    log("confirm 요청", { url, requestBody: { ...requestBody, paymentKey: "(hidden)" } });
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    // 401/403이면 로그인 페이지로
+    if (response.status === 401 || response.status === 403) {
+      $("title").textContent = "로그인이 필요합니다";
+      setStatusUI("FAIL", `인증이 만료되었습니다. (HTTP ${response.status}) 로그인 페이지로 이동합니다.`);
+      $("retryBtn").disabled = false;
+      log("인증 오류", { status: response.status });
+      redirectToLogin(`HTTP_${response.status}`);
+      return;
+    }
+
+    const text = await response.text();
+    let json = null;
+    try { json = text ? JSON.parse(text) : null; } catch { json = { raw: text }; }
+
+    log("confirm 응답", { status: response.status, json });
+
+    if (!response.ok) {
+      const message = json?.message ?? "결제 승인 실패";
+      const code = json?.code ?? `HTTP_${response.status}`;
+
+      $("title").textContent = "결제 실패";
+      setStatusUI("FAIL", message);
+      $("retryBtn").disabled = false;
+
+      redirectToFail(message, code);
+      return;
+    }
+
+    // ✅ 성공: 서버 응답 기반으로 화면 표시
+    $("title").textContent = "결제 완료";
+    setStatusUI("SUCCESS", "결제가 정상적으로 승인되었습니다.");
+    $("retryBtn").disabled = true;
+
+    renderFromConfirmResponse(json);
+  }
+
+  // 버튼들
+  $("goHomeBtn").addEventListener("click", () => {
+    // ✅ 네 프로젝트 홈/목록으로 변경
+    const url = "/api/v1/login.html";
+    log("홈/목록 이동", { url });
+    location.href = url;
+  });
+
+  $("retryBtn").addEventListener("click", () => {
+    log("다시 시도 클릭");
+    confirmPayment().catch((e) => {
+      log("재시도 중 에러", { message: e?.message, stack: e?.stack });
+      $("title").textContent = "결제 실패";
+      setStatusUI("FAIL", "네트워크 오류로 결제 승인 요청에 실패했습니다.");
+    });
+  });
+
+  // 실행
+  confirmPayment().catch((e) => {
+    log("confirmPayment 예외", { message: e?.message, stack: e?.stack });
+    $("title").textContent = "결제 실패";
+    setStatusUI("FAIL", "네트워크 오류로 결제 승인 요청에 실패했습니다.");
+    $("retryBtn").disabled = false;
+  });
+</script>
+</body>
+</html>

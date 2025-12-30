@@ -1,4 +1,7 @@
+
 spring:
+  application:
+    name: shopping-admin-api
   mvc:
     servlet:
       path: /api/v1
@@ -41,3 +44,19 @@ jwt:
 slack:
   bot-token: ${slack.token:1234}
   log-channel: ${slack.channel:1234}
+
+logstash:
+  host: ${logstash.host:localhost}
+  port: ${logstash.port:9601}
+
+management:
+  metrics:
+    tags:
+      application: ${spring.application.name}
+      namespace: ${spring.profiles.active}
+  server:
+    port: 9092
+  endpoints:
+    web:
+      exposure:
+        include: "health, prometheus"

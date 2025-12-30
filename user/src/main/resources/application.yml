@@ -1,4 +1,7 @@
+
 spring:
+  application:
+    name: shopping-user-api
   mvc:
     servlet:
       path: /api/v1
@@ -41,3 +44,24 @@ jwt:
 slack:
   bot-token: ${slack.token:1234}
   log-channel: ${slack.channel:1234}
+
+logstash:
+  host: ${logstash.host:localhost}
+  port: ${logstash.port:9601}
+
+management:
+  metrics:
+    tags:
+      application: ${spring.application.name}
+      namespace: ${spring.profiles.active}
+
+  server:
+    port: 9093
+  endpoints:
+    web:
+      exposure:
+        include: "health, prometheus"
+toss:
+  payments:
+    secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+    base-url: https://api.tosspayments.com

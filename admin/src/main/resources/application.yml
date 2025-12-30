@@ -1,4 +1,6 @@
 spring:
+  config:
+    import: classpath:integration.yml
   mvc:
     servlet:
       path: /api/v1

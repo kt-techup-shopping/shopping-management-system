@@ -117,6 +117,7 @@ subprojects {
 		testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 //		implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 		implementation 'io.micrometer:micrometer-registry-prometheus'
+		implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
 	}
 }
 

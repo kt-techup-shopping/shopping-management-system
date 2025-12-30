@@ -13,12 +13,14 @@ jobs:
 
     strategy:
       matrix:
-        target: [ admin, user ]
+        target: [ admin, user , chat ]
         include:
           - target: admin
             MODULE: admin
           - target: user
             MODULE: user
+          - target: chat
+            MODULE: chat
 
     steps:
       - uses: actions/checkout@v4

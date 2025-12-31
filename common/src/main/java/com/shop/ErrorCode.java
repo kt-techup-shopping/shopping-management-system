@@ -52,6 +52,13 @@ public enum ErrorCode {
 	INVALID_ORDER_ID(HttpStatus.BAD_REQUEST, "주문 정보가 일치하지 않습니다"),
 	ORDER_PAYMENT_MISMATCH(HttpStatus.BAD_REQUEST, "주문과 결제 정보가 일치하지 않습니다."),
 
+	// AI
+	INVALID_CHAT(HttpStatus.BAD_REQUEST, "입력 내용이 비어있습니다."),
+	EMPTY_CHAT_HISTORY(HttpStatus.BAD_REQUEST, "대화 내역이 존재하지 않습니다."),
+	NOT_FOUND_VECTOR_STORE(HttpStatus.BAD_REQUEST, "존재하지 않는 벡터스토어입니다."),
+	NOT_FOUND_FAQ(HttpStatus.BAD_REQUEST, "존재하지 않는 FAQ입니다."),
+	ERROR_VECTOR_SEARCH(HttpStatus.BAD_REQUEST, "벡터 서치에 오류가 발생했습니다."),
+
 	// Payment
 	NOT_FOUND_PAYMENT(HttpStatus.BAD_REQUEST, "해당 결제 내역이 존재하지 않습니다."),
 	INVALID_PAYMENT_STATUS(HttpStatus.BAD_REQUEST, "결제를 처리할 수 없습니다."),

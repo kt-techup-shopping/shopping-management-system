@@ -31,7 +31,7 @@ public class SecurityConfiguration {
 		"/actuator/**",
 		"/products", "/products/*", "/cart/**",
 		"/reviews", "/reviews/user", "/reviews/single",
-		"/payments/toss/success"
+		"/payments/toss/success", "/chats/**"
 	};
 	private static final String[] POST_PERMIT_ALL = {
 		"/auth/login", "/auth/refresh",

@@ -6,6 +6,10 @@ import org.redisson.config.Config;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import com.shop.profile.AppProfile;
 import com.shop.profile.DevProfile;
@@ -29,6 +33,19 @@ public class RedisConfiguration {
 	// 5초정도 줄까?
 	// 100개의 요청을처리하는데 100*5 = 500초가 걸릴수도?
 
+	@Bean
+	public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
+		RedisTemplate<String, Object> template = new RedisTemplate<>();
+		template.setConnectionFactory(connectionFactory);
+
+		// Key는 문자열로 저장
+		template.setKeySerializer(new StringRedisSerializer());
+
+		// Value는 자바 객체 그대로 저장 (Serializable 필수)
+		template.setValueSerializer(new JdkSerializationRedisSerializer());
+
+		return template;
+	}
 	// TODO 배포 시 반영
 	@Bean
 	@DevProfile

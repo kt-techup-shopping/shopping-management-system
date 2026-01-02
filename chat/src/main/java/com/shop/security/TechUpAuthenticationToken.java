@@ -1,11 +1,13 @@
 package com.shop.security;
 
+import java.io.Serializable;
 import java.util.Collection;
 
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 
-public class TechUpAuthenticationToken extends AbstractAuthenticationToken {
+public class TechUpAuthenticationToken extends AbstractAuthenticationToken implements Serializable {
+	private static final long serialVersionUID = 1L;
 	private final DefaultCurrentUser defaultCurrentUser;
 
 	public TechUpAuthenticationToken(DefaultCurrentUser defaultCurrentUser,

@@ -77,7 +77,7 @@ public class OpenAICustomAdvisor implements BaseAdvisor {
 				topScoreSearchData.score());
 			systemMessage = "사용자의 질문에 대한 정확한 정보를 찾을 수 없습니다. '사용자의 질문에 대한 정확한 정보를 찾을 수 없습니다.'라고 답변해주세요.";
 		} else {
-			systemMessage = String.format("다음 정보를 바탕으로 사용자의 질문에 답변해주세요: %s", topScoreSearchData.content().toString());
+			systemMessage = topScoreSearchData.content().toString();
 		}
 
 		var newPrompt = prompt.augmentSystemMessage(systemMessage);

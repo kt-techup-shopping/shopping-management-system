@@ -54,9 +54,11 @@ public enum ErrorCode {
 
 	// Payment
 	NOT_FOUND_PAYMENT(HttpStatus.BAD_REQUEST, "해당 결제 내역이 존재하지 않습니다."),
+	ALREADY_PROCESSING_PAYMENT(HttpStatus.BAD_REQUEST, "이미 결제가 진행 중입니다."),
 	INVALID_PAYMENT_STATUS(HttpStatus.BAD_REQUEST, "결제를 처리할 수 없습니다."),
 	REQUIRED_ORDER_FOR_PAYMENT(HttpStatus.BAD_REQUEST, "주문 정보가 필요합니다."),
 	INVALID_PAYMENT_AMOUNT(HttpStatus.BAD_REQUEST, "결제 금액이 일치하지 않습니다."),
+	FAILED_PAYMENT(HttpStatus.BAD_REQUEST, "결제에 실패했습니다"),
 	;
 
 	private final HttpStatus status;

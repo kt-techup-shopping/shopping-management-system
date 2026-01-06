@@ -21,12 +21,11 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
     SELECT c FROM Chat c
     WHERE c.roomId = :roomId
       AND (c.createdAt < :createdAt)
-    ORDER BY c.createdAt DESC, c.id DESC
+    ORDER BY c.createdAt DESC
 """)
 	List<Chat> findChatsByCursor(
 		@Param("roomId") Long roomId,
 		@Param("createdAt") LocalDateTime createdAt,
-		@Param("id") UUID id,
 		Pageable pageable
 	);
 

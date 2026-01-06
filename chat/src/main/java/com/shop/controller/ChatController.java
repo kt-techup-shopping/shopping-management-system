@@ -18,9 +18,12 @@ import com.shop.security.DefaultCurrentUser;
 import com.shop.security.TechUpAuthenticationToken;
 import com.shop.service.ChatService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+@Tag(name = "채팅", description = "채팅 API")
 @Slf4j
 @Controller // WebSocket 메시지는 @Controller에서 처리
 @RequiredArgsConstructor
@@ -41,14 +44,14 @@ public class ChatController {
 		chatService.sendMessage(user.getLoginId(), request);
 	}
 
+	@Operation(summary = "채팅 내역 조회", description = "채팅 내역을 조회하는 API")
 	@ResponseBody
 	@GetMapping("/chats/rooms/{roomId}")
 	public ApiResult<List<ChatResponse>> getChats(
 		@PathVariable Long roomId,
-		@RequestParam(required = false) LocalDateTime lastCreatedAt,
-		@RequestParam(required = false) UUID lastChatId
+		@RequestParam(required = false) LocalDateTime lastCreatedAt
 	) {
-		return ApiResult.ok(chatService.getChats(roomId, lastCreatedAt, lastChatId));
+		return ApiResult.ok(chatService.getChats(roomId, lastCreatedAt));
 	}
 
 }

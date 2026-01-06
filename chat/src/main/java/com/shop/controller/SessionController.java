@@ -7,16 +7,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.shop.security.TechUpAuthenticationToken;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "세션", description = "세션 조회 API")
 @RestController
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
-public class TestController {
+public class SessionController {
 
 	private final RedisTemplate<String, Object> redisTemplate;
 
-	// 호출 url: /api/test/redis/sessions
+	@Operation(summary = "전체 세션 조회", description = "현재 사용중인 전체 세션을 조회하는 API")
 	@GetMapping("/api/test/redis/sessions")
 	public java.util.List<String> getWebsocketSessions() {
 		// 일단 모든 키를 다 가져옴

@@ -64,7 +64,7 @@ public class StompHandler implements ChannelInterceptor {
 				// 현재 요청에도 인증 정보 심어주기
 				accessor.setUser(auth);
 
-				System.out.println(">>> CONNECT: Redis에 사용자 저장 완료 (Key=" + redisKey + ")");
+				log.info("CONNECT: Redis에 사용자 저장 완료 (Key= {} )", redisKey);
 
 				// 재조립해서 리턴
 				return MessageBuilder.createMessage(message.getPayload(), accessor.getMessageHeaders());
@@ -100,7 +100,7 @@ public class StompHandler implements ChannelInterceptor {
 		if (StompCommand.DISCONNECT.equals(command)) {
 			String redisKey = SESSION_KEY_PREFIX + sessionId;
 			redisTemplate.delete(redisKey);
-			System.out.println(">>> DISCONNECT: Redis 데이터 삭제 완료");
+			log.info("DISCONNECT: Redis 데이터 삭제 완료(Key= {} )", redisKey);
 		}
 
 		return message;

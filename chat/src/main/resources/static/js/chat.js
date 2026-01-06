@@ -2,7 +2,6 @@ let stompClient = null;
 
 // ===== cursor & paging 상태 =====
 let lastCreatedAt = null;
-let lastChatId = null;
 let isLoading = false;
 let hasMore = true;
 
@@ -10,8 +9,8 @@ let hasMore = true;
 let loadTriggerTop = null;
 
 // ===== API BASE =====
-const API_BASE = "http://kt-techup-1-chat-env.eba-thmzphdi.ap-northeast-2.elasticbeanstalk.com";
-// const API_BASE = "http://localhost:8080";
+// const API_BASE = "http://kt-techup-1-chat-env.eba-thmzphdi.ap-northeast-2.elasticbeanstalk.com";
+const API_BASE = "http://localhost:8080";
 
 
 // ==========================
@@ -90,8 +89,8 @@ function loadPreviousChats(roomId, isFirst = false) {
     isLoading = true;
 
     let url = `${API_BASE}/api/v1/chats/rooms/${roomId}`;
-    if (!isFirst && lastCreatedAt && lastChatId) {
-        url += `?lastCreatedAt=${encodeURIComponent(lastCreatedAt)}&lastChatId=${lastChatId}`;
+    if (!isFirst && lastCreatedAt) {
+        url += `?lastCreatedAt=${encodeURIComponent(lastCreatedAt)}`;
     }
 
     fetch(url)
@@ -119,7 +118,6 @@ function loadPreviousChats(roomId, isFirst = false) {
             // 커서는 "가장 오래된 메시지"
             const oldest = chats[chats.length - 1];
             lastCreatedAt = oldest.createdAt;
-            lastChatId = oldest.chatId;
 
             // 🔥 다음 로딩 기준선 재설정
             loadTriggerTop = chatBox.scrollHeight * 0.4;
@@ -203,7 +201,6 @@ document.getElementById('chat-box').addEventListener('scroll', function () {
 function resetChatState() {
     document.getElementById('chat-box').innerHTML = '';
     lastCreatedAt = null;
-    lastChatId = null;
     isLoading = false;
     hasMore = true;
     loadTriggerTop = null;

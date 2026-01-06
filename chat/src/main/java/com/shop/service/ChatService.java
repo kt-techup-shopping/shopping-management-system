@@ -32,8 +32,7 @@ public class ChatService {
 	@Transactional
 	public List<ChatResponse> getChats(
 		Long roomId,
-		LocalDateTime lastCreatedAt,
-		UUID lastChatId
+		LocalDateTime lastCreatedAt
 	) {
 
 		Pageable pageable = PageRequest.of(0, PAGE_SIZE);
@@ -41,7 +40,7 @@ public class ChatService {
 		List<Chat> chats;
 
 		// 최초 진입
-		if (lastCreatedAt == null || lastChatId == null) {
+		if (lastCreatedAt == null) {
 			chats = chatRepository
 				.findTop20ByRoomIdOrderByCreatedAtDesc(roomId);
 		}
@@ -50,7 +49,6 @@ public class ChatService {
 			chats = chatRepository.findChatsByCursor(
 				roomId,
 				lastCreatedAt,
-				lastChatId,
 				pageable
 			);
 		}

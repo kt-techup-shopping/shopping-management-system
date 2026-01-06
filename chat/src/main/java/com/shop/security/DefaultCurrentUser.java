@@ -1,5 +1,6 @@
 package com.shop.security;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
@@ -16,7 +17,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class DefaultCurrentUser implements UserDetails, CurrentUser {
+public class DefaultCurrentUser implements UserDetails, CurrentUser, Serializable {
+	private static final long serialVersionUID = 1L;
 	//jwt파싱해서 넣어주면 될 것 같음
 	private Long id;
 	private String loginId;

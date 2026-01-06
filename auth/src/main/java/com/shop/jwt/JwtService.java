@@ -65,6 +65,18 @@ public class JwtService {
 		return Long.valueOf(id);
 	}
 
+	public String parseName(String token) {
+		var id = Jwts
+			.parser()
+			.verifyWith(jwtProperties.getSecret())
+			.build()
+			.parseSignedClaims(token)
+			.getPayload()
+			.get("loginId", String.class);
+
+		return id;
+	}
+
 	public Role parseRole(String token) {
 		String role = Jwts
 			.parser()

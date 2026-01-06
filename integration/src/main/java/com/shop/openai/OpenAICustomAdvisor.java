@@ -75,9 +75,16 @@ public class OpenAICustomAdvisor implements BaseAdvisor {
 			|| topScoreSearchData.content().toString().isEmpty()) {
 			log.info("Low confidence score ({}) or empty content. Returning unknown information message.",
 				topScoreSearchData.score());
-			systemMessage = "사용자의 질문에 대한 정확한 정보를 찾을 수 없습니다. '사용자의 질문에 대한 정확한 정보를 찾을 수 없습니다.'라고 답변해주세요.";
+			systemMessage = """
+				사용자의 질문에 대한 정확한 정보를 찾을 수 없습니다.
+				반드시 이 메시지만 응답하고, 추가적인 추측이나 일반적인 정보를 제공하지 마세요.
+				""";
 		} else {
-			systemMessage = topScoreSearchData.content().toString();
+			// 검색된 내용을 더 명확하게 지시
+			systemMessage = String.format("""
+				다음 정보만을 바탕으로 정확하게 답변하세요. 이 정보 외의 추가적인 추측이나 일반적인 정보를 제공하지 마세요.
+				검색된 정보:%s
+				""", topScoreSearchData.content().toString());
 		}
 
 		var newPrompt = prompt.augmentSystemMessage(systemMessage);

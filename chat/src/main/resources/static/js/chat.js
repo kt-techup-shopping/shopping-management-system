@@ -9,8 +9,8 @@ let hasMore = true;
 let loadTriggerTop = null;
 
 // ===== API BASE =====
-// const API_BASE = "http://kt-techup-1-chat-env.eba-thmzphdi.ap-northeast-2.elasticbeanstalk.com";
-const API_BASE = "http://localhost:8080";
+const API_BASE = "http://kt-techup-1-chat-env.eba-thmzphdi.ap-northeast-2.elasticbeanstalk.com";
+// const API_BASE = "http://localhost:8080";
 
 
 // ==========================

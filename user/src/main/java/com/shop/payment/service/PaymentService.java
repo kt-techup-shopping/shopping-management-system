@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.shop.CustomException;
 import com.shop.ErrorCode;
 import com.shop.Preconditions;
 import com.shop.domain.payment.Payment;
@@ -109,20 +110,28 @@ public class PaymentService {
 		// 결제 금액 검증
 		Preconditions.validate(payment.getFinalAmount().equals(amount), ErrorCode.INVALID_PAYMENT_AMOUNT);
 
-		var toss = tossPaymentsClient.confirm(paymentKey, orderId, amount);
+		// 결제 진행 검증
+		int updated = paymentRepository.markProcessingIfPending(paymentId);
+		Preconditions.validate(updated == 1, ErrorCode.ALREADY_PROCESSING_PAYMENT);
 
-		// 토스 응답 확인
-		Preconditions.validate("DONE".equals(toss.status()), ErrorCode.INVALID_PAYMENT_STATUS);
-		Preconditions.validate(amount.equals(toss.totalAmount()), ErrorCode.INVALID_PAYMENT_AMOUNT);
-		Preconditions.validate(orderId.equals(toss.orderId()), ErrorCode.ORDER_PAYMENT_MISMATCH);
+		try {
+			var toss = tossPaymentsClient.confirm(paymentKey, orderId, amount);
 
-		// 내부 완료 처리
-		// TODO: 개선 필요할지도?
-		payment.complete();
-		order.completePayment();
+			// 토스 응답 확인
+			Preconditions.validate("DONE".equals(toss.status()), ErrorCode.INVALID_PAYMENT_STATUS);
+			Preconditions.validate(amount.equals(toss.totalAmount()), ErrorCode.INVALID_PAYMENT_AMOUNT);
+			Preconditions.validate(orderId.equals(toss.orderId()), ErrorCode.ORDER_PAYMENT_MISMATCH);
 
-		var orderName = order.generateOrderName();
+			// 내부 완료 처리
+			payment.complete();
+			order.completePayment();
 
-		return PaymentConfirmResponse.of(toss, orderName);
+			var orderName = order.generateOrderName();
+
+			return PaymentConfirmResponse.of(toss, orderName);
+		} catch (RuntimeException e) {
+			payment.fail();
+			throw new CustomException(ErrorCode.FAILED_PAYMENT);
+		}
 	}
 }

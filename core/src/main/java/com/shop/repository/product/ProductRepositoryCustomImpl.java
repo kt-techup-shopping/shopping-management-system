@@ -1,7 +1,9 @@
 package com.shop.repository.product;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.domain.Page;
@@ -28,16 +30,18 @@ import com.shop.domain.product.ProductSort;
 import com.shop.domain.product.ProductStatus;
 import com.shop.domain.product.QProduct;
 import com.shop.repository.category.CategoryRepository;
+import com.shop.repository.discount.DiscountRepository;
+import com.shop.repository.discount.response.LatestDiscountQueryResponse;
 import com.shop.repository.product.response.AdminProductDetailQueryResponse;
 import com.shop.repository.product.response.AdminProductSearchQueryResponse;
 import com.shop.repository.product.response.AdminProductStockQueryResponse;
+import com.shop.repository.product.response.ProductBaseQueryResponse;
 import com.shop.repository.product.response.ProductDetailQueryResponse;
 import com.shop.repository.product.response.ProductSearchQueryResponse;
 import com.shop.repository.product.response.QAdminProductDetailQueryResponse;
-import com.shop.repository.product.response.QAdminProductSearchQueryResponse;
 import com.shop.repository.product.response.QAdminProductStockQueryResponse;
+import com.shop.repository.product.response.QProductBaseQueryResponse;
 import com.shop.repository.product.response.QProductDetailQueryResponse;
-import com.shop.repository.product.response.QProductSearchQueryResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -51,32 +55,55 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 	private final QDiscount discount = QDiscount.discount;
 	private final QOrderProduct orderProduct = QOrderProduct.orderProduct;
 	private final QOrder order = QOrder.order;
+	private final DiscountRepository discountRepository;
 
 	// 사용자 상품 목록 조회 (검색/카테고리/판매중/정렬 조건 적용)
+	// @Override
+	// public Page<ProductSearchQueryResponse> getSearchList(
+	// 	String keyword,
+	// 	Long categoryId,
+	// 	Boolean activeOnly,
+	// 	ProductSort sort,
+	// 	PageRequest pageable
+	// ) {
+	// 	return searchProducts(
+	// 		keyword,
+	// 		categoryId,
+	// 		activeOnly,
+	// 		sort,
+	// 		pageable,
+	// 		new QProductSearchQueryResponse(
+	// 			product.id,
+	// 			product.name,
+	// 			product.price,
+	// 			product.status,
+	// 			discount.value,
+	// 			discount.type,
+	// 			discountedPriceExpression()
+	// 		),
+	// 		true
+	// 	);
+	// }
 	@Override
 	public Page<ProductSearchQueryResponse> getSearchList(
-		String keyword,
-		Long categoryId,
-		Boolean activeOnly,
-		ProductSort sort,
-		PageRequest pageable
+		String keyword, Long categoryId, Boolean activeOnly, ProductSort sort, PageRequest pageable
 	) {
-		return searchProducts(
-			keyword,
-			categoryId,
-			activeOnly,
-			sort,
-			pageable,
-			new QProductSearchQueryResponse(
-				product.id,
-				product.name,
-				product.price,
-				product.status,
-				discount.value,
-				discount.type,
-				discountedPriceExpression()
-			),
-			true
+		return searchProductsV2(keyword, categoryId, activeOnly, sort, pageable, true,
+			(p, d) -> {
+				Long discountValue = d == null ? null : d.value();
+				DiscountType discountType = d == null ? null : d.type();
+				long discountedPrice = calculateDiscountedPrice(p.price(), discountType, discountValue);
+
+				return new ProductSearchQueryResponse(
+					p.id(),
+					p.name(),
+					p.price(),
+					p.status(),
+					discountValue,
+					discountType,
+					discountedPrice
+				);
+			}
 		);
 	}
 
@@ -101,31 +128,54 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 	}
 
 	// 관리자 상품 목록 조회 (검색/카테고리/판매중/정렬 조건 적용, 재고 포함)
+	// @Override
+	// public Page<AdminProductSearchQueryResponse> getAdminSearchList(
+	// 	String keyword,
+	// 	Long categoryId,
+	// 	Boolean activeOnly,
+	// 	ProductSort sort,
+	// 	PageRequest pageable
+	// ) {
+	// 	return searchProducts(
+	// 		keyword,
+	// 		categoryId,
+	// 		activeOnly,
+	// 		sort,
+	// 		pageable,
+	// 		new QAdminProductSearchQueryResponse(
+	// 			product.id,
+	// 			product.name,
+	// 			product.price,
+	// 			product.stock,
+	// 			product.status,
+	// 			discount.value,
+	// 			discount.type,
+	// 			discountedPriceExpression()
+	// 		),
+	// 		false
+	// 	);
+	// }
 	@Override
 	public Page<AdminProductSearchQueryResponse> getAdminSearchList(
-		String keyword,
-		Long categoryId,
-		Boolean activeOnly,
-		ProductSort sort,
-		PageRequest pageable
+		String keyword, Long categoryId, Boolean activeOnly, ProductSort sort, PageRequest pageable
 	) {
-		return searchProducts(
-			keyword,
-			categoryId,
-			activeOnly,
-			sort,
-			pageable,
-			new QAdminProductSearchQueryResponse(
-				product.id,
-				product.name,
-				product.price,
-				product.stock,
-				product.status,
-				discount.value,
-				discount.type,
-				discountedPriceExpression()
-			),
-			false
+		return searchProductsV2(keyword, categoryId, activeOnly, sort, pageable, false,
+			(p, d) -> {
+				Long discountValue = d == null ? null : d.value();
+				DiscountType discountType = d == null ? null : d.type();
+				long discountedPrice = calculateDiscountedPrice(p.price(), discountType, discountValue);
+
+				return new AdminProductSearchQueryResponse(
+					p.id(),
+					p.name(),
+					p.price(),
+					p.stock(),
+					p.status(),
+					discountValue,
+					discountType,
+					discountedPrice
+				);
+			}
 		);
 	}
 
@@ -155,16 +205,16 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 	public Page<AdminProductStockQueryResponse> getStockList(String keyword, PageRequest pageable) {
 		var reservedStock = reservedStockExpression();
 		BooleanBuilder builder = new BooleanBuilder();
-		builder.and(stockKeywordFilter(keyword)); 					// 숫자면 상품 ID, 아니면 상품명 검색
-		builder.and(filterDeleted(false)); 							// 삭제된 상품 포함
+		builder.and(stockKeywordFilter(keyword));                    // 숫자면 상품 ID, 아니면 상품명 검색
+		builder.and(filterDeleted(false));                            // 삭제된 상품 포함
 
 		var content = jpaQueryFactory
 			.select(new QAdminProductStockQueryResponse(
 				product.id,
 				product.name,
-				product.stock.subtract(reservedStock), 				// 사용 가능한 재고 = 전체 재고 - 예약된 재고
-				reservedStock, 										// 예약된 재고 (주문 상태 PENDING 또는 COMPLETED)
-				product.stock 										// 전체 재고 = 사용 가능한 재고 + 예약된 재고
+				product.stock.subtract(reservedStock),                // 사용 가능한 재고 = 전체 재고 - 예약된 재고
+				reservedStock,                                        // 예약된 재고 (주문 상태 PENDING 또는 COMPLETED)
+				product.stock                                        // 전체 재고 = 사용 가능한 재고 + 예약된 재고
 			))
 			.from(product)
 			.where(builder)
@@ -173,6 +223,44 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 			.limit(pageable.getPageSize())
 			.fetch();
 
+		Long total = jpaQueryFactory
+			.select(product.id.count())
+			.from(product)
+			.where(builder)
+			.fetchOne();
+
+		return new PageImpl<>(content, pageable, total != null ? total : 0L);
+	}
+
+	private <T> Page<T> searchProductsV2(
+		String keyword,
+		Long categoryId,
+		Boolean activeOnly,
+		ProductSort sort,
+		PageRequest pageable,
+		boolean filterDeleted,
+		java.util.function.BiFunction<ProductBaseQueryResponse, LatestDiscountQueryResponse, T> mapper
+	) {
+		var builder = new BooleanBuilder();
+		builder.and(filterActive(activeOnly));
+		builder.and(containsProductName(keyword));
+		builder.and(categoryIn(categoryId));
+		builder.and(filterDeleted(filterDeleted));
+
+		// 1) product base rows
+		var baseRows = fetchProductBaseQuery(builder, sort, pageable);
+		var ids = baseRows.stream().map(ProductBaseQueryResponse::id).toList();
+
+		// 2) latest discounts in batch
+		var discountMap = toDiscountMap(discountRepository.fetchLatestDiscountsByProductIds(ids));
+
+		// 3) map to T
+		var content = new ArrayList<T>(baseRows.size());
+		for (var r : baseRows) {
+			content.add(mapper.apply(r, discountMap.get(r.id())));
+		}
+
+		// 4) count
 		Long total = jpaQueryFactory
 			.select(product.id.count())
 			.from(product)
@@ -342,6 +430,43 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
 		return keyword.chars().allMatch(Character::isDigit)
 			? product.id.eq(Long.valueOf(keyword))
 			: product.name.containsIgnoreCase(keyword);
+	}
+
+	private List<ProductBaseQueryResponse> fetchProductBaseQuery(BooleanBuilder builder, ProductSort sort,
+		PageRequest pageable) {
+		return jpaQueryFactory
+			.select(new QProductBaseQueryResponse(
+				product.id,
+				product.name,
+				product.price,
+				product.stock,
+				product.status
+			))
+			.from(product)
+			.where(builder)
+			.orderBy(resolveSort(sort))
+			.offset(pageable.getOffset())
+			.limit(pageable.getPageSize())
+			.fetch();
+	}
+
+	private Map<Long, LatestDiscountQueryResponse> toDiscountMap(List<LatestDiscountQueryResponse> rows) {
+		var map = new HashMap<Long, LatestDiscountQueryResponse>();
+		for (var r : rows)
+			map.put(r.productId(), r);
+		return map;
+	}
+
+	private long calculateDiscountedPrice(Long price, DiscountType type, Long value) {
+		if (price == null)
+			return 0L;
+		if (type == null || value == null)
+			return price;
+
+		return switch (type) {
+			case PERCENT -> price - (price * value / 100);
+			case FIXED -> price - value;
+		};
 	}
 
 }

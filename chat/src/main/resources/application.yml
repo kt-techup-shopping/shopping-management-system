@@ -39,12 +39,14 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer    # 문자열 형태로 메시지 키 값 직렬화
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer  # 문자열 형태로 메시지 값 직렬화
       properties:
+        linger.bs: 0
         spring.json.trusted.packages: "*"
     consumer:
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer      # 문자열 형태로 메시지 키 값 역직렬화
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer    # 문자열 형태로 메시지 값 역직렬화
       properties:
+        fetch.min.bytes: 1
         spring.json.trusted.packages: "*"
 
 # Spring Kafka Logging

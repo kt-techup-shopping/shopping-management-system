@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 @Configuration
 @EnableWebSocketMessageBroker
 @RequiredArgsConstructor
-public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer {
 
 	private final StompHandler stompHandler; // 주입 받기
 

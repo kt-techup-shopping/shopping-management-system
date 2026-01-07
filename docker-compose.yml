@@ -4,6 +4,7 @@ services:
     container_name: techup-mysql
     environment:
       MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: shopping
     ports:
       - "3306:3306"
     platform: linux/arm64
@@ -17,11 +18,15 @@ services:
 
   local-prometheus:
     image: prom/prometheus:latest
-    container_name: my-prometheus-container
     ports:
       - "9091:9090"
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --web.enable-remote-write-receiver
+      - --enable-feature=native-histograms
+
   local-grafana:
     image: grafana/grafana:latest
     container_name: my-grafana-container
@@ -77,13 +82,20 @@ services:
       - ./elk/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
     networks:
       - elk
+  k6:
+    image: grafana/k6:latest
+    volumes:
+      - ./k6:/scripts
+    command: >
+      run --tag testid=local
+      -o experimental-prometheus-rw
+      /scripts/k6-test.js
+    environment:
+      - K6_PROMETHEUS_RW_SERVER_URL=http://local-prometheus:9090/api/v1/write
+      - K6_PROMETHEUS_RW_TREND_AS_NATIVE_HISTOGRAM=true
+    depends_on:
+      - local-prometheus
 
-networks:
-  elk:
-    driver: bridge
-
-volumes:
-  es-data:
   kafka:
     image: confluentinc/cp-kafka:latest
     ports:
@@ -104,9 +116,16 @@ volumes:
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     ports:
-      - "8001:8001"
+      - "8001:8080"
     environment:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
     depends_on:
       - kafka
+
+networks:
+  elk:
+    driver: bridge
+
+volumes:
+  es-data:

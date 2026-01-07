@@ -1,30 +1,57 @@
 package com.shop.controller;
 
-import org.springframework.kafka.core.KafkaTemplate;
+import java.security.Principal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.shop.request.ChatMessage;
+import com.shop.ApiResult;
+import com.shop.request.ChatRequest;
+import com.shop.response.ChatResponse;
+import com.shop.security.DefaultCurrentUser;
+import com.shop.security.TechUpAuthenticationToken;
+import com.shop.service.ChatService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+@Tag(name = "채팅", description = "채팅 API")
 @Slf4j
-@Controller // WebSocket 메시지는 @Controller에서 처리합니다.
+@Controller // WebSocket 메시지는 @Controller에서 처리
+@RequiredArgsConstructor
 public class ChatController {
 
-	private final KafkaTemplate<String, ChatMessage> kafkaTemplate;
-	private final String topicName = "chat-topic1"; // 채팅용 토픽
+	private final ChatService chatService;
 
-	public ChatController(KafkaTemplate<String, ChatMessage> kafkaTemplate) {
-		this.kafkaTemplate = kafkaTemplate;
-	}
-
-	// 클라이언트가 /pub/chat/message로 메시지를 보내면 호출됨
 	@MessageMapping("/chat/message")
-	public void sendMessage(ChatMessage message) {
-		log.info("클라이언트로부터 메시지 수신: {}", message);
-		// 수신된 메시지를 Kafka 토픽으로 발행
-		kafkaTemplate.send(topicName, message.getRoomId(), message);
-		log.info("클라이언트로부터 메시지 수신 완료: {}", message);
+	public void sendMessage(Principal principal, ChatRequest request) {
+
+		// 형변환
+		TechUpAuthenticationToken token = (TechUpAuthenticationToken) principal;
+
+		// getPrincipal()이 DefaultCurrentUser를 반환하도록 만드셨으니 바로 꺼내서 사용
+		DefaultCurrentUser user = (DefaultCurrentUser) token.getPrincipal();
+
+		log.info("채팅 메시지 수신: {}", request);
+		chatService.sendMessage(user.getLoginId(), request);
 	}
+
+	@Operation(summary = "채팅 내역 조회", description = "채팅 내역을 조회하는 API")
+	@ResponseBody
+	@GetMapping("/chats/rooms/{roomId}")
+	public ApiResult<List<ChatResponse>> getChats(
+		@PathVariable Long roomId,
+		@RequestParam(required = false) LocalDateTime lastCreatedAt
+	) {
+		return ApiResult.ok(chatService.getChats(roomId, lastCreatedAt));
+	}
+
 }

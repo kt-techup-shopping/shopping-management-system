@@ -1,7 +1,8 @@
-
 spring:
   application:
     name: shopping-admin-api
+  config:
+    import: classpath:integration.yml
   mvc:
     servlet:
       path: /api/v1
@@ -46,8 +47,8 @@ slack:
   log-channel: ${slack.channel:1234}
 
 logstash:
-  host: ${logstash.host:localhost}
-  port: ${logstash.port:9601}
+  host: ${LOGSTASH_HOST:localhost}
+  port: ${LOGSTASH_PORT:9601}
 
 management:
   metrics:
